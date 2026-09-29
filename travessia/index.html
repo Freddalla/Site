@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Travessia Norte</title>
+<meta name="description" content="Uma jornada de 30 dias para quem sente que tem potencial, mas está vivendo no automático. Clareza, movimento e direção. Turma fundadora com 15 vagas.">
+<meta property="og:title" content="Travessia Norte — Você não está perdido. Está adiando.">
+<meta property="og:description" content="30 dias de clareza, corpo em movimento e conversas reais. Faça o Diagnóstico de Deriva e entre na lista da turma fundadora.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0e1c20">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: uma carta náutica noturna. Seções como trechos de rota, marcadas por rumo (000°, 090°...), texto à esquerda, respiro à direita. */
+:root{
+  --bg:#0e1c20;          /* mar à noite */
+  --bg-2:#132629;        /* água mais funda */
+  --line:#24403f;        /* linhas de carta */
+  --fg:#e8e3d6;          /* osso / papel de carta */
+  --muted:#93a5a2;       /* névoa */
+  --accent:#d9b36a;      /* luz de farol, o Norte */
+  --accent-ink:#1a1408;
+  --tide:#6fa8a4;        /* maré */
+  --danger:#e08a6e;
+  --display:'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+  --body:'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono:'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --gutter:clamp(16px, 5vw, 64px);
+  --max:1160px;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#ecefeb; --bg-2:#e1e6e2; --line:#c3cfcb; --fg:#10262a; --muted:#51625f;
+    --accent:#8a5f12; --accent-ink:#fbf6ea; --tide:#2f6d69; --danger:#a24a2c; color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#ecefeb; --bg-2:#e1e6e2; --line:#c3cfcb; --fg:#10262a; --muted:#51625f;
+  --accent:#8a5f12; --accent-ink:#fbf6ea; --tide:#2f6d69; --danger:#a24a2c; color-scheme:light;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.65;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+img,svg,canvas{max-width:100%;display:block}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+.wrap{max-width:var(--max);margin-inline:auto;padding-inline:var(--gutter)}
+h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.05;text-wrap:balance;letter-spacing:-.01em}
+h2{font-size:clamp(2.3rem,5.4vw,4rem)}
+h3{font-size:clamp(1.5rem,2.6vw,1.9rem)}
+em{font-style:italic;color:var(--accent)}
+p{max-width:62ch}
+.mono{font-family:var(--mono);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.bearing{display:flex;align-items:center;gap:14px;margin-bottom:28px}
+.bearing::after{content:"";height:1px;flex:1;max-width:220px;background:var(--line)}
+.bearing b{color:var(--accent);font-weight:500}
+section{padding-block:clamp(72px,11vw,140px);border-top:1px solid var(--line);position:relative}
+.lead{font-size:clamp(1.1rem,1.6vw,1.25rem);color:var(--muted)}
+
+/* botões */
+.btn{display:inline-flex;align-items:center;gap:10px;font:600 .95rem/1 var(--body);padding:17px 26px;border-radius:999px;border:1px solid transparent;cursor:pointer;text-decoration:none;transition:transform .2s ease, background .2s ease, border-color .2s ease}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-primary:hover{transform:translateY(-2px)}
+.btn-ghost{border-color:var(--line);color:var(--fg);background:transparent}
+.btn-ghost:hover{border-color:var(--fg)}
+
+/* NAV */
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:.82rem;letter-spacing:.34em;text-decoration:none}
+.logo svg{width:22px;height:22px}
+.nav-links{display:flex;gap:28px;align-items:center}
+.nav-links a{text-decoration:none;font-size:.9rem;color:var(--muted)}
+.nav-links a:hover{color:var(--fg)}
+.nav-links a.btn-primary{color:var(--accent-ink)}
+.nav .btn{padding:11px 18px;font-size:.85rem}
+@media (max-width:760px){.nav-links a:not(.btn){display:none}}
+
+/* HERO */
+.hero{border-top:0;padding-block:0;position:relative;overflow:hidden}
+#crowd{position:absolute;inset:0;width:100%;height:100%;max-width:none}
+.hero-inner{position:relative;padding-block:clamp(90px,15vw,170px) clamp(70px,10vw,120px);pointer-events:none}
+.hero-inner > *{pointer-events:auto}
+.hero h1{font-size:clamp(3.1rem,9vw,7.4rem);max-width:12ch;margin-block:22px 28px}
+.hero h1 span{display:block}
+.hero p.lead{max-width:48ch;color:var(--fg);opacity:.86}
+.hero-ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:36px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:10px 28px;margin-top:44px}
+.hero-hint{position:absolute;right:var(--gutter);bottom:22px;text-align:right;max-width:30ch}
+@media (max-width:760px){.hero-hint{position:relative;right:auto;bottom:auto;text-align:left;padding:0 var(--gutter) 48px;margin-top:-40px}}
+.hero::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,var(--bg) 0%,color-mix(in srgb,var(--bg) 70%,transparent) 45%,transparent 80%)}
+.hero-inner{z-index:2}
+
+/* MITO */
+.myth{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(32px,6vw,90px);align-items:center}
+.myth > *{min-width:0}
+.myth p + p{margin-top:18px}
+.myth .quote{font-family:var(--display);font-size:clamp(1.6rem,3vw,2.3rem);line-height:1.2;margin-top:34px;padding-left:22px;border-left:1px solid var(--accent)}
+.myth svg{width:100%;height:auto}
+@media (max-width:860px){.myth{grid-template-columns:1fr}}
+
+/* MANIFESTO */
+.manifesto{background:var(--bg-2)}
+.manifesto-text{font-family:var(--display);font-size:clamp(2rem,4.6vw,3.6rem);line-height:1.12;max-width:20ch}
+.manifesto-text .soft{color:var(--muted)}
+.nots{display:flex;flex-wrap:wrap;gap:10px;margin-top:48px}
+.nots span{font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;padding:9px 14px;border:1px solid var(--line);border-radius:999px;color:var(--muted);text-decoration:line-through;text-decoration-color:var(--danger)}
+
+/* PARA QUEM */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,56px);margin-top:48px}
+.split > div{min-width:0}
+.split h3{margin-bottom:18px}
+.list{list-style:none;display:grid;gap:14px}
+.list li{display:grid;grid-template-columns:22px 1fr;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.list li::before{content:"→";color:var(--accent);font-family:var(--mono)}
+.list.no li::before{content:"×";color:var(--muted)}
+.list.no li{color:var(--muted)}
+@media (max-width:760px){.split{grid-template-columns:1fr}}
+
+/* JORNADA */
+.route{margin-top:56px;overflow-x:auto}
+.route svg{min-width:640px;width:100%;height:auto}
+.weeks{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:28px}
+.week{background:var(--bg);padding:28px 24px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.week h3{font-size:2rem}
+.week .q{font-family:var(--display);font-style:italic;font-size:1.2rem;color:var(--accent);line-height:1.3}
+.week p{font-size:.95rem;color:var(--muted)}
+@media (max-width:960px){.weeks{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.weeks{grid-template-columns:1fr}}
+
+/* RITUAL */
+.ritual{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(20px,3vw,40px);margin-top:52px}
+.ritual article{display:flex;flex-direction:column;gap:12px;min-width:0}
+.ritual .glyph{width:54px;height:54px;color:var(--accent)}
+.ritual ul{list-style:none;display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.ritual li{font-size:.82rem;padding:6px 11px;border-radius:999px;background:var(--bg-2);color:var(--muted)}
+@media (max-width:860px){.ritual{grid-template-columns:1fr}}
+
+/* FORMATO */
+.format{display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(32px,6vw,90px);align-items:start}
+.format > *{min-width:0}
+.specs{display:grid;border-top:1px solid var(--line)}
+.spec{display:grid;grid-template-columns:120px 1fr;gap:20px;padding-block:18px;border-bottom:1px solid var(--line)}
+.spec .mono{padding-top:5px}
+.spec strong{display:block;font-weight:600}
+.spec span{color:var(--muted);font-size:.95rem}
+@media (max-width:860px){.format{grid-template-columns:1fr}.spec{grid-template-columns:1fr;gap:4px}}
+
+/* DIAGNÓSTICO */
+.diag{background:var(--bg-2)}
+.diag-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:24px}
+.quiz{margin-top:48px;border:1px solid var(--line);border-radius:22px;background:var(--bg);padding:clamp(22px,4vw,48px);position:relative}
+.progress{height:3px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:34px}
+.progress i{display:block;height:100%;width:0;background:var(--accent);transition:width .4s ease}
+.qstep{display:flex;justify-content:space-between;gap:16px;margin-bottom:14px}
+.qtext{font-family:var(--display);font-size:clamp(1.6rem,3.4vw,2.5rem);line-height:1.15;max-width:26ch;margin-bottom:30px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{text-align:left;font:500 1rem/1.4 var(--body);color:var(--fg);background:transparent;border:1px solid var(--line);border-radius:14px;padding:18px 20px;cursor:pointer;transition:border-color .2s, background .2s, transform .15s;display:flex;gap:14px;align-items:flex-start}
+.opt:hover{border-color:var(--accent);transform:translateY(-1px)}
+.opt kbd{font-family:var(--mono);font-size:.72rem;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:2px 7px;flex:none;margin-top:1px}
+@media (max-width:640px){.opts{grid-template-columns:1fr}}
+.quiz-back{margin-top:22px;background:none;border:0;color:var(--muted);font:500 .85rem var(--body);cursor:pointer}
+.quiz-back:disabled{opacity:0;pointer-events:none}
+
+.result{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,5vw,64px)}
+.result > *{min-width:0}
+.result h3{font-size:clamp(2.6rem,6vw,4.4rem);margin-block:10px 16px}
+.dims{display:grid;gap:16px;margin-top:6px}
+.dim{display:grid;grid-template-columns:110px 1fr 36px;gap:14px;align-items:center;font-size:.9rem}
+.dim .bar{height:6px;background:var(--line);border-radius:6px;overflow:hidden}
+.dim .bar i{display:block;height:100%;background:var(--tide);border-radius:6px;transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.dim.low .bar i{background:var(--accent)}
+.dim .n{font-family:var(--mono);font-size:.78rem;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.first-move{margin-top:28px;padding:22px;border:1px dashed var(--accent);border-radius:14px}
+.first-move p{margin-top:6px}
+@media (max-width:860px){.result{grid-template-columns:1fr}}
+
+/* LISTA DE ESPERA */
+.waitlist{display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(32px,6vw,90px);align-items:start}
+.waitlist > *{min-width:0}
+.price{margin-top:36px;padding:26px;border:1px solid var(--line);border-radius:18px}
+.price .big{font-family:var(--display);font-size:3.4rem;line-height:1;margin-block:10px 6px}
+.price .big s{font-size:1.6rem;color:var(--muted);margin-right:10px}
+.price p{font-size:.92rem;color:var(--muted)}
+.seats{display:flex;gap:6px;margin-top:18px;flex-wrap:wrap}
+.seats i{width:14px;height:14px;border-radius:50%;border:1px solid var(--accent)}
+form{display:grid;gap:18px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.row > *{min-width:0}
+@media (max-width:640px){.row{grid-template-columns:1fr}}
+label{display:grid;gap:8px;font-size:.88rem;font-weight:500}
+label small{color:var(--muted);font-weight:400}
+input,textarea,select{font:400 1rem var(--body);color:var(--fg);background:var(--bg-2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;width:100%}
+textarea{min-height:96px;resize:vertical}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent)}
+fieldset{border:0;display:grid;gap:10px}
+legend{font-size:.88rem;font-weight:500;margin-bottom:8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips input{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px}
+.chips label{display:inline-flex;font-weight:500;padding:10px 16px;border:1px solid var(--line);border-radius:999px;cursor:pointer;font-size:.9rem}
+.chips input:checked + label{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.chips input:focus-visible + label{outline:2px solid var(--accent);outline-offset:2px}
+.check{display:flex;gap:12px;align-items:flex-start;font-weight:400;color:var(--muted)}
+.check input{width:18px;height:18px;margin-top:4px;flex:none;accent-color:var(--accent)}
+.form-note{font-size:.8rem;color:var(--muted)}
+.form-error{color:var(--danger);font-size:.9rem}
+.success{border:1px solid var(--accent);border-radius:18px;padding:32px}
+.success h3{margin-bottom:12px}
+.success p + p{margin-top:12px}
+.tag-result{display:inline-block;margin-top:4px;font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;padding:6px 10px;border-radius:8px;background:var(--bg-2);color:var(--accent)}
+
+/* FAQ */
+.faq{margin-top:40px;border-top:1px solid var(--line);max-width:860px}
+details{border-bottom:1px solid var(--line);padding-block:22px}
+summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:20px;font-size:1.1rem;font-weight:600}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-family:var(--mono);color:var(--accent)}
+details[open] summary::after{content:"−"}
+details p{margin-top:12px;color:var(--muted)}
+
+/* FINAL */
+.final{text-align:left}
+.final h2{font-size:clamp(2.6rem,7vw,5.6rem);max-width:14ch}
+footer{border-top:1px solid var(--line);padding-block:36px}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px}
+
+.reveal{transform:translateY(14px);opacity:.001;transition:opacity .8s ease, transform .8s ease}
+.reveal.in{transform:none;opacity:1}
+.no-js .reveal{opacity:1;transform:none}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  .reveal{opacity:1;transform:none;transition:none}
+  *{transition:none!important}
+}
+</style>
+</head>
+<body class="no-js">
+
+<!-- ============ NAV ============ -->
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="#topo" aria-label="Travessia — início">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><circle cx="12" cy="12" r="10.5"/><path d="M12 3.5 14.4 12 12 20.5 9.6 12Z" fill="var(--accent)" stroke="none"/><path d="M12 3.5 14.4 12H9.6Z" fill="var(--fg)" stroke="none"/></svg>
+      TRAVESSIA
+    </a>
+    <nav class="nav-links" aria-label="Seções">
+      <a href="#jornada">A jornada</a>
+      <a href="#diagnostico">Diagnóstico</a>
+      <a href="#faq">Perguntas</a>
+      <a class="btn btn-primary" href="#lista" data-track="nav_cta">Entrar na lista</a>
+    </nav>
+  </div>
+</header>
+
+<main id="topo">
+
+<!-- ============ HERO ============ -->
+<section class="hero" aria-labelledby="hero-title">
+  <canvas id="crowd" aria-hidden="true"></canvas>
+  <div class="wrap hero-inner">
+    <p class="mono">Travessia Norte · turma fundadora · 15 vagas</p>
+    <h1 id="hero-title"><span>Você não está perdido.</span><span><em>Está adiando.</em></span></h1>
+    <p class="lead">Uma jornada de 30 dias para quem sente que tem potencial, mas está vivendo no automático. Clareza, corpo em movimento e conversas reais para sair da deriva e encontrar direção.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-primary" href="#diagnostico" data-track="hero_diag">Fazer o Diagnóstico de Deriva · 2 min</a>
+      <a class="btn btn-ghost" href="#lista" data-track="hero_lista">Quero entrar na lista</a>
+    </div>
+    <div class="hero-meta">
+      <span class="mono">30 dias</span>
+      <span class="mono">4 encontros ao vivo</span>
+      <span class="mono">Online, com desafios no mundo real</span>
+    </div>
+  </div>
+  <p class="mono hero-hint" style="z-index:2">Cada ponto é alguém no automático.<br>Pare o cursor e observe o que desacelera.</p>
+</section>
+
+<!-- ============ MITO ============ -->
+<section id="mito" aria-labelledby="mito-title">
+  <div class="wrap myth">
+    <div class="reveal">
+      <p class="mono bearing"><b>000°</b> O mito</p>
+      <h2 id="mito-title">Todo dia, <em>a mesma pedra.</em></h2>
+      <p class="lead" style="margin-top:24px">Na mitologia grega, Sísifo foi condenado a empurrar uma pedra morro acima. Quando chegava perto do topo, ela rolava de volta. No dia seguinte ele recomeçava. Para sempre.</p>
+      <p>Hoje a pedra tem outro formato. É a agenda que se repete, a ideia guardada na gaveta, o treino que fica para segunda, a conversa que nunca acontece. Você empurra com competência. Só não sabe mais para onde.</p>
+      <p>Camus escreveu que é preciso imaginar Sísifo feliz. A gente acha que dá para ir além: parar, olhar o morro de fora e escolher outro caminho.</p>
+      <p class="quote">Largue a pedra.<br>Comece a travessia.</p>
+    </div>
+    <div class="reveal" aria-hidden="true">
+      <svg viewBox="0 0 520 440" role="img">
+        <defs>
+          <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="var(--accent)" stop-opacity=".55"/>
+            <stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <!-- linhas de relevo, como carta topográfica -->
+        <g fill="none" stroke="var(--line)" stroke-width="1">
+          <path d="M0 420 C120 400 200 250 330 150 C380 112 430 100 520 96"/>
+          <path d="M0 430 C130 412 215 275 340 176 C392 136 440 124 520 122"/>
+          <path d="M0 438 C140 424 230 300 350 202 C404 160 450 150 520 148"/>
+          <path d="M0 410 C110 388 185 225 320 124 C370 88 420 76 520 70" stroke-dasharray="3 6"/>
+        </g>
+        <!-- trilha de subidas repetidas -->
+        <g fill="none" stroke="var(--muted)" stroke-width="1" stroke-dasharray="2 7" opacity=".7">
+          <path d="M60 404 C160 380 220 260 300 176"/>
+          <path d="M70 410 C170 386 230 268 308 186"/>
+        </g>
+        <!-- pedra e figura -->
+        <circle cx="300" cy="150" r="30" fill="var(--bg-2)" stroke="var(--fg)" stroke-width="1.4"/>
+        <g stroke="var(--fg)" stroke-width="2" stroke-linecap="round" fill="none">
+          <circle cx="252" cy="176" r="8" fill="var(--fg)" stroke="none"/>
+          <path d="M256 186 L240 222"/>
+          <path d="M254 194 L276 170"/>
+          <path d="M250 202 L274 184"/>
+          <path d="M240 222 L230 250"/>
+          <path d="M240 222 L256 246"/>
+        </g>
+        <!-- o norte, fora do morro -->
+        <circle cx="462" cy="46" r="40" fill="url(#glow)"/>
+        <path d="M462 22 L467 46 L462 70 L457 46Z" fill="var(--accent)"/>
+        <text x="462" y="104" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" letter-spacing="3" fill="var(--muted)">N</text>
+        <text x="24" y="30" font-family="JetBrains Mono, monospace" font-size="10" letter-spacing="2" fill="var(--muted)">SUBIDA Nº 11.312</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MANIFESTO ============ -->
+<section class="manifesto" aria-labelledby="manifesto-title">
+  <div class="wrap">
+    <p class="mono bearing"><b>045°</b> Manifesto</p>
+    <h2 id="manifesto-title" class="manifesto-text reveal">
+      O perigo não é dar errado. <span class="soft">É acordar daqui a cinco anos vivendo a mesma vida.</span> Clareza não vem só pensando. <em>Vem se movendo.</em>
+    </h2>
+    <div class="nots" aria-label="O que a Travessia não é">
+      <span>papo de guru</span><span>palco e fórmula</span><span>networking de cartão</span><span>frase motivacional</span><span>curso de produtividade</span><span>terapia</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PARA QUEM ============ -->
+<section id="para-quem" aria-labelledby="quem-title">
+  <div class="wrap">
+    <p class="mono bearing"><b>090°</b> Para quem é</p>
+    <h2 id="quem-title" class="reveal">Para quem sabe que precisa mudar,<br><em>mas não sabe por onde começar.</em></h2>
+    <div class="split">
+      <div class="reveal">
+        <h3>É para você se</h3>
+        <ul class="list">
+          <li>Sente que tem potencial e está desperdiçando.</li>
+          <li>Tem uma vida boa por fora e uma inquietação por dentro.</li>
+          <li>Quer construir algo seu, mas está travado.</li>
+          <li>Tem uma decisão empurrada há meses.</li>
+          <li>Sente falta de corpo, natureza e silêncio.</li>
+          <li>Quer atravessar isso junto de gente na mesma fase.</li>
+        </ul>
+      </div>
+      <div class="reveal">
+        <h3>Não é para você se</h3>
+        <ul class="list no">
+          <li>Busca uma fórmula pronta de sucesso.</li>
+          <li>Quer só fazer contatos e vender algo para o grupo.</li>
+          <li>Não pretende aparecer nos encontros nem fazer os desafios.</li>
+          <li>Precisa de acompanhamento psicológico agora. A Travessia não substitui terapia.</li>
+        </ul>
+        <p class="form-note" style="margin-top:22px">A primeira turma é de homens entre 28 e 45 anos. As próximas serão abertas conforme a comunidade crescer.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ JORNADA ============ -->
+<section id="jornada" aria-labelledby="jornada-title">
+  <div class="wrap">
+    <p class="mono bearing"><b>135°</b> A jornada · 30 dias</p>
+    <h2 id="jornada-title" class="reveal">Da cabeça para o corpo.<br><em>Do corpo para a decisão.</em></h2>
+    <p class="lead reveal" style="margin-top:22px">Quatro trechos, uma semana cada. Começa entendendo o que trava, desce para o movimento, encara o que está sendo adiado e termina com um próximo passo concreto.</p>
+
+    <div class="route" aria-hidden="true">
+      <svg viewBox="0 0 1000 150">
+        <path d="M20 110 C140 110 170 40 260 40 S400 120 500 110 S650 30 740 40 S880 110 980 60" fill="none" stroke="var(--line)" stroke-width="2"/>
+        <path id="routePath" d="M20 110 C140 110 170 40 260 40 S400 120 500 110 S650 30 740 40 S880 110 980 60" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="6 8"/>
+        <g font-family="JetBrains Mono, monospace" font-size="11" letter-spacing="2" fill="var(--muted)">
+          <circle cx="20" cy="110" r="5" fill="var(--muted)"/><text x="20" y="140" text-anchor="start">DERIVA</text>
+          <circle cx="260" cy="40" r="7" fill="var(--bg)" stroke="var(--accent)" stroke-width="2"/><text x="260" y="22" text-anchor="middle">S1</text>
+          <circle cx="500" cy="110" r="7" fill="var(--bg)" stroke="var(--accent)" stroke-width="2"/><text x="500" y="140" text-anchor="middle">S2</text>
+          <circle cx="740" cy="40" r="7" fill="var(--bg)" stroke="var(--accent)" stroke-width="2"/><text x="740" y="22" text-anchor="middle">S3</text>
+          <path d="M980 38 L986 60 L980 82 L974 60Z" fill="var(--accent)"/><text x="980" y="108" text-anchor="middle" fill="var(--accent)">NORTE</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="weeks">
+      <article class="week reveal">
+        <span class="mono">Semana 1 · dias 1–7</span>
+        <h3>Clareza</h3>
+        <p class="q">O que está me travando?</p>
+        <p>Nomear a inquietação, mapear onde a vida entrou no automático e listar as decisões adiadas.</p>
+      </article>
+      <article class="week reveal">
+        <span class="mono">Semana 2 · dias 8–14</span>
+        <h3>Corpo</h3>
+        <p class="q">Como eu volto a me mover?</p>
+        <p>Sair da cabeça. Treino, mar, trilha, caminhada sem fone. O corpo como ferramenta de clareza.</p>
+      </article>
+      <article class="week reveal">
+        <span class="mono">Semana 3 · dias 15–21</span>
+        <h3>Coragem</h3>
+        <p class="q">Que decisão eu estou adiando?</p>
+        <p>Encarar uma escolha, abrir uma conversa, parar de negociar com o que já está claro por dentro.</p>
+      </article>
+      <article class="week reveal">
+        <span class="mono">Semana 4 · dias 22–30</span>
+        <h3>Direção</h3>
+        <p class="q">Qual é meu próximo movimento?</p>
+        <p>Um rumo escolhido, um compromisso público com o grupo e um plano simples para os 30 dias seguintes.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RITUAL ============ -->
+<section aria-labelledby="ritual-title">
+  <div class="wrap">
+    <p class="mono bearing"><b>180°</b> O ritual semanal</p>
+    <h2 id="ritual-title" class="reveal">Três práticas por semana.<br><em>Nenhuma delas é assistir aula.</em></h2>
+    <div class="ritual">
+      <article class="reveal">
+        <svg class="glyph" viewBox="0 0 54 54" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M4 34c6-6 10-6 16 0s10 6 16 0 10-6 14-2"/><path d="M4 42c6-6 10-6 16 0s10 6 16 0 10-6 14-2" opacity=".5"/><circle cx="38" cy="14" r="6"/></svg>
+        <h3>Movimento</h3>
+        <p>Uma prática física fora do lugar de sempre. Não é sobre performance. É sobre tirar a cabeça do comando por uma hora.</p>
+        <ul><li>caminhada sem celular</li><li>mar</li><li>trilha</li><li>nascer do sol</li><li>treino</li></ul>
+      </article>
+      <article class="reveal">
+        <svg class="glyph" viewBox="0 0 54 54" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M10 44 38 16l6 6-28 28H10z"/><path d="M34 20l6 6"/><path d="M8 50h38" opacity=".5"/></svg>
+        <h3>Escrita</h3>
+        <p>Perguntas que incomodam do jeito certo. Você escreve à mão ou no celular e leva uma resposta para o encontro.</p>
+        <ul><li>o que estou evitando olhar?</li><li>o que perco se nada mudar em 5 anos?</li></ul>
+      </article>
+      <article class="reveal">
+        <svg class="glyph" viewBox="0 0 54 54" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="16" y="6" width="22" height="40" rx="4"/><path d="M8 8l38 38"/></svg>
+        <h3>Desconexão</h3>
+        <p>Um bloco de silêncio por semana. Menos ruído para escutar o que você já sabe e está adiando.</p>
+        <ul><li>2 horas sem tela</li><li>primeira hora sem WhatsApp</li><li>jantar sem celular</li></ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FORMATO ============ -->
+<section aria-labelledby="formato-title">
+  <div class="wrap format">
+    <div class="reveal">
+      <p class="mono bearing"><b>225°</b> O que tem dentro</p>
+      <h2 id="formato-title">Ninguém atravessa <em>sozinho.</em></h2>
+      <p class="lead" style="margin-top:22px">Você entra num grupo de 15 pessoas, dividido em cinco trios. Cada trio se acompanha durante os 30 dias. O condutor guia a rota. A transformação é sua.</p>
+    </div>
+    <div class="specs reveal">
+      <div class="spec"><span class="mono">Início</span><div><strong>Diagnóstico de Deriva</strong><span>Um mapa de onde você está: clareza, corpo, desconexão, coragem e pertencimento.</span></div></div>
+      <div class="spec"><span class="mono">Semanal</span><div><strong>4 encontros ao vivo · 75 min</strong><span>Provocação, conversa em grupo e o movimento da semana. Gravados para quem perder.</span></div></div>
+      <div class="spec"><span class="mono">Semanal</span><div><strong>1 vídeo curto · até 12 min</strong><span>Gravado fora do escritório. Direto, sem enrolação.</span></div></div>
+      <div class="spec"><span class="mono">Diário</span><div><strong>Grupo fechado</strong><span>Check-ins, registros dos desafios e troca honesta. Sem spam, sem venda.</span></div></div>
+      <div class="spec"><span class="mono">30 dias</span><div><strong>Trio de travessia</strong><span>Três pessoas que cobram, apoiam e celebram o movimento uma da outra.</span></div></div>
+      <div class="spec"><span class="mono">Dia 30</span><div><strong>Carta de rumo</strong><span>Seu próximo movimento escrito, assumido e compartilhado com o grupo.</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DIAGNÓSTICO ============ -->
+<section id="diagnostico" class="diag" aria-labelledby="diag-title">
+  <div class="wrap">
+    <div class="diag-head">
+      <div>
+        <p class="mono bearing"><b>270°</b> Diagnóstico de Deriva</p>
+        <h2 id="diag-title">Onde você está <em>agora?</em></h2>
+      </div>
+      <p class="lead" style="max-width:40ch">7 perguntas, 2 minutos. No fim você recebe seu ponto na carta e um primeiro movimento para fazer esta semana.</p>
+    </div>
+
+    <div class="quiz" id="quiz" aria-live="polite">
+      <div class="progress" aria-hidden="true"><i id="qbar"></i></div>
+      <div id="qbody"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LISTA ============ -->
+<section id="lista" aria-labelledby="lista-title">
+  <div class="wrap waitlist">
+    <div class="reveal">
+      <p class="mono bearing"><b>315°</b> Lista da turma fundadora</p>
+      <h2 id="lista-title">Guarde seu lugar <em>no barco.</em></h2>
+      <p class="lead" style="margin-top:22px">A primeira turma abre quando a lista fechar. Quem está nela recebe o convite antes, com preço de fundador, e ajuda a desenhar o que a Travessia vai virar.</p>
+      <div class="price">
+        <span class="mono">Investimento previsto · turma fundadora</span>
+        <p class="big"><s>R$ 697</s>R$ 397</p>
+        <p>Ou 3x no cartão. Nada é cobrado agora. Entrar na lista não obriga a nada.</p>
+        <div class="seats" aria-label="15 vagas"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <p class="mono" style="margin-top:10px">15 vagas · 5 trios</p>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <form id="waitlist" novalidate>
+        <div class="row">
+          <label for="f-nome">Nome<input id="f-nome" name="nome" autocomplete="given-name" required></label>
+          <label for="f-idade">Idade<input id="f-idade" name="idade" inputmode="numeric" pattern="[0-9]*" maxlength="2"></label>
+        </div>
+        <div class="row">
+          <label for="f-email">E-mail<input id="f-email" name="email" type="email" autocomplete="email" required></label>
+          <label for="f-whats">WhatsApp <small>com DDD</small><input id="f-whats" name="whatsapp" type="tel" autocomplete="tel" placeholder="(11) 90000-0000" required></label>
+        </div>
+        <label for="f-adiando">O que você está adiando? <small>Uma frase basta. Só o condutor lê.</small>
+          <textarea id="f-adiando" name="adiando" placeholder="Ex.: sair do emprego e tirar do papel uma ideia que tenho há dois anos."></textarea>
+        </label>
+        <fieldset>
+          <legend>Qual valor faria sentido para você numa jornada de 30 dias assim?</legend>
+          <div class="chips">
+            <input type="radio" name="preco" id="p1" value="ate_197"><label for="p1">até R$ 197</label>
+            <input type="radio" name="preco" id="p2" value="297"><label for="p2">R$ 297</label>
+            <input type="radio" name="preco" id="p3" value="397"><label for="p3">R$ 397</label>
+            <input type="radio" name="preco" id="p4" value="497_mais"><label for="p4">R$ 497 ou mais</label>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>O que mais te atrai? <small style="color:var(--muted);font-weight:400">Pode marcar mais de um.</small></legend>
+          <div class="chips">
+            <input type="checkbox" name="atrai" id="a1" value="clareza"><label for="a1">Clareza</label>
+            <input type="checkbox" name="atrai" id="a2" value="movimento"><label for="a2">Movimento e natureza</label>
+            <input type="checkbox" name="atrai" id="a3" value="grupo"><label for="a3">Um grupo na mesma fase</label>
+            <input type="checkbox" name="atrai" id="a4" value="projeto"><label for="a4">Tirar um projeto do papel</label>
+            <input type="checkbox" name="atrai" id="a5" value="desconexao"><label for="a5">Desconectar</label>
+          </div>
+        </fieldset>
+        <label class="check" for="f-cocriar"><input type="checkbox" id="f-cocriar" name="cocriar" value="sim">Topo uma conversa de 15 minutos para ajudar a construir a Travessia antes do lançamento.</label>
+        <input type="hidden" name="perfil" id="f-perfil">
+        <input type="hidden" name="pontuacao" id="f-pontuacao">
+        <p class="form-error" id="f-error" hidden></p>
+        <button class="btn btn-primary" type="submit" id="f-submit" style="justify-self:start">Entrar na lista da turma fundadora</button>
+        <p class="form-note">Sem spam. Você recebe no máximo um e-mail por semana e pode sair quando quiser.</p>
+      </form>
+      <div class="success" id="success" hidden>
+        <p class="mono">Você está na lista</p>
+        <h3>Bem-vindo a bordo, <span id="s-nome"></span>.</h3>
+        <p>Nos próximos dias você recebe uma mensagem pessoal no WhatsApp. Não é robô.</p>
+        <p>Enquanto isso, faça o movimento desta semana: <strong>uma caminhada de 30 minutos sem celular e sem fone.</strong> Repare no que aparecer na sua cabeça.</p>
+        <p id="s-perfil"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section id="faq" aria-labelledby="faq-title">
+  <div class="wrap">
+    <p class="mono bearing"><b>330°</b> Perguntas</p>
+    <h2 id="faq-title">Antes de <em>embarcar.</em></h2>
+    <div class="faq">
+      <details><summary>Isso é terapia ou coaching?</summary><p>Nenhum dos dois. É uma jornada em grupo com práticas de reflexão, movimento e desconexão. Se você está passando por sofrimento intenso, procure um psicólogo. A Travessia pode caminhar junto, mas não substitui.</p></details>
+      <details><summary>Preciso surfar, correr ou ser atleta?</summary><p>Não. O movimento é o seu: uma caminhada conta. O ponto é sair da cabeça e do lugar de sempre, não bater marca.</p></details>
+      <details><summary>Quanto tempo por semana eu preciso?</summary><p>Cerca de 3 horas: o encontro ao vivo (75 min), o vídeo curto, a escrita e o desafio de movimento. A desconexão você encaixa no seu dia.</p></details>
+      <details><summary>É online ou presencial?</summary><p>Online, com desafios feitos no mundo real. Encontros presenciais vão acontecer nas próximas turmas, a partir do que a turma fundadora pedir.</p></details>
+      <details><summary>E se eu perder um encontro?</summary><p>Fica gravado. Mas o valor está no grupo. Quem entra se compromete a aparecer em pelo menos 3 dos 4.</p></details>
+      <details><summary>Quando começa?</summary><p>Quando a lista fechar a primeira turma. Quem está na lista recebe o convite antes de qualquer divulgação aberta.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL ============ -->
+<section class="final" aria-labelledby="final-title">
+  <div class="wrap">
+    <p class="mono bearing"><b>360°</b> De volta ao Norte</p>
+    <h2 id="final-title" class="reveal">Daqui a cinco anos você vai estar em algum lugar. <em>Escolha qual.</em></h2>
+    <div class="hero-ctas">
+      <a class="btn btn-primary" href="#lista" data-track="final_lista">Entrar na lista</a>
+      <a class="btn btn-ghost" href="#diagnostico" data-track="final_diag">Fazer o diagnóstico</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="mono">Travessia · um movimento contra a vida no piloto automático</span>
+    <span class="mono">Parte de cada turma volta para ações na comunidade</span>
+  </div>
+</footer>
+
+<script>
+/* ================= CONFIGURAÇÃO =================
+   FORM_ENDPOINT: URL do Google Apps Script (ver travessia/README.md). Vazio = salva só no navegador.
+   META_PIXEL_ID: ID do pixel do Meta Ads. Vazio = pixel desligado. */
+const CONFIG = {
+  FORM_ENDPOINT: '',
+  META_PIXEL_ID: ''
+};
+
+document.body.classList.remove('no-js');
+
+/* ---------- Meta Pixel (só carrega se configurado) ---------- */
+function track(event, params){
+  try { if (window.fbq) window.fbq('track', event, params || {}); } catch(e){}
+}
+if (CONFIG.META_PIXEL_ID) {
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', CONFIG.META_PIXEL_ID);
+  fbq('track', 'PageView');
+}
+document.querySelectorAll('[data-track]').forEach(a => a.addEventListener('click', () => {
+  try { if (window.fbq) fbq('trackCustom', 'CTA', { local: a.dataset.track }); } catch(e){}
+}));
+
+/* ---------- UTM (para saber qual anúncio trouxe cada pessoa) ---------- */
+const UTM = {};
+try {
+  const q = new URLSearchParams(location.search);
+  ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'].forEach(k => { if (q.get(k)) UTM[k] = q.get(k); });
+} catch(e){}
+
+/* ---------- Reveal ---------- */
+const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }), {threshold:.12}) : null;
+document.querySelectorAll('.reveal').forEach(el => io ? io.observe(el) : el.classList.add('in'));
+setTimeout(() => document.querySelectorAll('.reveal').forEach(el => el.classList.add('in')), 2500);
+
+/* ---------- Hero: a multidão no automático ---------- */
+(function(){
+  const cv = document.getElementById('crowd');
+  const ctx = cv.getContext('2d');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W, H, dpr, pts = [], mouse = {x:-999, y:-999, still:0, lx:0, ly:0};
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  function size(){
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const r = cv.getBoundingClientRect(); W = r.width; H = r.height;
+    cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+    const n = Math.round(Math.min(260, W * H / 3800));
+    pts = Array.from({length:n}, () => spawn(Math.random() * W));
+  }
+  function spawn(x){
+    const lane = Math.random();
+    return { x, y: H * (.08 + lane * .86), v: (.5 + Math.random() * 1.6) * (Math.random() < .5 ? 1 : -1), r: .8 + Math.random() * 1.6, calm: 0, w: Math.random() * 6.28 };
+  }
+  cv.parentElement.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; });
+  cv.parentElement.addEventListener('pointerleave', () => { mouse.x = mouse.y = -999; });
+  let fg, accent;
+  function colors(){ fg = css('--muted'); accent = css('--accent'); }
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    const moved = Math.hypot(mouse.x - mouse.lx, mouse.y - mouse.ly);
+    mouse.still = moved < 1 ? Math.min(mouse.still + 1, 240) : 0; mouse.lx = mouse.x; mouse.ly = mouse.y;
+    const radius = 90 + mouse.still * .9;
+    for (const p of pts){
+      const d = Math.hypot(p.x - mouse.x, p.y - mouse.y);
+      const target = d < radius ? 1 : 0;
+      p.calm += (target - p.calm) * .06;
+      p.w += .03;
+      p.x += p.v * (1 - p.calm * .92);
+      p.y += Math.sin(p.w) * .15;
+      if (p.x > W + 10) p.x = -10; if (p.x < -10) p.x = W + 10;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r + p.calm * 1.4, 0, 6.283);
+      ctx.fillStyle = p.calm > .15 ? accent : fg;
+      ctx.globalAlpha = .35 + p.calm * .6; ctx.fill();
+      if (!reduce && p.calm < .2){ ctx.globalAlpha = .12; ctx.fillRect(p.x - p.v * 6, p.y - .4, p.v * 6, .8); }
+    }
+    ctx.globalAlpha = 1;
+    if (!reduce) requestAnimationFrame(frame);
+  }
+  size(); colors();
+  addEventListener('resize', () => { size(); if (reduce) frame(); });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', colors);
+  new MutationObserver(colors).observe(document.documentElement, {attributes:true, attributeFilter:['data-theme']});
+  frame();
+})();
+
+/* ---------- Diagnóstico de Deriva ---------- */
+const DIMS = { clareza:'Clareza', corpo:'Corpo', desconexao:'Desconexão', coragem:'Coragem', vinculo:'Pertencimento' };
+const QUESTIONS = [
+  { dim:'clareza', q:'Se alguém perguntasse hoje o que você quer para os próximos 5 anos, você…',
+    o:['Responderia na hora, sem hesitar','Teria uma ideia vaga','Mudaria de assunto','Nem me faço mais essa pergunta'] },
+  { dim:'coragem', q:'Existe uma decisão que você vem adiando há mais de seis meses?',
+    o:['Não. Quando decido, faço','Uma, mas já estou encarando','Sim, e penso nela toda semana','Várias. Já viraram paisagem'] },
+  { dim:'corpo', q:'Nos últimos 30 dias, o seu corpo…',
+    o:['Se moveu 3 ou mais vezes por semana','Se moveu de vez em quando','Quase não saiu da cadeira','Fez o trajeto sofá, carro, mesa'] },
+  { dim:'desconexao', q:'Quando foi a última vez que você ficou 2 horas sem tela, por escolha?',
+    o:['Esta semana','Este mês','Não lembro','Isso existe?'] },
+  { dim:'clareza', q:'O seu dia de hoje foi…',
+    o:['Escolhido por mim','Metade escolhido, metade reação','Uma sequência de demandas','Igual a ontem. Igual a amanhã'] },
+  { dim:'vinculo', q:'Com quantas pessoas você fala abertamente sobre o que te inquieta?',
+    o:['Três ou mais','Uma ou duas','Uma, mas evito o assunto','Nenhuma'] },
+  { dim:'coragem', q:'Aquela ideia ou projeto seu…',
+    o:['Já está em movimento','Está no papel','Está só na cabeça','Desisti de pensar nela'] }
+];
+const PROFILES = [
+  { max:6,  name:'Sísifo', tag:'SÍSIFO · 000°', text:'A pedra virou rotina. Você empurra todo dia, com competência, mas perdeu de vista para onde. A boa notícia: quem percebe isso já começou a parar.' },
+  { max:11, name:'À deriva', tag:'À DERIVA · 090°', text:'Tem movimento, mas quem escolhe a direção é a corrente. Muita coisa acontece e pouca coisa é decidida por você.' },
+  { max:16, name:'Na margem', tag:'NA MARGEM · 180°', text:'Você já sabe o que precisa mudar. Está na beira da água, medindo a temperatura. Falta entrar.' },
+  { max:21, name:'Em travessia', tag:'EM TRAVESSIA · 315°', text:'Você já está atravessando. Um grupo na mesma fase pode acelerar o caminho, e você pode ser o apoio de alguém na turma.' }
+];
+const MOVES = {
+  clareza:'Escreva à mão, sem parar por 10 minutos: “Se nada mudar nos próximos 5 anos, eu vou perder…”. Não releia até amanhã.',
+  corpo:'Três vezes nesta semana, 30 minutos de movimento ao ar livre. Caminhar conta. Registre como a cabeça estava antes e depois.',
+  desconexao:'Escolha um bloco de 2 horas neste fim de semana. Celular em outro cômodo. Nada de compensar depois.',
+  coragem:'Escreva a decisão que você está adiando numa frase. Mande essa frase para uma pessoa de confiança ainda hoje.',
+  vinculo:'Chame um amigo para uma caminhada e faça uma pergunta de verdade: “o que tem te tirado o sono?”. Depois conte a sua.'
+};
+let step = 0, answers = [];
+const qbody = document.getElementById('qbody'), qbar = document.getElementById('qbar');
+let quizStarted = false;
+
+function renderQ(){
+  const Q = QUESTIONS[step];
+  qbar.style.width = (step / QUESTIONS.length * 100) + '%';
+  qbody.innerHTML = `
+    <div class="qstep"><span class="mono">Pergunta ${step+1} de ${QUESTIONS.length}</span><span class="mono">${DIMS[Q.dim]}</span></div>
+    <p class="qtext">${Q.q}</p>
+    <div class="opts">${Q.o.map((t,i)=>`<button type="button" class="opt" data-v="${3-i}"><kbd>${'ABCD'[i]}</kbd><span>${t}</span></button>`).join('')}</div>
+    <button type="button" class="quiz-back" ${step===0?'disabled':''}>← voltar</button>`;
+  qbody.querySelectorAll('.opt').forEach(b => b.addEventListener('click', () => answer(+b.dataset.v)));
+  qbody.querySelector('.quiz-back').addEventListener('click', () => { if (step>0){ step--; answers.pop(); renderQ(); } });
+}
+function answer(v){
+  if (!quizStarted){ quizStarted = true; track('ViewContent', {content_name:'diagnostico_inicio'}); }
+  answers[step] = v; step++;
+  step < QUESTIONS.length ? renderQ() : renderResult();
+}
+function renderResult(){
+  qbar.style.width = '100%';
+  const total = answers.reduce((a,b)=>a+b,0);
+  const prof = PROFILES.find(p => total <= p.max);
+  const byDim = {}, cnt = {};
+  QUESTIONS.forEach((Q,i) => { byDim[Q.dim] = (byDim[Q.dim]||0) + answers[i]; cnt[Q.dim] = (cnt[Q.dim]||0) + 3; });
+  const pct = Object.fromEntries(Object.keys(byDim).map(k => [k, Math.round(byDim[k]/cnt[k]*100)]));
+  const low = Object.keys(pct).sort((a,b)=>pct[a]-pct[b])[0];
+  qbody.innerHTML = `
+    <div class="result">
+      <div>
+        <span class="mono">Seu ponto na carta · ${total} de 21</span>
+        <h3>${prof.name}</h3>
+        <p class="lead">${prof.text}</p>
+        <div class="first-move"><span class="mono">Seu primeiro movimento · ${DIMS[low]}</span><p>${MOVES[low]}</p></div>
+      </div>
+      <div>
+        <span class="mono">Mapa por dimensão</span>
+        <div class="dims" style="margin-top:18px">
+          ${Object.keys(pct).map(k=>`<div class="dim ${k===low?'low':''}"><span>${DIMS[k]}</span><div class="bar"><i style="width:0" data-w="${pct[k]}"></i></div><span class="n">${pct[k]}%</span></div>`).join('')}
+        </div>
+        <p style="margin-top:28px">A Travessia Norte trabalha exatamente essas dimensões em 30 dias. Guarde seu resultado e entre na lista da turma fundadora.</p>
+        <div class="hero-ctas" style="margin-top:20px">
+          <a class="btn btn-primary" href="#lista">Entrar na lista com meu resultado</a>
+          <button type="button" class="btn btn-ghost" id="q-restart">Refazer</button>
+        </div>
+      </div>
+    </div>`;
+  requestAnimationFrame(() => setTimeout(() => qbody.querySelectorAll('.bar i').forEach(i => i.style.width = i.dataset.w + '%'), 60));
+  document.getElementById('q-restart').addEventListener('click', () => { step = 0; answers = []; renderQ(); });
+  document.getElementById('f-perfil').value = prof.name;
+  document.getElementById('f-pontuacao').value = total + '/21 · mais baixo: ' + DIMS[low];
+  track('ViewContent', {content_name:'diagnostico_resultado', content_category: prof.name});
+  try { localStorage.setItem('travessia_diag', JSON.stringify({perfil:prof.name,total,low})); } catch(e){}
+}
+renderQ();
+
+/* ---------- Lista de espera ---------- */
+const form = document.getElementById('waitlist'), err = document.getElementById('f-error');
+try { const d = JSON.parse(localStorage.getItem('travessia_diag') || 'null'); if (d){ document.getElementById('f-perfil').value = d.perfil; document.getElementById('f-pontuacao').value = d.total + '/21'; } } catch(e){}
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+  err.hidden = true;
+  const fd = new FormData(form);
+  const nome = (fd.get('nome')||'').trim(), email = (fd.get('email')||'').trim(), whats = (fd.get('whatsapp')||'').replace(/\D/g,'');
+  if (!nome){ return fail('Escreva seu nome para a gente saber como te chamar.', 'f-nome'); }
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ return fail('Esse e-mail parece incompleto. Confira o que vem depois do @.', 'f-email'); }
+  if (whats.length < 10){ return fail('Coloque o WhatsApp com DDD, por exemplo (11) 90000-0000.', 'f-whats'); }
+  const data = {
+    nome, email, whatsapp: whats, idade: fd.get('idade')||'',
+    adiando: fd.get('adiando')||'', preco: fd.get('preco')||'',
+    atrai: fd.getAll('atrai').join(', '), cocriar: fd.get('cocriar') ? 'sim' : 'não',
+    perfil: fd.get('perfil')||'', pontuacao: fd.get('pontuacao')||'',
+    ...UTM, pagina: location.pathname, data: new Date().toISOString()
+  };
+  const btn = document.getElementById('f-submit'); btn.disabled = true; btn.textContent = 'Enviando…';
+  try { const list = JSON.parse(localStorage.getItem('travessia_lista') || '[]'); list.push(data); localStorage.setItem('travessia_lista', JSON.stringify(list)); } catch(e){}
+  if (CONFIG.FORM_ENDPOINT){
+    try { await fetch(CONFIG.FORM_ENDPOINT, { method:'POST', mode:'no-cors', body: new URLSearchParams(data) }); }
+    catch(e){ btn.disabled = false; btn.textContent = 'Entrar na lista da turma fundadora'; return fail('Não conseguimos enviar agora. Verifique sua conexão e tente de novo.'); }
+  }
+  track('Lead', {content_name:'lista_turma_fundadora', value: 397, currency:'BRL'});
+  form.hidden = true;
+  document.getElementById('s-nome').textContent = nome.split(' ')[0];
+  if (data.perfil) document.getElementById('s-perfil').innerHTML = 'Seu diagnóstico: <span class="tag-result">' + data.perfil.toUpperCase() + '</span>';
+  document.getElementById('success').hidden = false;
+});
+function fail(msg, id){ err.textContent = msg; err.hidden = false; if (id) document.getElementById(id).focus(); }
+</script>
+</body>
+</html>

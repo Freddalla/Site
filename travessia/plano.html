@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Travessia · Plano de Rota</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: caderno de bordo. Coluna de leitura à esquerda, índice fixo à direita no desktop. Mesmos tokens da landing. */
+:root{
+  --bg:#ecefeb; --bg-2:#e1e6e2; --card:#f6f7f4; --line:#c3cfcb; --fg:#10262a; --muted:#51625f;
+  --accent:#8a5f12; --accent-soft:#e9dcc0; --tide:#2f6d69; --sea:#0e1c20; --bone:#e8e3d6; --gold:#d9b36a;
+  --display:'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+  --body:'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono:'JetBrains Mono', ui-monospace, Menlo, monospace;
+  --gutter:clamp(16px,4vw,48px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1c20; --bg-2:#132629; --card:#16292c; --line:#24403f; --fg:#e8e3d6; --muted:#93a5a2;
+    --accent:#d9b36a; --accent-soft:#2c3326; --tide:#6fa8a4; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1c20; --bg-2:#132629; --card:#16292c; --line:#24403f; --fg:#e8e3d6; --muted:#93a5a2;
+  --accent:#d9b36a; --accent-soft:#2c3326; --tide:#6fa8a4; color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font:400 16.5px/1.68 var(--body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.page{max-width:1240px;margin-inline:auto;padding-inline:var(--gutter);padding-block:48px 96px;display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:64px}
+@media (max-width:980px){.page{grid-template-columns:minmax(0,1fr)}.toc{display:none}}
+main{min-width:0}
+.toc{position:sticky;top:32px;align-self:start;display:grid;gap:6px;font-size:.86rem}
+.toc a{color:var(--muted);text-decoration:none;padding:4px 0;border-left:1px solid var(--line);padding-left:14px}
+.toc a:hover{color:var(--fg);border-color:var(--accent)}
+.toc .mono{margin-bottom:10px}
+.mono{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.08;text-wrap:balance}
+h1{font-size:clamp(2.8rem,7vw,5.2rem);margin-block:14px 18px}
+h2{font-size:clamp(2rem,4.2vw,3rem);margin-bottom:18px}
+h3{font-size:1.5rem;margin-block:28px 10px}
+h4{font:600 1rem var(--body);margin-block:18px 6px}
+em{color:var(--accent)}
+p,li{max-width:68ch}
+p + p{margin-top:12px}
+ul,ol{padding-left:20px;display:grid;gap:6px;margin-top:10px}
+section{padding-block:56px;border-top:1px solid var(--line)}
+header.intro{padding-bottom:40px}
+.lead{font-size:1.18rem;color:var(--muted);max-width:60ch}
+.kicker{display:flex;gap:12px;align-items:center}
+.kicker b{color:var(--accent);font-weight:500}
+
+.callout{background:var(--accent-soft);border-radius:14px;padding:20px 22px;margin-top:22px}
+.callout p{max-width:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:22px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:22px}
+.grid2 > *, .grid3 > *{min-width:0}
+@media (max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+.card h4{margin-top:0}
+.card p,.card li{font-size:.94rem}
+
+.tbl{overflow-x:auto;margin-top:22px;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:.92rem}
+th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 .7rem var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--bg-2)}
+tr:last-child td{border-bottom:0}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* escada de valor */
+.ladder{display:grid;gap:10px;margin-top:22px}
+.step{display:grid;grid-template-columns:140px 1fr 150px;gap:18px;align-items:center;padding:16px 20px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.step > *{min-width:0}
+.step .price{font-family:var(--mono);font-size:.85rem;text-align:right;font-variant-numeric:tabular-nums}
+.step.now{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}
+@media (max-width:640px){.step{grid-template-columns:1fr}.step .price{text-align:left}}
+
+/* paleta */
+.swatches{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:18px}
+.sw{border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+.sw i{display:block;height:74px}
+.sw span{display:block;padding:8px 10px;font:500 .72rem var(--mono);background:var(--card)}
+@media (max-width:640px){.swatches{grid-template-columns:repeat(2,1fr)}}
+
+/* mockups de post 4:5 */
+.posts{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:22px}
+@media (max-width:980px){.posts{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:480px){.posts{grid-template-columns:1fr}}
+.post{aspect-ratio:4/5;max-width:100%;border-radius:10px;overflow:hidden;position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:18px;color:var(--bone);background:var(--sea);isolation:isolate}
+.post::before{content:"";position:absolute;inset:0;z-index:-1;opacity:.35;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E")}
+.post .pm{font:500 .6rem var(--mono);letter-spacing:.16em;text-transform:uppercase;opacity:.7}
+.post .pt{font-family:var(--display);font-size:clamp(1.3rem,2.2vw,1.7rem);line-height:1.1}
+.post .pt em{color:var(--gold)}
+.post.city{background:linear-gradient(180deg,#26343a 0%,#3d4a4c 45%,#a88652 100%)}
+.post.city .pt{font-size:1.05rem;font-family:var(--body);font-weight:500}
+.post.face{background:radial-gradient(circle at 50% 38%,#4b5a58 0 22%,#1c2a2d 23% 100%)}
+.post.face .pt{font-size:1.1rem;font-style:italic}
+.post.myth{background:var(--bone);color:var(--sea)}
+.post.myth .pt em{color:#8a5f12}
+.post .play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;border:1px solid rgba(232,227,214,.7);display:grid;place-items:center;font-size:.8rem}
+.post-cap{font-size:.84rem;color:var(--muted);margin-top:8px}
+
+/* calendário semanal */
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:22px;min-width:720px}
+.day{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--card);font-size:.84rem;display:flex;flex-direction:column;gap:6px}
+.day b{font:500 .7rem var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.day .fmt{display:inline-block;align-self:flex-start;font:500 .64rem var(--mono);padding:3px 7px;border-radius:6px;background:var(--accent-soft);color:var(--accent)}
+.day.off{background:transparent;border-style:dashed;color:var(--muted)}
+
+/* roadmap */
+.road{display:grid;gap:0;margin-top:22px;border-left:1px solid var(--line);margin-left:6px}
+.road > div{position:relative;padding:0 0 26px 26px}
+.road > div::before{content:"";position:absolute;left:-6px;top:6px;width:11px;height:11px;border-radius:50%;background:var(--bg);border:2px solid var(--accent)}
+.road h4{margin-top:0}
+
+.do-dont{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:22px}
+.do-dont > div{padding:18px 20px;min-width:0}
+.do-dont > div + div{border-left:1px solid var(--line);background:var(--bg-2)}
+.do-dont ul{list-style:none;padding:0}
+@media (max-width:640px){.do-dont{grid-template-columns:1fr}.do-dont > div + div{border-left:0;border-top:1px solid var(--line)}}
+code,.prompt{font-family:var(--mono);font-size:.82rem;overflow-wrap:anywhere}
+.prompt{display:block;background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-top:10px;white-space:pre-wrap;overflow-wrap:anywhere}
+.sources{font-size:.85rem;color:var(--muted)}
+.sources li{max-width:none}
+</style>
+</head>
+<body>
+<div class="page">
+<main>
+
+<header class="intro">
+  <p class="mono">Documento de trabalho · v0.1 · setembro de 2026</p>
+  <h1>Plano de rota da <em>Travessia</em></h1>
+  <p class="lead">Marca, oferta, modelo de negócio, validação com tráfego pago e plano de conteúdo para o Instagram. Tudo pensado para caber em 5 a 6 horas por semana enquanto isso é renda extra.</p>
+  <div class="callout">
+    <p><strong>A tese em uma linha.</strong> O conteúdo gratuito observa a vida real (cidade, pessoas, histórias). O Diagnóstico de Deriva transforma quem se identificou em lead. A Travessia Norte transforma lead em renda. Cada entrevista de rua também é pesquisa de mercado.</p>
+  </div>
+</header>
+
+<!-- ================= 1. MARCA ================= -->
+<section id="marca">
+  <p class="mono kicker"><b>01</b> Marca e storytelling</p>
+  <h2>O movimento contra a vida no piloto automático</h2>
+  <p>Você pediu uma figura mitológica e um nome irreverente, e a nossa conversa chegou em TRAVESSIA. Dá para ter os dois. <strong>Travessia continua sendo a marca</strong>, porque é um nome amplo o bastante para virar comunidade, retiro, caderno e fotografia. <strong>O mito entra como antagonista</strong>: Sísifo, o homem condenado a empurrar a mesma pedra morro acima para sempre.</p>
+  <p>Toda boa marca-movimento tem um inimigo claro. O nosso é a pedra de Sísifo, ou seja, a rotina que você empurra todo dia sem saber para onde. Isso dá à marca uma voz irreverente sem cair no discurso de guru: <em>“Largue a pedra.”</em></p>
+
+  <h3>A história em três atos</h3>
+  <div class="grid3">
+    <div class="card"><p class="mono">Início · a pedra</p><h4>Sísifo</h4><p>Vida boa por fora, automática por dentro. Competente, ocupado e adiando. É onde o público está.</p></div>
+    <div class="card"><p class="mono">Meio · a travessia</p><h4>Largar a pedra</h4><p>Parar, olhar de fora, voltar ao corpo, encarar a decisão. Desconfortável e feito em grupo. É o produto.</p></div>
+    <div class="card"><p class="mono">Fim · o norte</p><h4>Direção</h4><p>Não é uma vida perfeita. É um rumo escolhido e o próximo movimento feito. É a promessa.</p></div>
+  </div>
+
+  <h3>Arquitetura de nomes</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Nome</th><th>O que é</th><th>Por que funciona</th></tr></thead>
+    <tbody>
+      <tr><td><strong>TRAVESSIA</strong></td><td>A marca e o movimento</td><td>Jornada, passagem e coragem. Serve para conteúdo, comunidade e produtos físicos.</td></tr>
+      <tr><td><strong>Travessia Norte</strong></td><td>A jornada de 30 dias (produto piloto)</td><td>Travessia é o caminho. Norte é a direção.</td></tr>
+      <tr><td><strong>Diagnóstico de Deriva</strong></td><td>Quiz gratuito que gera os leads</td><td>Dá nome à dor sem acusar ninguém. “Deriva” não é fracasso.</td></tr>
+      <tr><td><strong>Tripulação</strong></td><td>Comunidade contínua para quem terminou a jornada</td><td>Quem atravessou continua junto. Gera a receita recorrente.</td></tr>
+      <tr><td><strong>Carta de Rumo</strong></td><td>Newsletter semanal e a carta escrita no dia 30</td><td>Linguagem náutica, íntima, que as pessoas querem guardar.</td></tr>
+      <tr><td><strong>Largue a pedra</strong></td><td>Campanha e bordão</td><td>Irreverente, fácil de lembrar e dá um bom post de lançamento.</td></tr>
+    </tbody>
+  </table></div>
+  <p style="margin-top:14px">Se ainda quiser um nome próprio mitológico, estas são as alternativas que testei: <strong>Caronte</strong>, o barqueiro que cobra uma moeda pela travessia (a entrada da turma pode se chamar “o óbolo”, mas tem uma carga de morte que pede cuidado); <strong>Ítaca</strong>, a volta de Ulisses para casa, que funciona como “voltar para si”; e <strong>Kairós</strong>, o momento certo, em contraste com Cronos, o tempo do relógio. Minha recomendação é manter TRAVESSIA e usar Sísifo como o vilão. Uma marca com antagonista é mais fácil de lembrar do que uma marca com nome de deus.</p>
+
+  <h3>Identidade visual</h3>
+  <p>Carta náutica à noite: mar escuro, papel envelhecido e uma única luz dourada, a do farol. A bússola é o símbolo. A agulha que aponta para o norte é dourada.</p>
+  <div class="swatches" aria-label="Paleta">
+    <div class="sw"><i style="background:#0e1c20"></i><span>Mar à noite · #0E1C20</span></div>
+    <div class="sw"><i style="background:#132629"></i><span>Água funda · #132629</span></div>
+    <div class="sw"><i style="background:#e8e3d6"></i><span>Osso · #E8E3D6</span></div>
+    <div class="sw"><i style="background:#d9b36a"></i><span>Farol · #D9B36A</span></div>
+    <div class="sw"><i style="background:#6fa8a4"></i><span>Maré · #6FA8A4</span></div>
+  </div>
+  <div class="grid3">
+    <div class="card"><p class="mono">Títulos</p><p style="font-family:var(--display);font-size:1.8rem;line-height:1.1">Instrument Serif</p><p>Para as frases que param o scroll. Itálico para a palavra que importa.</p></div>
+    <div class="card"><p class="mono">Texto</p><p style="font-weight:600;font-size:1.3rem">Manrope</p><p>Leitura limpa em legenda, carrossel e site.</p></div>
+    <div class="card"><p class="mono">Rótulos</p><p style="font-family:var(--mono);font-size:1.05rem">JetBrains Mono</p><p>Rumos, horários e lugares: <code>RUA AUGUSTA · 18H12</code>.</p></div>
+  </div>
+
+  <h4>Direção de fotografia (o “olhar Travessia”)</h4>
+  <ul>
+    <li><strong>Observador parado, mundo em movimento.</strong> Tripé, câmera fixa, pessoas pequenas no quadro. É a sua ideia de “paz no caos”.</li>
+    <li><strong>Luz de fim de tarde e hora azul.</strong> A referência de luz de Brandon Woelfel, só que mais contida, sem bokeh colorido.</li>
+    <li><strong>Escala humana diante da natureza.</strong> Chris Burkard e Jimmy Chin: uma pessoa pequena diante do mar ou da montanha.</li>
+    <li><strong>Retrato com história.</strong> Humans of New York e Steve McCurry: rosto, olhar e uma frase.</li>
+    <li>Grão leve, cores dessaturadas e o dourado só onde há luz. Nada de filtro saturado.</li>
+  </ul>
+
+  <h4>Voz da marca</h4>
+  <div class="do-dont">
+    <div><p class="mono">Fala assim</p><ul>
+      <li>“Você não está perdido. Está adiando.”</li>
+      <li>“Clareza não vem só pensando. Vem se movendo.”</li>
+      <li>“Sísifo tinha uma pedra. Você tem uma agenda.”</li>
+      <li>“Duas horas sem celular. Conta pra gente o que apareceu.”</li>
+    </ul></div>
+    <div><p class="mono">Nunca fala assim</p><ul>
+      <li>“Desperte seu gigante interior.”</li>
+      <li>“Seja sua melhor versão.”</li>
+      <li>“Networking de alto nível.”</li>
+      <li>“Mentalidade de homem de sucesso.”</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- ================= 2. MERCADO ================= -->
+<section id="mercado">
+  <p class="mono kicker"><b>02</b> O que o mercado ensina</p>
+  <h2>Quem já faz isso e o que dá para copiar</h2>
+  <p>Nenhum desses players vende exatamente a Travessia. Cada um prova uma parte do modelo.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Referência</th><th>O que faz</th><th>Como ganha dinheiro</th><th>Lição para a Travessia</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Humans of New York</strong><br><span class="mono">Brandon Stanton</span></td><td>Retratos de rua com uma história curta. Cerca de 30 milhões de seguidores.</td><td>Livros (três chegaram ao 1º lugar da lista do NYT) e Patreon. Já ajudou a arrecadar mais de US$ 20 milhões para causas e pessoas retratadas.</td><td>É o modelo da série “Travessias”. Formato fixo, história real e impacto como parte da marca.</td></tr>
+      <tr><td><strong>Modern Elder Academy</strong><br><span class="mono">Chip Conley</span></td><td>Escola para transições de meia-idade.</td><td>Workshops presenciais de uma semana a partir de US$ 5 mil, programa online de 8 semanas e membership de ex-alunos. Oferece bolsa para mais de 50% dos participantes.</td><td>Prova que “transição de vida” vende caro. Usa a mesma escada: online, depois presencial, depois comunidade. Bolsas são impacto com cara de marca.</td></tr>
+      <tr><td><strong>Evryman</strong></td><td>Grupos de homens com encontros semanais, retiros e formação de líderes.</td><td>Grupos pagos, retiros e treinamentos como o MELT.</td><td>Valida o público masculino que quer conversa real sem papo de “alfa”. O grupo pequeno e recorrente é o produto.</td></tr>
+      <tr><td><strong>Ness Labs</strong><br><span class="mono">Anne-Laure Le Cunff</span></td><td>Newsletter sobre mente e trabalho, com comunidade.</td><td>Começou com uma membership barata (US$ 5 por mês ou US$ 50 por ano) com encontros online e conexões 1:1.</td><td>Newsletter primeiro, comunidade depois. Ticket baixo para começar e subir com o tempo.</td></tr>
+      <tr><td><strong>The School of Life</strong><br><span class="mono">Alain de Botton</span></td><td>Filosofia aplicada à vida em vídeo, livros e aulas.</td><td>Livros, aulas, produtos físicos e eventos. O conteúdo gratuito leva ao pago.</td><td>Filosofia sem pose vende. Um conceito por post (Sísifo, estoicos, kairós) vira série.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout"><p><strong>Padrão comum.</strong> Todos começam com conteúdo gratuito e um formato reconhecível. Vendem primeiro uma experiência curta em grupo e só depois criam a recorrência. Ninguém começou pela mensalidade.</p></div>
+</section>
+
+<!-- ================= 3. MODELO ================= -->
+<section id="modelo">
+  <p class="mono kicker"><b>03</b> Modelo de negócio</p>
+  <h2>Uma escada de valor, e hoje você só constrói o primeiro degrau</h2>
+  <p>Mensalidade logo de cara é o erro mais comum. A comunidade ainda não existe e a pessoa paga por algo vazio. A ordem certa é jornada curta, depois comunidade para quem terminou, depois experiência presencial.</p>
+  <div class="ladder">
+    <div class="step"><span class="mono">Grátis</span><div><strong>Instagram + Diagnóstico de Deriva + Carta de Rumo</strong><br><span style="color:var(--muted);font-size:.92rem">Gera audiência, leads e pesquisa.</span></div><span class="price">R$ 0</span></div>
+    <div class="step now"><span class="mono">Agora · piloto</span><div><strong>Travessia Norte · 30 dias · 15 pessoas</strong><br><span style="color:var(--muted);font-size:.92rem">Valida a oferta e gera prova social.</span></div><span class="price">R$ 397</span></div>
+    <div class="step"><span class="mono">Mês 3+</span><div><strong>Tripulação · comunidade contínua</strong><br><span style="color:var(--muted);font-size:.92rem">Só para quem terminou a jornada. Um encontro por mês e o grupo.</span></div><span class="price">R$ 59–79/mês</span></div>
+    <div class="step"><span class="mono">Mês 6+</span><div><strong>Travessia presencial · fim de semana na natureza</strong><br><span style="color:var(--muted);font-size:.92rem">De 12 a 16 pessoas, duas ou três vezes por ano.</span></div><span class="price">R$ 1.500–2.800</span></div>
+    <div class="step"><span class="mono">Mês 9+</span><div><strong>Caderno de Bordo · produto físico</strong><br><span style="color:var(--muted);font-size:.92rem">Diário com suas fotos e as perguntas da jornada. É onde entram a arte e a fotografia.</span></div><span class="price">R$ 89–129</span></div>
+  </div>
+
+  <h3>Conta da primeira turma</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Item</th><th>Valor</th><th>Observação</th></tr></thead>
+    <tbody>
+      <tr><td>Receita · 15 × R$ 397</td><td class="num">R$ 5.955</td><td>Com parcelamento, a taxa da plataforma fica entre 5% e 10%.</td></tr>
+      <tr><td>Tráfego pago de validação</td><td class="num">− R$ 1.500</td><td>14 dias a cerca de R$ 100 por dia (ver seção 4).</td></tr>
+      <tr><td>Ferramentas</td><td class="num">− R$ 150</td><td>Zoom ou Meet, domínio e checkout (Hotmart, Kiwify ou Stripe).</td></tr>
+      <tr><td>Taxas de pagamento (~8%)</td><td class="num">− R$ 476</td><td></td></tr>
+      <tr><td>Uma bolsa por turma</td><td class="num">R$ 0</td><td>A 16ª vaga é gratuita para alguém que não pode pagar. É o seu “reverter em ações positivas” desde a primeira turma.</td></tr>
+      <tr><td><strong>Resultado da turma 1</strong></td><td class="num"><strong>≈ R$ 3.800</strong></td><td>O objetivo da turma 1 é aprender. A turma 2 já sai sem o custo de validação e com depoimentos.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h4>Remuneração e impacto</h4>
+  <ul>
+    <li><strong>Nos primeiros 6 meses, reinvista tudo:</strong> tráfego, equipamento básico (tripé e microfone de lapela) e o Caderno de Bordo.</li>
+    <li><strong>Depois disso, divida a receita.</strong> 50% para você, 40% para reinvestir e 10% para impacto (bolsas, ações na comunidade e um print da foto para cada entrevistado da série “Travessias”).</li>
+    <li><strong>Mostre o impacto em público.</strong> Um post por trimestre mostrando para onde foram os 10% vale mais que qualquer depoimento.</li>
+  </ul>
+  <p>Quando for virar fonte principal, a conta aproximada é: 2 turmas por mês com 15 pessoas a R$ 497, mais 60 membros na Tripulação a R$ 69, mais 2 retiros por ano. Isso dá perto de R$ 18 mil por mês de receita. É uma meta para 12 a 18 meses, não para agora.</p>
+</section>
+
+<!-- ================= 4. VALIDAÇÃO ================= -->
+<section id="validacao">
+  <p class="mono kicker"><b>04</b> Validação com Meta Ads</p>
+  <h2>Validar é vender antes de construir</h2>
+  <p>A landing page já é o experimento. Ela mostra preço, captura quanto a pessoa pagaria, o que ela está adiando e se topa conversar. O pixel registra <code>Lead</code> e <code>ViewContent</code> no diagnóstico.</p>
+
+  <h3>Estrutura da campanha (14 dias, R$ 1.500)</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Conjunto</th><th>Criativo</th><th>Gancho dos primeiros 2 segundos</th><th>Verba/dia</th></tr></thead>
+    <tbody>
+      <tr><td>A · Provocação</td><td>Reel com você falando para a câmera, 20s</td><td>“Você não está perdido. Está adiando.”</td><td class="num">R$ 35</td></tr>
+      <tr><td>B · Mito</td><td>Carrossel de 5 slides sobre Sísifo</td><td>“Sísifo tinha uma pedra. Você tem uma agenda.”</td><td class="num">R$ 35</td></tr>
+      <tr><td>C · Diagnóstico</td><td>Reel da série Paz no Caos com convite para o quiz</td><td>“Em 2 minutos: você está no automático ou à deriva?”</td><td class="num">R$ 35</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li><strong>Objetivo:</strong> Leads (conversão no site) com o evento <code>Lead</code>. Se o pixel tiver poucos dados, comece por Tráfego nos 3 primeiros dias.</li>
+    <li><strong>Público:</strong> homens de 28 a 45 anos, capitais e regiões metropolitanas, público aberto (Advantage+). Não segmente por interesse de “coaching”, isso atrai o público errado.</li>
+    <li><strong>UTM em todo anúncio:</strong> <code>?utm_source=meta&amp;utm_campaign=validacao1&amp;utm_content=A</code>. A planilha registra de qual anúncio veio cada pessoa.</li>
+    <li>Depois de 5 dias, desligue o pior conjunto e passe a verba para o melhor.</li>
+  </ul>
+
+  <h3>Critérios de decisão (defina antes, não depois)</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Métrica</th><th>Sinal verde</th><th>Sinal amarelo</th><th>O que fazer se vier vermelho</th></tr></thead>
+    <tbody>
+      <tr><td>Custo por lead</td><td class="num">≤ R$ 8</td><td class="num">R$ 8–15</td><td>Trocar o gancho e o criativo. O problema está na promessa, não no público.</td></tr>
+      <tr><td>Conversão da página</td><td class="num">≥ 20%</td><td class="num">10–20%</td><td>Encurtar o formulário e subir o diagnóstico para o topo.</td></tr>
+      <tr><td>Leads em 14 dias</td><td class="num">≥ 150</td><td class="num">80–150</td><td>Menos que 80: repensar o público ou a dor.</td></tr>
+      <tr><td>Marcaram R$ 297 ou mais</td><td class="num">≥ 40%</td><td class="num">25–40%</td><td>Testar R$ 297 ou um formato de 21 dias.</td></tr>
+      <tr><td>Toparam conversar</td><td class="num">≥ 15 pessoas</td><td class="num">8–15</td><td>Chamar no WhatsApp quem escreveu algo forte em “o que está adiando”.</td></tr>
+      <tr><td><strong>Pré-venda para a lista</strong></td><td class="num"><strong>≥ 10 vendas</strong></td><td class="num">5–9</td><td>Abaixo de 5, a oferta ainda não está pronta. Volte às conversas.</td></tr>
+    </tbody>
+  </table></div>
+  <p class="mono" style="margin-top:10px">São metas de referência para o primeiro teste, não médias de mercado. Ajuste depois da primeira semana com os seus dados.</p>
+
+  <h3>Roteiro das conversas de 15 minutos</h3>
+  <p>A regra é perguntar sobre o passado e nunca sobre o que a pessoa faria no futuro. Pessoas mentem sobre o futuro sem querer.</p>
+  <ol>
+    <li>Me conta sobre a última vez que você sentiu que estava vivendo no automático. O que estava acontecendo?</li>
+    <li>O que você já tentou para sair disso? Livro, terapia, curso, esporte, viagem?</li>
+    <li>Quanto isso custou, e o que funcionou ou não funcionou?</li>
+    <li>A decisão que você escreveu no formulário: há quanto tempo ela está parada? O que te impede?</li>
+    <li>Se existisse um grupo para atravessar isso em 30 dias, o que faria você não entrar?</li>
+    <li>Posso te chamar primeiro quando abrir a turma?</li>
+  </ol>
+</section>
+
+<!-- ================= 5. CONTEÚDO ================= -->
+<section id="conteudo">
+  <p class="mono kicker"><b>05</b> Instagram</p>
+  <h2>Quatro séries, um só olhar</h2>
+  <p>Os seus dois conceitos (a cidade observada em silêncio e as histórias de pessoas) viram as duas séries principais. As outras duas trazem a filosofia e os bastidores de quem está construindo a marca em público.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <p class="mono">Série 1 · Reels · 15–30s</p>
+      <h4>Paz no Caos</h4>
+      <p>Câmera parada no tripé, cidade em movimento, música calma e uma única frase na tela. Legenda com lugar e hora, por exemplo <code>AV. PAULISTA · 18H12</code>. É um passeio pela cidade pelos olhos de um observador curioso.</p>
+      <p><strong>Por que funciona:</strong> é contemplativo no meio de um feed agitado, alcança quem não segue a conta e dá para gravar dez num único passeio.</p>
+    </div>
+    <div class="card">
+      <p class="mono">Série 2 · Reels 45–90s + carrossel</p>
+      <h4>Travessias</h4>
+      <p>Entrevistas de rua no estilo Humans of New York, sempre com as mesmas três perguntas: <em>“O que você está adiando?”</em>, <em>“Qual foi a travessia mais difícil da sua vida?”</em> e <em>“O que você diria para você de cinco anos atrás?”</em></p>
+      <p><strong>Bônus:</strong> cada resposta vira dado de pesquisa. Em 30 entrevistas você tem o vocabulário exato do seu público para usar nos anúncios.</p>
+    </div>
+    <div class="card">
+      <p class="mono">Série 3 · Carrossel · 5–7 slides</p>
+      <h4>A Pedra da Semana</h4>
+      <p>Um conceito de filosofia ou psicologia aplicado à vida real: Sísifo, Kairós e Cronos, o flâneur de Baudelaire, amor fati, a dicotomia do controle dos estoicos, o efeito Zeigarnik (tarefas abertas ocupam a cabeça).</p>
+      <p><strong>Por que funciona:</strong> é o conteúdo mais salvo e compartilhado, e é o que dá autoridade sem precisar de palco.</p>
+    </div>
+    <div class="card">
+      <p class="mono">Série 4 · Stories · quase diário</p>
+      <h4>Diário de Bordo</h4>
+      <p>Você construindo a Travessia em público: dúvidas, números da lista, enquetes sobre nome, preço e formato. Isso é a cocriação que você anotou, ou seja, as pessoas participam da construção da marca.</p>
+      <p><strong>Por que funciona:</strong> é o tom vulnerável e autoral que você escolheu. Gera conversa no direct e prepara a venda.</p>
+    </div>
+  </div>
+
+  <h3>Como os posts ficam</h3>
+  <p>Mockups no formato do feed (4:5). O texto é real e as imagens de fundo são provisórias, para serem trocadas pelas suas fotos.</p>
+  <div class="posts">
+    <div>
+      <div class="post"><span class="pm">Travessia · 000°</span><p class="pt">Você não está perdido.<br><em>Está adiando.</em></p><span class="pm">Lançamento · post fixado</span></div>
+      <p class="post-cap">Post de lançamento. Tom autoral e provocativo.</p>
+    </div>
+    <div>
+      <div class="post myth"><span class="pm">A pedra da semana · 01/05</span><p class="pt">Sísifo tinha uma pedra.<br><em>Você tem uma agenda.</em></p><span class="pm">Arraste →</span></div>
+      <p class="post-cap">Capa do carrossel. O mito como antagonista.</p>
+    </div>
+    <div>
+      <div class="post city"><span class="pm">Av. Paulista · 18h12</span><span class="play" aria-hidden="true">▶</span><p class="pt">Quatrocentas pessoas passaram.<br>Ninguém olhou para cima.</p></div>
+      <p class="post-cap">Capa de Reel da série Paz no Caos (exemplo).</p>
+    </div>
+    <div>
+      <div class="post face"><span class="pm">Travessias · nº 07</span><p class="pt">“Adiei cinco anos uma conversa com meu pai. Ela durou vinte minutos.”</p><span class="pm">Exemplo de formato</span></div>
+      <p class="post-cap">Série Travessias. A frase é ilustrativa; as reais vêm das entrevistas.</p>
+    </div>
+  </div>
+
+  <h3>Semana padrão</h3>
+  <p>São 3 posts no feed e stories quase todos os dias. Tudo é produzido em um bloco de cerca de 4 horas no domingo (2h de passeio e gravação, 2h de edição no CapCut e agendamento no Meta Business Suite).</p>
+  <div class="tbl" style="border:0">
+    <div class="week">
+      <div class="day"><b>Seg</b><span class="fmt">Carrossel</span>A Pedra da Semana</div>
+      <div class="day"><b>Ter</b><span class="fmt">Stories</span>Enquete: o que você está adiando?</div>
+      <div class="day"><b>Qua</b><span class="fmt">Reel</span>Paz no Caos</div>
+      <div class="day"><b>Qui</b><span class="fmt">Stories</span>Diário de Bordo e números da lista</div>
+      <div class="day"><b>Sex</b><span class="fmt">Reel</span>Travessias (entrevista)</div>
+      <div class="day"><b>Sáb</b><span class="fmt">Stories</span>Desafio do fim de semana: 2h sem tela</div>
+      <div class="day off"><b>Dom</b>Bloco de produção. Passeio com a câmera.</div>
+    </div>
+  </div>
+
+  <h3>Os 9 primeiros posts (a grade de lançamento)</h3>
+  <ol>
+    <li><strong>Fixado:</strong> “Você não está perdido. Está adiando.” Um texto seu, pessoal, sobre por que está criando a Travessia.</li>
+    <li><strong>Fixado:</strong> o carrossel de Sísifo, “Sísifo tinha uma pedra. Você tem uma agenda.”</li>
+    <li><strong>Fixado:</strong> Reel convidando para o Diagnóstico de Deriva, com o link na bio.</li>
+    <li>Paz no Caos #1, na hora do rush, com a frase “Todo mundo com pressa. Para onde?”</li>
+    <li>Travessias #1, a primeira entrevista de rua.</li>
+    <li>A Pedra da Semana: Kairós e Cronos, o tempo do relógio e o momento certo.</li>
+    <li>Paz no Caos #2, a praia ou o parque às 6h. “A cidade antes de acordar.”</li>
+    <li>Carrossel com o manifesto e a lista do que a Travessia não é.</li>
+    <li>Travessias #2, com uma pessoa mais velha: “O que você diria para você aos 30?”</li>
+  </ol>
+
+  <h3>Onde entra a IA, e onde não entra</h3>
+  <p>A marca é sobre vida real, então <strong>as fotos e os vídeos precisam ser seus e reais.</strong> Uma imagem gerada por IA num perfil que fala de “sair do automático” soa falso, e o público percebe. A IA entra no que toma tempo:</p>
+  <div class="grid2">
+    <div class="card"><h4>Use a IA para</h4><ul>
+      <li>Transformar um áudio seu de 3 minutos em carrossel, legenda e roteiro de Reel.</li>
+      <li>Agrupar as respostas de “o que você está adiando” em temas (é só colar a planilha aqui).</li>
+      <li>Criar 10 variações de gancho para cada anúncio.</li>
+      <li>Escrever a Carta de Rumo semanal a partir das suas anotações.</li>
+      <li>Montar moodboards para testar direções visuais antes de fotografar.</li>
+    </ul></div>
+    <div class="card"><h4>Não use para</h4><ul>
+      <li>Rostos ou “entrevistados” da série Travessias.</li>
+      <li>Fotos da cidade no lugar das suas.</li>
+      <li>Depoimentos. Nunca invente um.</li>
+      <li>Responder o direct das pessoas.</li>
+    </ul></div>
+  </div>
+  <h4>Prompt de moodboard (Midjourney, Ideogram ou gerador do Canva)</h4>
+  <span class="prompt">Moodboard, 9 frames, documentary street photography, static tripod shot of a busy city crossing at blue hour, motion-blurred crowd, one still person looking up, muted teal and bone tones, single warm golden light source, subtle film grain, Humans of New York intimacy meets Chris Burkard scale, no text --ar 4:5</span>
+  <h4>Prompt para transformar um áudio seu em post (cole aqui no Claude)</h4>
+  <span class="prompt">Você é o editor da marca Travessia (tom: raiz, profundo, sem guru, frases curtas). Transforme a transcrição abaixo em: (1) carrossel de 6 slides, máximo 20 palavras por slide, primeiro slide com gancho provocativo; (2) legenda de até 120 palavras terminando com uma pergunta; (3) 5 ganchos alternativos para Reel. Evite: "melhor versão", "mentalidade", "alto nível". Transcrição: [cole aqui]</span>
+</section>
+
+<!-- ================= 6. ROTEIRO ================= -->
+<section id="roteiro">
+  <p class="mono kicker"><b>06</b> Próximos 30 dias</p>
+  <h2>Da ideia à primeira turma</h2>
+  <div class="road">
+    <div><p class="mono">Semana 1 · montar o barco</p><h4>Infraestrutura (cerca de 4h)</h4><ul>
+      <li>Ligar a planilha à landing page (passo a passo no README, 15 minutos).</li>
+      <li>Criar o Instagram @travessia (ou uma variação livre), com bio, destaque e link na bio para a landing.</li>
+      <li>Criar o pixel no Meta Business e colar o ID na landing.</li>
+      <li>Gravar no domingo o material dos 9 primeiros posts.</li>
+    </ul></div>
+    <div><p class="mono">Semana 2 · zarpar</p><h4>Lançamento orgânico e anúncios</h4><ul>
+      <li>Publicar os 9 posts ao longo da semana. Os 3 primeiros no mesmo dia, para a grade não ficar vazia.</li>
+      <li>Postar o convite pessoal nos seus stories e no LinkedIn, com o tom vulnerável e autoral.</li>
+      <li>Ligar a campanha de validação: 3 conjuntos, R$ 105 por dia.</li>
+    </ul></div>
+    <div><p class="mono">Semana 3 · escutar</p><h4>Conversas e ajuste</h4><ul>
+      <li>Fazer 10 a 15 conversas de 15 minutos com quem marcou a opção de cocriação.</li>
+      <li>Colar as respostas aqui e agrupar as dores. Ajustar o texto da landing com as palavras deles.</li>
+      <li>Desligar o pior anúncio e escalar o melhor.</li>
+    </ul></div>
+    <div><p class="mono">Semana 4 · abrir a turma</p><h4>Pré-venda para a lista</h4><ul>
+      <li>Mandar a mensagem pessoal no WhatsApp para a lista, com 72 horas de preço de fundador.</li>
+      <li>Com 10 ou mais vendas, marcar a data de início. Com menos de 5, voltar para a semana 3.</li>
+      <li>Preparar o material da semana 1 da jornada (vídeo, perguntas e desafio).</li>
+    </ul></div>
+  </div>
+  <div class="callout"><p><strong>Como me usar ao longo do caminho.</strong> Toda semana, cole aqui os números da planilha e do Meta Ads. Eu analiso, sugiro o próximo teste, reescrevo a copy com as palavras do seu público e preparo os roteiros da semana. Quando a primeira turma fechar, montamos juntos o conteúdo dos 30 dias.</p></div>
+</section>
+
+<section id="fontes">
+  <p class="mono kicker"><b>—</b> Fontes da pesquisa</p>
+  <ul class="sources">
+    <li><a href="https://en.wikipedia.org/wiki/Humans_of_New_York" target="_blank" rel="noopener">Humans of New York · Wikipedia</a></li>
+    <li><a href="https://en.wikipedia.org/wiki/Brandon_Stanton" target="_blank" rel="noopener">Brandon Stanton · Wikipedia</a></li>
+    <li><a href="https://www.goodreads.com/author_blog_posts/21774918-i-started-the-humans-of-new-york-patreon-several-years-ago-and" target="_blank" rel="noopener">Brandon Stanton sobre o Patreon do HONY · Goodreads</a></li>
+    <li><a href="https://www.nextavenue.org/modern-elder-academy/amp/" target="_blank" rel="noopener">Modern Elder Academy · Next Avenue</a></li>
+    <li><a href="https://helpcenter.meawisdom.com/what-is-the-modern-elder-academy-how-did-it-begin" target="_blank" rel="noopener">O que é a Modern Elder Academy · MEA</a></li>
+    <li><a href="https://www.wetravel.com/trips/men-s-emotional-leadership-training-evryman-15454048" target="_blank" rel="noopener">Evryman MELT · WeTravel</a></li>
+    <li><a href="https://newsinfo.inquirer.net/?p=1212101" target="_blank" rel="noopener">Grupos de apoio masculinos nos EUA · Inquirer</a></li>
+    <li><a href="https://www.indiehackers.com/product/maker-mind" target="_blank" rel="noopener">Ness Labs (Maker Mind) · Indie Hackers</a></li>
+  </ul>
+</section>
+
+</main>
+
+<nav class="toc" aria-label="Índice">
+  <p class="mono">Índice</p>
+  <a href="#marca">01 · Marca</a>
+  <a href="#mercado">02 · Mercado</a>
+  <a href="#modelo">03 · Modelo de negócio</a>
+  <a href="#validacao">04 · Validação</a>
+  <a href="#conteudo">05 · Instagram</a>
+  <a href="#roteiro">06 · Próximos 30 dias</a>
+  <a href="index.html">← Landing page</a>
+</nav>
+</div>
+</body>
+</html>
