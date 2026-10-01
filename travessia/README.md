@@ -42,3 +42,13 @@ Use sempre UTM, porque ela vai para a planilha:
 ```
 https://SEU-DOMINIO/travessia/?utm_source=meta&utm_medium=paid&utm_campaign=validacao1&utm_content=A
 ```
+
+## 5. Diário de Bordo (painel) e Fábrica de Pílulas
+
+| Arquivo | O que é |
+|---|---|
+| `painel/index.html` | O painel diário: diagnóstico, trilha de 30 dias, pílula com protocolo, meditação de 5 min, 3 gratidões, pergunta, evolução e metas |
+| `painel/conteudo.js` | A biblioteca de conteúdo: 36 pílulas, perguntas, meditações, ações e metas sugeridas. É o arquivo para editar ou ampliar |
+| `posts.html` | Fábrica de Pílulas: transforma cada pílula em 6 slides 1080×1350, legenda e roteiro de Reel |
+
+Os dados do painel ficam só no aparelho (localStorage). Para usar no celular, abra `/travessia/painel/` e use "Adicionar à tela inicial". Faça o backup na aba Rumo.

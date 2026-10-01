@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Fábrica de Pílulas</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: mesa de produção. Controles no topo; os 6 slides 4:5 em grade, cada um exportável; legenda e roteiro abaixo. */
+:root{
+  --bg:#ecefeb; --card:#f7f8f5; --line:#c9d2ce; --fg:#10262a; --muted:#51625f; --accent:#8a5f12; --on-accent:#fbf6ea;
+  --sea:#0e1c20; --sea-2:#132629; --bone:#e8e3d6; --gold:#d9b36a; --tide:#6fa8a4;
+  --display:'Instrument Serif','Iowan Old Style',Georgia,serif;
+  --body:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#0b1619; --card:#132629; --line:#24403f; --fg:#e8e3d6; --muted:#93a5a2; --accent:#d9b36a; --on-accent:#1a1408; color-scheme:dark; } }
+:root[data-theme="dark"]{ --bg:#0b1619; --card:#132629; --line:#24403f; --fg:#e8e3d6; --muted:#93a5a2; --accent:#d9b36a; --on-accent:#1a1408; color-scheme:dark; }
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font:400 15px/1.6 var(--body);overflow-x:hidden}
+.wrap{max-width:1180px;margin-inline:auto;padding-inline:clamp(16px,4vw,40px);padding-block:32px 80px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.05}
+h2{font-family:var(--display);font-weight:400;font-size:1.7rem;margin-bottom:10px}
+.mono{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:end;margin-block:24px}
+.controls > *{min-width:0}
+label{display:grid;gap:6px;font-weight:600;font-size:.85rem}
+select{font:inherit;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;max-width:100%}
+.btn{font:600 .88rem var(--body);border:1px solid var(--line);background:transparent;color:var(--fg);border-radius:999px;padding:10px 18px;cursor:pointer}
+.btn-primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+@media (max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.grid{grid-template-columns:minmax(0,1fr)}}
+.cell{display:grid;gap:8px}
+.cell .row{display:flex;justify-content:space-between;align-items:center}
+
+/* slide: desenhado em 1080x1350 e reduzido com transform */
+.frame{position:relative;width:100%;aspect-ratio:4/5;max-width:100%;overflow:hidden;border-radius:8px;box-shadow:0 1px 0 var(--line)}
+.slide{position:absolute;top:0;left:0;width:1080px;height:1350px;transform-origin:top left;padding:96px 96px 88px;display:flex;flex-direction:column;justify-content:space-between;background:var(--sea);color:var(--bone);font-family:var(--body)}
+.slide.light{background:var(--bone);color:var(--sea)}
+.slide .top,.slide .bot{display:flex;justify-content:space-between;align-items:center;font:500 26px var(--mono);letter-spacing:.16em;text-transform:uppercase;opacity:.72}
+.slide .logo{display:flex;gap:14px;align-items:center}
+.slide .logo svg{width:40px;height:40px}
+.slide .big{font-family:var(--display);font-size:118px;line-height:1.02;letter-spacing:-.01em}
+.slide .big em{color:var(--gold);font-style:italic}
+.slide.light .big em{color:#8a5f12}
+.slide .quote{font-family:var(--display);font-style:italic;font-size:76px;line-height:1.15}
+.slide .ref{font:500 28px var(--mono);letter-spacing:.08em;opacity:.7;margin-top:36px}
+.slide .txt{font-size:50px;line-height:1.38;font-weight:500}
+.slide .kicker{font:500 28px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:34px}
+.slide.light .kicker{color:#8a5f12}
+.slide .box{border:2px solid var(--gold);border-radius:28px;padding:56px}
+.slide .cta{font-size:36px;font-weight:600;opacity:.85}
+.slide .grain{position:absolute;inset:0;pointer-events:none;opacity:.18;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E")}
+
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-top:28px}
+.panel pre{white-space:pre-wrap;overflow-wrap:anywhere;font:400 .92rem/1.6 var(--body);margin-top:10px}
+.panel .row{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.msg{font-size:.85rem;color:var(--muted)}
+.how{margin-top:12px;color:var(--muted);max-width:70ch}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="mono">Travessia · fábrica de pílulas</p>
+  <h1>Uma pílula, seis slides, uma legenda.</h1>
+  <p class="how">Escolha uma pílula da biblioteca. Os slides saem no tamanho do feed do Instagram (1080 × 1350). Baixe cada um em PNG, copie a legenda e poste. Para um Reel da série Paz no Caos, use o roteiro no fim da página por cima de um vídeo seu da cidade.</p>
+
+  <div class="controls">
+    <label for="sel">Pílula<select id="sel"></select></label>
+    <label for="estilo">Estilo<select id="estilo"><option value="alt">Alternado (escuro e claro)</option><option value="dark">Todo escuro</option><option value="light">Todo claro</option></select></label>
+    <button class="btn" id="aleatoria" type="button">Sortear</button>
+    <button class="btn btn-primary" id="baixar-todos" type="button">Baixar os 6 slides</button>
+  </div>
+  <p class="msg" id="msg" hidden></p>
+
+  <div class="grid" id="grid"></div>
+
+  <section class="panel"><div class="row"><h2>Legenda</h2><button class="btn" type="button" data-copy="legenda">Copiar legenda</button></div><pre id="legenda"></pre></section>
+  <section class="panel"><div class="row"><h2>Roteiro de Reel · Paz no Caos</h2><button class="btn" type="button" data-copy="reel">Copiar roteiro</button></div><pre id="reel"></pre></section>
+</div>
+
+<script src="painel/conteudo.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+const LOGO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="10.5"/><path d="M12 3.5 14.4 12 12 20.5 9.6 12Z" fill="#d9b36a" stroke="none"/><path d="M12 3.5 14.4 12H9.6Z" fill="currentColor" stroke="none"/></svg>';
+const HASHTAGS = {
+  estoicismo:'#estoicismo #marcoaurelio #seneca #filosofia',
+  budismo:'#budismo #meditacao #atencaoplena #sabedoria',
+  evangelhos:'#jesus #evangelho #fe #reflexao',
+  mitologia:'#mitologia #mitologiagrega #filosofia #simbolismo'
+};
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const sel = document.getElementById('sel'), grid = document.getElementById('grid'), estilo = document.getElementById('estilo'), msg = document.getElementById('msg');
+
+PILULAS.forEach((p, i) => sel.insertAdjacentHTML('beforeend', `<option value="${i}">${String(i+1).padStart(2,'0')} · ${esc(p.titulo)} (${esc(TRADICOES[p.trad])})</option>`));
+
+function frases(t){ return t.match(/[^.!?]+[.!?]+/g) || [t]; }
+function dividir(t){ const f = frases(t).map(s => s.trim()); const m = Math.ceil(f.length / 2); return [f.slice(0, m).join(' '), f.slice(m).join(' ')]; }
+function tamanho(txt, base, limite){ return txt.length > limite ? Math.round(base * Math.sqrt(limite / txt.length)) : base; }
+
+function slides(p, n){
+  const [t1, t2] = dividir(p.texto);
+  const trad = TRADICOES[p.trad], num = 'Nº ' + String(n).padStart(2,'0');
+  const head = (k) => `<div class="top"><span class="logo">${LOGO}Travessia</span><span>${k}/6</span></div>`;
+  const foot = (txt) => `<div class="bot"><span>${esc(trad)}</span><span>${txt}</span></div>`;
+  const titulo = p.titulo.split(' '), corte = Math.max(1, Math.ceil(titulo.length / 2));
+  return [
+    `${head(1)}<div><p class="kicker">Pílula ${num}</p><p class="big" style="font-size:${tamanho(p.titulo,132,26)}px">${esc(titulo.slice(0,corte).join(' '))}<br><em>${esc(titulo.slice(corte).join(' '))}</em></p></div>${foot('Arraste →')}`,
+    `${head(2)}<div><p class="quote" style="font-size:${tamanho(p.citacao,80,110)}px">“${esc(p.citacao)}”</p><p class="ref">${esc(p.ref)}</p></div>${foot('')}`,
+    `${head(3)}<div><p class="kicker">O ensinamento</p><p class="txt" style="font-size:${tamanho(t1,54,230)}px">${esc(t1)}</p></div>${foot('')}`,
+    `${head(4)}<div><p class="kicker">Na vida real</p><p class="txt" style="font-size:${tamanho(t2 || t1,54,230)}px">${esc(t2 || '')}</p></div>${foot('')}`,
+    `${head(5)}<div class="box"><p class="kicker">Protocolo de hoje</p><p class="txt" style="font-size:${tamanho(p.protocolo,52,200)}px">${esc(p.protocolo)}</p></div>${foot('Salve para fazer')}`,
+    `${head(6)}<div><p class="kicker">Para o seu diário</p><p class="big" style="font-size:${tamanho(p.pergunta,96,60)}px">${esc(p.pergunta)}</p></div><div><p class="cta">Responda nos comentários ou no seu diário de bordo.<br>Diagnóstico gratuito no link da bio.</p></div>`
+  ];
+}
+
+function render(){
+  const i = +sel.value, p = PILULAS[i], st = estilo.value;
+  grid.innerHTML = slides(p, i + 1).map((html, k) => {
+    const light = st === 'light' || (st === 'alt' && k % 2 === 1);
+    return `<div class="cell"><div class="frame"><div class="slide ${light ? 'light' : ''}" id="s${k}">${html}<div class="grain"></div></div></div>
+      <div class="row"><span class="mono">Slide ${k+1}</span><button class="btn" type="button" data-baixar="${k}">Baixar PNG</button></div></div>`;
+  }).join('');
+  escalar();
+  document.getElementById('legenda').textContent =
+`${p.titulo}
+
+${frases(p.texto)[0].trim()}
+
+“${p.citacao}”
+${p.ref}
+
+Protocolo de hoje: ${p.protocolo}
+
+${p.pergunta} Responda aqui embaixo ou no seu diário.
+
+Salve para fazer hoje e mande para alguém que precisa ouvir isso.
+
+${HASHTAGS[p.trad]} #travessia #autoconhecimento #menostela`;
+  document.getElementById('reel').textContent =
+`Formato: 15 a 25 segundos, câmera parada no tripé, cidade em movimento, música calma. Texto na tela, uma linha por vez.
+
+0–5s   “${p.citacao}”
+5–9s   ${p.ref}
+9–17s  Hoje: ${p.protocolo.split('. ')[0].replace(/\.$/, '')}.
+17–23s ${p.pergunta}
+Final  TRAVESSIA · salve para fazer hoje
+
+Legenda: use a legenda acima.`;
+}
+function escalar(){ document.querySelectorAll('.frame').forEach(f => { const s = f.querySelector('.slide'); s.style.transform = `scale(${f.clientWidth / 1080})`; }); }
+addEventListener('resize', escalar);
+
+async function baixar(k){
+  if (!window.html2canvas){ aviso('O exportador não carregou. Tire um print do slide como alternativa.'); return; }
+  const el = document.getElementById('s' + k), tr = el.style.transform;
+  el.style.transform = 'none';
+  try {
+    await document.fonts.ready;
+    const c = await html2canvas(el, { width:1080, height:1350, scale:1, backgroundColor:null });
+    const a = document.createElement('a'); a.href = c.toDataURL('image/png');
+    a.download = `travessia-${String(+sel.value + 1).padStart(2,'0')}-slide${k+1}.png`; document.body.appendChild(a); a.click(); a.remove();
+  } catch(e){ aviso('Não foi possível gerar a imagem aqui. Tire um print do slide como alternativa.'); }
+  el.style.transform = tr;
+}
+function aviso(t){ msg.hidden = false; msg.textContent = t; }
+
+grid.addEventListener('click', e => { const b = e.target.closest('[data-baixar]'); if (b) baixar(+b.dataset.baixar); });
+document.getElementById('baixar-todos').addEventListener('click', async () => { for (let k = 0; k < 6; k++) await baixar(k); });
+document.getElementById('aleatoria').addEventListener('click', () => { sel.value = Math.floor(Math.random() * PILULAS.length); render(); });
+document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', () => {
+  const txt = document.getElementById(b.dataset.copy).textContent;
+  navigator.clipboard?.writeText(txt).then(() => aviso('Copiado.')).catch(() => {
+    const r = document.createRange(); r.selectNodeContents(document.getElementById(b.dataset.copy)); const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    aviso('Texto selecionado. Copie com Ctrl+C ou segurando o dedo.');
+  });
+}));
+sel.addEventListener('change', render); estilo.addEventListener('change', render);
+sel.value = PILULAS.findIndex(p => p.id === 'mito-icaro'); render();
+</script>
+</body>
+</html>

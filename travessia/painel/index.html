@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Diário de Bordo</title>
+<meta name="description" content="Travessia · seu painel diário: uma pílula de sabedoria com protocolo, 5 minutos de meditação, 3 gratidões e a sua evolução.">
+<meta name="theme-color" content="#0e1c20">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Travessia">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: uma coluna estreita, como a página de um caderno. Uma coisa por vez, muito respiro, navegação de 3 abas no rodapé. */
+:root{
+  --bg:#f1f2ee;        /* papel de névoa */
+  --card:#fafaf7;
+  --line:#d5dbd6;
+  --fg:#10262a;        /* tinta de carta náutica */
+  --muted:#5b6b68;
+  --accent:#8a5f12;    /* farol, em tinta */
+  --accent-soft:#efe5cf;
+  --on-accent:#fbf6ea;
+  --tide:#2f6d69;      /* maré */
+  --tide-soft:#d9e8e5;
+  --display:'Instrument Serif','Iowan Old Style',Georgia,serif;
+  --body:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1c20; --card:#14272a; --line:#24403f; --fg:#e8e3d6; --muted:#93a5a2;
+    --accent:#d9b36a; --accent-soft:#2e3324; --on-accent:#1a1408; --tide:#6fa8a4; --tide-soft:#1b3536; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1c20; --card:#14272a; --line:#24403f; --fg:#e8e3d6; --muted:#93a5a2;
+  --accent:#d9b36a; --accent-soft:#2e3324; --on-accent:#1a1408; --tide:#6fa8a4; --tide-soft:#1b3536; color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--fg);font:400 16px/1.6 var(--body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.app{max-width:580px;margin-inline:auto;padding-inline:18px;padding-block:20px 120px}
+h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.1;text-wrap:balance}
+h1{font-size:2.4rem}
+h2{font-size:1.9rem}
+h3{font-size:1.45rem}
+.mono{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+.stack{display:grid;gap:16px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.between{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px}
+.card > * + *{margin-top:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:transparent;border-radius:999px;padding:12px 20px;font-weight:600;font-size:.92rem;cursor:pointer;text-decoration:none;color:var(--fg)}
+.btn:hover{border-color:var(--fg)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn-primary:hover{border-color:var(--accent);filter:brightness(1.05)}
+.btn-small{padding:8px 14px;font-size:.84rem}
+.btn-link{background:none;border:0;color:var(--accent);font-weight:600;cursor:pointer;padding:0;font-size:.88rem}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+label.field{display:grid;gap:6px;font-weight:600;font-size:.9rem}
+label.field small{font-weight:400;color:var(--muted)}
+input[type=text],textarea,select{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:1rem}
+textarea{min-height:84px;resize:vertical;line-height:1.5}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:transparent;border-radius:999px;padding:9px 14px;font-size:.88rem;cursor:pointer;font-weight:500}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.tag{display:inline-block;font:500 .66rem var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:4px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent)}
+.tag.tide{background:var(--tide-soft);color:var(--tide)}
+
+/* topo */
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
+.brand{display:flex;gap:8px;align-items:center;font:500 .74rem var(--mono);letter-spacing:.3em}
+.brand svg{width:20px;height:20px}
+.demo{background:var(--accent-soft);border-radius:12px;padding:10px 14px;margin-bottom:20px;font-size:.88rem;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+
+/* hoje */
+.greet{margin-bottom:22px}
+.greet h1{margin-block:6px 6px}
+.progress{display:flex;gap:14px;align-items:center;margin-bottom:22px}
+.ring{width:54px;height:54px;flex:none}
+.ring circle{fill:none;stroke-width:5}
+.ring .bg{stroke:var(--line)}
+.ring .fg{stroke:var(--accent);stroke-linecap:round;transition:stroke-dashoffset .6s ease}
+.ring text{font:600 13px var(--body);fill:var(--fg)}
+.task-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.done-mark{font:500 .7rem var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--tide)}
+.quote{font-family:var(--display);font-style:italic;font-size:1.3rem;line-height:1.3}
+.ref{font-size:.82rem;color:var(--muted)}
+.protocol{background:var(--accent-soft);border-radius:14px;padding:14px 16px}
+.protocol p{margin-top:4px}
+.check{display:flex;gap:12px;align-items:flex-start;cursor:pointer;padding:6px 0}
+.check input{width:22px;height:22px;accent-color:var(--accent);flex:none;margin-top:1px}
+.check.done span{text-decoration:line-through;color:var(--muted)}
+.personal{font-size:.9rem;color:var(--muted);border-left:2px solid var(--accent);padding-left:12px}
+.grat{display:grid;gap:10px}
+.grat label{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:center}
+.grat label b{font:500 .8rem var(--mono);color:var(--accent);text-align:center}
+.grat .hint{grid-column:2;font-size:.76rem;color:var(--muted);margin-top:-6px}
+.scale{display:flex;gap:6px}
+.scale button{flex:1;border:1px solid var(--line);background:transparent;border-radius:10px;padding:8px 0;cursor:pointer;font-weight:600}
+.scale button[aria-pressed="true"]{background:var(--tide);border-color:var(--tide);color:var(--bg)}
+.complete{text-align:center;padding:36px 22px}
+.complete svg{width:56px;height:56px;margin:0 auto 10px;color:var(--accent)}
+.nudge{font-size:.9rem;padding:12px 14px;border-radius:12px;border:1px dashed var(--line);color:var(--muted)}
+
+/* evolução */
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.stat b{display:block;font-family:var(--display);font-size:2rem;line-height:1.1;font-weight:400;font-variant-numeric:tabular-nums}
+.heat{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.heat i{aspect-ratio:1;border-radius:6px;background:var(--line);display:block;max-width:100%}
+.heat i[data-l="1"]{background:color-mix(in srgb,var(--accent) 30%,var(--line))}
+.heat i[data-l="2"]{background:color-mix(in srgb,var(--accent) 60%,var(--line))}
+.heat i[data-l="3"]{background:var(--accent)}
+.heat i.today{outline:2px solid var(--fg);outline-offset:1px}
+.heat-days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center}
+.legend{display:flex;gap:16px;font-size:.8rem;color:var(--muted);flex-wrap:wrap}
+.legend span::before{content:"";display:inline-block;width:10px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle;background:var(--c)}
+svg.chart{width:100%;height:auto;overflow:visible}
+.chart text{font:500 10px var(--mono);fill:var(--muted)}
+details.entry{border-top:1px solid var(--line);padding-block:12px}
+details.entry summary{cursor:pointer;display:flex;justify-content:space-between;gap:10px;font-weight:600;list-style:none}
+details.entry summary::-webkit-details-marker{display:none}
+details.entry ul{margin:8px 0 0 18px;font-size:.92rem}
+details.entry p{font-size:.92rem;margin-top:8px}
+.slider{display:grid;grid-template-columns:96px 1fr 28px;gap:12px;align-items:center;font-size:.9rem}
+.slider input{accent-color:var(--accent);width:100%}
+.slider output{font-family:var(--mono);text-align:right;font-variant-numeric:tabular-nums}
+
+/* rumo */
+.trail{display:grid;gap:2px;max-height:360px;overflow:auto;border:1px solid var(--line);border-radius:12px}
+.trail div{display:grid;grid-template-columns:44px 1fr auto;gap:10px;padding:9px 12px;font-size:.88rem;align-items:center}
+.trail div.past{color:var(--muted)}
+.trail div.now{background:var(--accent-soft);font-weight:600}
+.action-item{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.med-plan{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.med-plan label{display:grid;gap:4px;font-size:.8rem;color:var(--muted)}
+.danger{color:#b4472b}
+
+/* onboarding */
+.ob{min-height:80vh;display:flex;flex-direction:column;gap:22px;padding-top:12px}
+.ob-bar{height:3px;background:var(--line);border-radius:3px;overflow:hidden}
+.ob-bar i{display:block;height:100%;background:var(--accent);transition:width .4s}
+.ob h1{font-size:2.6rem}
+.ob p.lead{font-size:1.08rem;color:var(--muted)}
+.ob-nav{display:flex;justify-content:space-between;gap:12px;margin-top:auto;padding-top:20px}
+.phases{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.phases div{border:1px solid var(--line);border-radius:12px;padding:12px}
+.phases b{font-family:var(--display);font-size:1.3rem;font-weight:400;display:block}
+
+/* nav inferior */
+.tabs{position:fixed;left:0;right:0;bottom:0;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);z-index:20}
+.tabs div{max-width:580px;margin-inline:auto;display:grid;grid-template-columns:repeat(3,1fr)}
+.tabs button{background:none;border:0;padding:14px 0 12px;cursor:pointer;display:grid;justify-items:center;gap:3px;font-size:.78rem;font-weight:600;color:var(--muted)}
+.tabs button svg{width:22px;height:22px}
+.tabs button[aria-current="page"]{color:var(--accent)}
+
+/* meditação */
+.med{position:fixed;inset:0;background:var(--bg);z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:calc(28px + env(safe-area-inset-top,0px)) 20px calc(28px + env(safe-area-inset-bottom,0px));text-align:center}
+.med .orb-wrap{flex:1;display:grid;place-items:center;width:100%}
+.orb{width:min(62vw,260px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 50% 40%,color-mix(in srgb,var(--accent) 45%,transparent),color-mix(in srgb,var(--tide) 25%,transparent) 70%);border:1px solid color-mix(in srgb,var(--accent) 50%,transparent);transform:scale(.6);transition-property:transform;transition-timing-function:ease-in-out}
+.med .phase{font:500 .8rem var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent);min-height:1.2em;margin-top:18px}
+.med .cue{font-family:var(--display);font-size:1.5rem;line-height:1.25;max-width:22ch;min-height:3.8em}
+.med .time{font:500 1rem var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion: reduce){.orb{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<nav class="tabs" id="tabs" hidden aria-label="Seções">
+  <div>
+    <button type="button" data-tab="hoje"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Hoje</button>
+    <button type="button" data-tab="evolucao"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 20h18"/><path d="M4 16l5-5 4 3 7-8"/></svg>Evolução</button>
+    <button type="button" data-tab="rumo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9.5"/><path d="M12 5l2 7-2 7-2-7z"/></svg>Rumo</button>
+  </div>
+</nav>
+<div class="med" id="med" hidden role="dialog" aria-modal="true" aria-label="Meditação"></div>
+
+<script src="conteudo.js"></script>
+<script>
+/* ======================================================================
+   TRAVESSIA · Diário de Bordo
+   Tudo fica salvo neste aparelho (localStorage). Exporte o backup no Rumo.
+   ====================================================================== */
+const KEY = 'travessia.painel.v1';
+const PILAR_IDS = Object.keys(PILARES);
+const DIAS_SEMANA = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const app = document.getElementById('app'), tabsEl = document.getElementById('tabs'), medEl = document.getElementById('med');
+
+let S = load();
+let tab = 'hoje';
+let ob = null;           // rascunho do onboarding
+let ui = { revisao:false, rodaForm:false, confirmApagar:false, lerMais:false };
+
+/* ---------------- utilidades ---------------- */
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad = n => String(n).padStart(2,'0');
+const dkey = (d = new Date()) => d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+const parseKey = k => { const [y,m,d] = k.split('-').map(Number); return new Date(y, m-1, d); };
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const diffDays = (a, b) => Math.round((parseKey(dkey(b)) - parseKey(dkey(a))) / 864e5);
+const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+const rng = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const pill = id => PILULAS.find(p => p.id === id);
+const fmtDate = (d, opt) => d.toLocaleDateString('pt-BR', opt || { weekday:'long', day:'numeric', month:'long' });
+
+function load(){ try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e){ return null; } }
+let saveT; function save(){ clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }, 150); }
+function saveNow(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+
+function faseDoDia(d){ return d <= 7 ? 'clareza' : d <= 14 ? 'corpo' : d <= 21 ? 'coragem' : 'direcao'; }
+function diaTrilha(){ return diffDays(parseKey(S.perfil.inicio), new Date()) + 1; }
+
+function gerarTrilha(trads, foco, seed, evitar = []){
+  const r = rng(seed), pool = PILULAS.filter(p => trads.includes(p.trad));
+  const used = new Set(evitar), out = [];
+  for (let d = 1; d <= 30; d++){
+    const fase = faseDoDia(d);
+    let c = pool.filter(p => !used.has(p.id) && p.fase === fase);
+    if (!c.length) c = pool.filter(p => !used.has(p.id));
+    if (!c.length){ used.clear(); c = pool.slice(); }
+    const score = p => (p.pilares.some(x => foco.includes(x)) ? 2 : 0) + r() + (d === 1 && p.id === 'mito-sisifo' ? 10 : 0);
+    c.sort((a,b) => score(b) - score(a));
+    used.add(c[0].id); out.push(c[0].id);
+  }
+  return out;
+}
+
+function dia(k = dkey()){
+  if (!S.dias[k]) S.dias[k] = { feito:{}, grat:['','',''], resposta:'', energia:null, paz:null, medMin:0 };
+  return S.dias[k];
+}
+function pilulaDe(k){
+  const d = diffDays(parseKey(S.perfil.inicio), parseKey(k)) + 1;
+  if (d >= 1 && d <= 30) return pill(S.perfil.trilha[d-1]);
+  const pool = PILULAS.filter(p => S.perfil.tradicoes.includes(p.trad));
+  return pool[hash(k) % pool.length];
+}
+function perguntaDe(k){
+  const D = dia(k);
+  if (D.pergunta) return D.pergunta;
+  const n = diffDays(parseKey(S.perfil.inicio), parseKey(k)) + 1;
+  if (n % 2 === 1) D.pergunta = pilulaDe(k).pergunta;
+  else {
+    const f = S.perfil.foco, arr = [...(PERGUNTAS[f[0]]||[]), ...(PERGUNTAS[f[1]]||[]), ...PERGUNTAS.geral];
+    D.pergunta = arr[hash(k + 'q') % arr.length];
+  }
+  return D.pergunta;
+}
+function itensDoDia(k){
+  const D = dia(k);
+  const base = [['pilula', D.feito.pilula], ['med', D.feito.med], ['diario', D.feito.diario]];
+  S.perfil.acoes.forEach(a => base.push(['a:' + a.id, !!D.feito['a:' + a.id]]));
+  return base;
+}
+function diaCompleto(k){ const D = S.dias[k]; return !!(D && D.feito.pilula && D.feito.med && D.feito.diario); }
+function nivel(k){
+  const D = S.dias[k]; if (!D) return 0;
+  const n = ['pilula','med','diario'].filter(x => D.feito[x]).length;
+  return n;
+}
+/* Sequência com a regra "nunca falhe duas vezes": uma falha isolada não quebra. */
+function sequencia(){
+  let d = new Date(), n = 0, falhas = 0;
+  if (!diaCompleto(dkey(d))) d = addDays(d, -1);
+  const inicio = parseKey(S.perfil.inicioAbsoluto || S.perfil.inicio);
+  while (d >= inicio){
+    if (diaCompleto(dkey(d))){ n++; falhas = 0; }
+    else { falhas++; if (falhas >= 2) break; }
+    d = addDays(d, -1);
+  }
+  return n;
+}
+
+/* ---------------- som (sino) ---------------- */
+let actx;
+function sino(){
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const t = actx.currentTime;
+    [528, 792, 1056].forEach((f, i) => {
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.18 / (i+1), t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + 4);
+      o.connect(g).connect(actx.destination); o.start(t); o.stop(t + 4.1);
+    });
+  } catch(e){}
+}
+
+/* ======================================================================
+   ONBOARDING · diagnóstico do momento
+   ====================================================================== */
+function iniciarOnboarding(){
+  ob = { passo:0, nome:'', roda:Object.fromEntries(PILAR_IDS.map(p => [p, 5])), foco:[], sonho:'', infancia:'',
+         woop:null, tradicoes:Object.keys(TRADICOES), acoes:[] };
+}
+const OB_TOTAL = 7;
+function renderOnboarding(){
+  tabsEl.hidden = true;
+  const p = ob.passo;
+  const bar = `<div class="ob-bar" aria-hidden="true"><i style="width:${p / OB_TOTAL * 100}%"></i></div>`;
+  const nav = (proximo = 'Continuar', ok = true) => `<div class="ob-nav">${p > 0 ? '<button class="btn" data-act="ob-voltar">Voltar</button>' : '<span></span>'}<button class="btn btn-primary" data-act="ob-proximo" ${ok ? '' : 'disabled'}>${proximo}</button></div>`;
+  let h = '';
+  if (p === 0){
+    h = `<div class="ob">
+      ${marca()}
+      <p class="mono">Travessia · diário de bordo</p>
+      <h1>Menos tela.<br><em style="color:var(--accent)">Mais rumo.</em></h1>
+      <p class="lead">Um painel para cinco minutos de manhã e cinco à noite. Todo dia: uma pílula de sabedoria (Buda, estoicos, Jesus, mitologia) com um protocolo prático, 5 minutos de meditação, 3 gratidões e uma pergunta. Você acompanha a própria evolução.</p>
+      <p class="muted" style="font-size:.9rem">Antes, um diagnóstico de 4 minutos para montar a sua trilha de 30 dias. Seus dados ficam só neste aparelho.</p>
+      <div class="ob-nav" style="flex-direction:column;align-items:stretch">
+        <button class="btn btn-primary" data-act="ob-proximo">Fazer meu diagnóstico</button>
+        <button class="btn" data-act="demo">Explorar com dados de exemplo</button>
+        <button class="btn-link" data-act="importar-inicio" style="align-self:center;margin-top:6px">Tenho um backup</button>
+      </div>
+    </div>`;
+  }
+  if (p === 1){
+    h = `<div class="ob">${bar}<p class="mono">1 de 6 · você</p><h1>Como você quer ser chamado?</h1>
+      <label class="field">Nome<input type="text" id="ob-nome" data-ob="nome" value="${esc(ob.nome)}" autocomplete="given-name"></label>
+      ${nav('Continuar', !!ob.nome.trim())}</div>`;
+  }
+  if (p === 2){
+    h = `<div class="ob">${bar}<p class="mono">2 de 6 · a roda</p><h1>Onde você está hoje?</h1>
+      <p class="lead">De 1 a 10, sem pensar muito. É uma foto do momento, não uma nota de prova.</p>
+      <div class="stack">${PILAR_IDS.map(id => `<div><div class="slider"><label for="r-${id}">${PILARES[id].nome}</label><input type="range" min="1" max="10" id="r-${id}" data-ob-roda="${id}" value="${ob.roda[id]}"><output id="o-${id}">${ob.roda[id]}</output></div><p class="muted" style="font-size:.78rem;margin-left:108px">${PILARES[id].desc}</p></div>`).join('')}</div>
+      ${nav()}</div>`;
+  }
+  if (p === 3){
+    if (!ob.foco.length) ob.foco = PILAR_IDS.slice().sort((a,b) => ob.roda[a] - ob.roda[b]).slice(0,1);
+    h = `<div class="ob">${bar}<p class="mono">3 de 6 · o foco</p><h1>O que você quer impulsionar agora?</h1>
+      <p class="lead">Escolha até 2. Já marcamos o pilar com a nota mais baixa, mas a escolha é sua.</p>
+      <div class="chips">${PILAR_IDS.map(id => `<button class="chip" data-act="ob-foco" data-id="${id}" aria-pressed="${ob.foco.includes(id)}">${PILARES[id].nome} · ${ob.roda[id]}</button>`).join('')}</div>
+      ${nav('Continuar', ob.foco.length > 0)}</div>`;
+  }
+  if (p === 4){
+    h = `<div class="ob">${bar}<p class="mono">4 de 6 · o sonho</p><h1>Para onde é a travessia?</h1>
+      <label class="field">Daqui a 5 anos, num dia comum, como é a sua vida? <small>Onde você acorda, com quem, o que faz.</small><textarea id="ob-sonho" data-ob="sonho" placeholder="Ex.: acordo cedo perto do mar, trabalho no meu próprio projeto, tenho tempo para treinar e para quem eu amo.">${esc(ob.sonho)}</textarea></label>
+      <label class="field">O que você fazia quando criança que te fazia perder a noção do tempo? <small>Costuma esconder uma pista do seu propósito.</small><textarea id="ob-infancia" data-ob="infancia" placeholder="Ex.: pulava da escada tentando voar.">${esc(ob.infancia)}</textarea></label>
+      ${nav()}</div>`;
+  }
+  if (p === 5){
+    if (!ob.woop){ const s = WOOP_SUGESTOES[ob.foco[0]]; ob.woop = { desejo:s.desejo, resultado:'', obstaculo:s.obstaculo, plano:s.plano }; }
+    h = `<div class="ob">${bar}<p class="mono">5 de 6 · a meta de 90 dias</p><h1>Uma meta, quatro linhas</h1>
+      <p class="lead">Método WOOP, da psicóloga Gabriele Oettingen: desejo, resultado, obstáculo e plano. Já deixamos uma sugestão para você editar.</p>
+      <label class="field">Desejo · o que você quer em 90 dias<textarea id="w-desejo" data-ob-woop="desejo">${esc(ob.woop.desejo)}</textarea></label>
+      <label class="field">Resultado · como vai ser quando conseguir <small>Imagine por 30 segundos antes de escrever.</small><textarea id="w-resultado" data-ob-woop="resultado" placeholder="Ex.: vou me sentir leve, orgulhoso e com tempo.">${esc(ob.woop.resultado)}</textarea></label>
+      <label class="field">Obstáculo · o que dentro de você atrapalha<textarea id="w-obstaculo" data-ob-woop="obstaculo">${esc(ob.woop.obstaculo)}</textarea></label>
+      <label class="field">Plano · "Se [obstáculo], então eu [ação]"<textarea id="w-plano" data-ob-woop="plano">${esc(ob.woop.plano)}</textarea></label>
+      ${nav()}</div>`;
+  }
+  if (p === 6){
+    if (!ob.acoes.length) ob.acoes = ob.foco.flatMap(f => ACOES_SUGERIDAS[f].slice(0,1));
+    const sug = [...new Set(ob.foco.flatMap(f => ACOES_SUGERIDAS[f]))];
+    h = `<div class="ob">${bar}<p class="mono">6 de 6 · o dia a dia</p><h1>Menos é mais</h1>
+      <p class="lead">Escolha de onde vêm as suas pílulas diárias e até 3 ações para repetir todo dia.</p>
+      <div><p class="mono" style="margin-bottom:8px">Tradições</p><div class="chips">${Object.entries(TRADICOES).map(([id,n]) => `<button class="chip" data-act="ob-trad" data-id="${id}" aria-pressed="${ob.tradicoes.includes(id)}">${n}</button>`).join('')}</div></div>
+      <div><p class="mono" style="margin-bottom:8px">Ações diárias · ${ob.acoes.length} de 3</p><div class="chips">${sug.map(a => `<button class="chip" data-act="ob-acao" data-txt="${esc(a)}" aria-pressed="${ob.acoes.includes(a)}">${esc(a)}</button>`).join('')}</div>
+      <div class="row" style="margin-top:10px"><input type="text" id="ob-nova-acao" placeholder="Ou escreva a sua" style="flex:1;min-width:0"><button class="btn btn-small" data-act="ob-add-acao">Adicionar</button></div>
+      ${ob.acoes.filter(a => !sug.includes(a)).map(a => `<p style="margin-top:8px">· ${esc(a)} <button class="btn-link" data-act="ob-acao" data-txt="${esc(a)}">remover</button></p>`).join('')}</div>
+      ${nav('Ver minha trilha', ob.tradicoes.length > 0)}</div>`;
+  }
+  if (p === 7){
+    const trilha = gerarTrilha(ob.tradicoes, ob.foco, hash(ob.nome + Date.now()));
+    ob.trilha = trilha;
+    const first = pill(trilha[0]);
+    h = `<div class="ob">${bar}<p class="mono">Pronto, ${esc(ob.nome)}</p><h1>Sua trilha de 30 dias</h1>
+      <p class="lead">Quatro trechos, com foco em ${ob.foco.map(f => PILARES[f].nome).join(' e ')}. Todo dia uma pílula termina num protocolo: uma ação específica, pequena e verificável.</p>
+      <div class="phases">${Object.entries(FASES).map(([id,f], i) => `<div><span class="mono">Semana ${i+1}</span><b>${f.nome}</b><span class="muted" style="font-size:.86rem">${f.pergunta}</span></div>`).join('')}</div>
+      <div class="card"><span class="mono">Dia 1</span><h3>${esc(first.titulo)}</h3><p class="muted">${esc(TRADICOES[first.trad])} · ${esc(first.ref)}</p></div>
+      ${nav('Começar hoje')}</div>`;
+  }
+  app.innerHTML = h;
+  const f = app.querySelector('input[type=text],textarea'); if (f && p > 0 && p < 6) f.focus({preventScroll:true});
+}
+function concluirOnboarding(){
+  const hoje = dkey();
+  S = { versao:1, perfil:{ nome:ob.nome.trim(), inicio:hoje, inicioAbsoluto:hoje, foco:ob.foco, sonho:ob.sonho, infancia:ob.infancia, woop:ob.woop,
+        tradicoes:ob.tradicoes, acoes:ob.acoes.map((t,i) => ({ id:'a' + Date.now().toString(36) + i, texto:t })), plano:{...PLANO_MEDITACAO}, trilha:ob.trilha, trilhasConcluidas:0 },
+        roda:[{ data:hoje, notas:ob.roda }], dias:{}, avaliacoes:[] };
+  ob = null; saveNow(); tab = 'hoje'; render();
+}
+
+/* ---------------- dados de exemplo ---------------- */
+function carregarExemplo(){
+  const hoje = new Date(), inicio = addDays(hoje, -11), r = rng(7);
+  const trads = Object.keys(TRADICOES), foco = ['proposito','coragem'];
+  S = { versao:1, exemplo:true, perfil:{ nome:'Exemplo', inicio:dkey(inicio), inicioAbsoluto:dkey(inicio), foco, sonho:'Acordar perto do mar, viver do meu próprio projeto e ter tempo para treinar e para quem eu amo.', infancia:'Pulava da escada tentando voar.',
+        woop:{ ...WOOP_SUGESTOES.proposito, desejo:WOOP_SUGESTOES.proposito.desejo, resultado:'Orgulho de ter começado.' }, tradicoes:trads,
+        acoes:[{id:'e1',texto:'30 min no meu projeto'},{id:'e2',texto:'Primeira hora sem celular'}], plano:{...PLANO_MEDITACAO}, trilha:gerarTrilha(trads, foco, 42), trilhasConcluidas:0 },
+        roda:[{ data:dkey(inicio), notas:{corpo:5,mente:4,proposito:3,relacoes:6,coragem:3,presenca:4} }, { data:dkey(addDays(hoje,-4)), notas:{corpo:6,mente:5,proposito:5,relacoes:6,coragem:5,presenca:5} }],
+        dias:{}, avaliacoes:[{ data:dkey(addDays(hoje,-4)), nota:8, ajudou:'A pílula com protocolo. Saber o que fazer no dia.', faltou:'Um lembrete no celular.' }] };
+  const grats = [['Café com minha mãe','Dormi bem','O sol no caminho'],['Um amigo me ligou','Treinei','Terminei uma tarefa chata'],['Risada no almoço','Caminhei sem fone','Uma ideia nova'],['Conversa honesta','Comida boa','Tempo livre à noite']];
+  for (let i = 0; i < 11; i++){
+    if (i === 6) continue; // um dia em branco, de propósito
+    const k = dkey(addDays(inicio, i)), g = grats[i % grats.length];
+    S.dias[k] = { feito:{ pilula:true, med: i !== 3, diario:true, 'a:e1': r() > .3, 'a:e2': r() > .5 }, grat:g, resposta:'(exemplo) Percebi que adio por medo de não estar pronto.',
+                  energia: Math.min(5, 2 + Math.round(i/4 + r())), paz: Math.min(5, 2 + Math.round(i/5 + r())), medMin: i !== 3 ? 5 : 0 };
+  }
+  saveNow(); tab = 'hoje'; render();
+}
+
+/* ======================================================================
+   TELAS PRINCIPAIS
+   ====================================================================== */
+function marca(){ return `<div class="brand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><circle cx="12" cy="12" r="10.5"/><path d="M12 3.5 14.4 12 12 20.5 9.6 12Z" fill="var(--accent)" stroke="none"/><path d="M12 3.5 14.4 12H9.6Z" fill="currentColor" stroke="none"/></svg>TRAVESSIA</div>`; }
+function topo(){
+  return `${S.exemplo ? `<div class="demo"><span>Você está vendo dados de exemplo.</span><button class="btn btn-small btn-primary" data-act="sair-exemplo">Começar o meu</button></div>` : ''}
+    <div class="top">${marca()}<span class="mono">${fmtDate(new Date(), { day:'numeric', month:'short' })}</span></div>`;
+}
+function ring(done, total){
+  const C = 2 * Math.PI * 22, off = C * (1 - (total ? done / total : 0));
+  return `<svg class="ring" viewBox="0 0 54 54" aria-hidden="true"><circle class="bg" cx="27" cy="27" r="22"/><circle class="fg" cx="27" cy="27" r="22" stroke-dasharray="${C}" stroke-dashoffset="${off}" transform="rotate(-90 27 27)"/><text x="27" y="31" text-anchor="middle">${done}/${total}</text></svg>`;
+}
+
+function renderHoje(){
+  const k = dkey(), D = dia(k), n = diaTrilha();
+  const P = pilulaDe(k), fase = n >= 1 && n <= 30 ? FASES[faseDoDia(n)] : null;
+  const itens = itensDoDia(k), feitos = itens.filter(x => x[1]).length;
+  const hora = new Date().getHours(), saud = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
+  const tipoMed = S.perfil.plano[new Date().getDay()] || 'suspiro', M = MEDITACOES[tipoMed];
+  const angulos = GRATIDAO_ANGULOS[hash(k) % GRATIDAO_ANGULOS.length];
+  const ontem = dkey(addDays(new Date(), -1)), anteontem = dkey(addDays(new Date(), -2));
+  const falhouOntem = parseKey(ontem) >= parseKey(S.perfil.inicioAbsoluto) && !diaCompleto(ontem);
+  const ultRoda = S.roda[S.roda.length-1], revisaoDevida = diffDays(parseKey(ultRoda.data), new Date()) >= 7;
+  const ligado = P.pilares.some(x => S.perfil.foco.includes(x));
+  const textoCurto = P.texto.split('. ')[0] + '.';
+
+  let h = topo() + `
+  <div class="greet">
+    <p class="mono">${n >= 1 && n <= 30 ? `Dia ${n} de 30 · ${fase.nome}` : 'Trilha concluída'}</p>
+    <h1>${saud}, ${esc(S.perfil.nome)}.</h1>
+    ${fase ? `<p class="muted">${fase.pergunta}</p>` : ''}
+  </div>
+  <div class="progress">${ring(feitos, itens.length)}<p class="muted" style="font-size:.92rem">${feitos === itens.length ? 'Tudo feito. Feche a tela e vá viver.' : `Faltam ${itens.length - feitos}. Depois, feche a tela.`}</p></div>
+  <div class="stack">`;
+
+  if (n > 30) h += `<div class="card"><h3>Você atravessou 30 dias.</h3><p>Refaça a roda para ver o quanto mudou e comece uma nova trilha com outras pílulas.</p><button class="btn btn-primary" data-act="nova-trilha">Começar nova trilha</button></div>`;
+  if (falhouOntem && !diaCompleto(anteontem) && parseKey(anteontem) >= parseKey(S.perfil.inicioAbsoluto)) h += `<p class="nudge">Dois dias em branco. Sem culpa: recomece pelo menor passo de hoje, a pílula.</p>`;
+  else if (falhouOntem) h += `<p class="nudge">Ontem ficou em branco. Tudo bem. A regra é só uma: nunca duas vezes seguidas.</p>`;
+  if (revisaoDevida) h += `<div class="card"><div class="between"><span class="tag tide">Revisão semanal · 1 min</span></div><p>Faz 7 dias desde a última roda. Atualize suas notas e diga o que o painel está ajudando ou atrapalhando.</p><button class="btn btn-small" data-act="abrir-revisao">Fazer revisão</button></div>`;
+
+  /* pílula */
+  h += `<article class="card">
+    <div class="task-head"><span class="tag">${esc(TRADICOES[P.trad])}</span>${D.feito.pilula ? '<span class="done-mark">Protocolo feito</span>' : ''}</div>
+    <h2>${esc(P.titulo)}</h2>
+    <p class="quote">“${esc(P.citacao)}”</p>
+    <p class="ref">${esc(P.ref)}</p>
+    <p>${esc(ui.lerMais ? P.texto : textoCurto)} ${ui.lerMais ? '' : '<button class="btn-link" data-act="ler-mais">Ler mais</button>'}</p>
+    ${ligado ? `<p class="personal">Isso conversa com a sua meta: ${esc(S.perfil.woop.desejo)}</p>` : (n % 5 === 0 && S.perfil.sonho ? `<p class="personal">Lembre para onde você vai: ${esc(S.perfil.sonho)}</p>` : '')}
+    <div class="protocol"><span class="mono">Protocolo de hoje</span><p>${esc(P.protocolo)}</p></div>
+    <label class="check ${D.feito.pilula ? 'done' : ''}"><input type="checkbox" data-feito="pilula" ${D.feito.pilula ? 'checked' : ''}><span>Fiz o protocolo</span></label>
+  </article>`;
+
+  /* meditação */
+  h += `<article class="card">
+    <div class="task-head"><span class="tag tide">5 min · meditação</span>${D.feito.med ? `<span class="done-mark">Feito · ${D.medMin || 5} min</span>` : ''}</div>
+    <h3>${esc(M.nome)}</h3>
+    <p class="muted" style="font-size:.92rem">${esc(M.desc)}</p>
+    <div class="row"><button class="btn btn-primary" data-act="meditar" data-tipo="${tipoMed}">${D.feito.med ? 'Meditar de novo' : 'Começar'}</button>
+      <select id="med-troca" data-act-change="trocar-med" aria-label="Trocar prática de hoje" style="width:auto;flex:1;min-width:0">${Object.entries(MEDITACOES).map(([id,m]) => `<option value="${id}" ${id === tipoMed ? 'selected' : ''}>${esc(m.nome)}</option>`).join('')}</select></div>
+    <label class="check ${D.feito.med ? 'done' : ''}"><input type="checkbox" data-feito="med" ${D.feito.med ? 'checked' : ''}><span>Meditei sem o timer</span></label>
+  </article>`;
+
+  /* diário */
+  h += `<article class="card" id="diario">
+    <div class="task-head"><span class="tag">Diário de bordo</span>${D.feito.diario ? '<span class="done-mark">Registrado</span>' : ''}</div>
+    <h3>Três motivos de gratidão de hoje</h3>
+    <p class="muted" style="font-size:.88rem">Algo que aconteceu hoje. Os temas mudam todo dia para não virar repetição.</p>
+    <div class="grat">${[0,1,2].map(i => `<label for="g${i}"><b>${i+1}</b><input type="text" id="g${i}" data-grat="${i}" value="${esc(D.grat[i])}" placeholder="${esc(angulos[i])}…"></label>`).join('')}</div>
+    <label class="field" for="resposta" style="margin-top:18px">${esc(perguntaDe(k))}<textarea id="resposta" data-dia="resposta" placeholder="Escreva o que vier. Ninguém mais lê.">${esc(D.resposta)}</textarea></label>
+    <div><p class="mono" style="margin-bottom:6px">Energia hoje</p><div class="scale" role="group" aria-label="Energia de 1 a 5">${[1,2,3,4,5].map(v => `<button type="button" data-escala="energia" data-v="${v}" aria-pressed="${D.energia === v}">${v}</button>`).join('')}</div></div>
+    <div><p class="mono" style="margin-bottom:6px">Paz hoje</p><div class="scale" role="group" aria-label="Paz de 1 a 5">${[1,2,3,4,5].map(v => `<button type="button" data-escala="paz" data-v="${v}" aria-pressed="${D.paz === v}">${v}</button>`).join('')}</div></div>
+    <button class="btn ${D.feito.diario ? '' : 'btn-primary'}" data-act="salvar-diario">${D.feito.diario ? 'Atualizar registro' : 'Registrar o dia'}</button>
+    <p class="form-msg muted" id="diario-msg" style="font-size:.86rem" hidden></p>
+  </article>`;
+
+  /* ações */
+  if (S.perfil.acoes.length) h += `<article class="card"><div class="task-head"><span class="tag tide">Minhas ações</span><button class="btn-link" data-tab-go="rumo">Editar</button></div>
+    ${S.perfil.acoes.map(a => `<label class="check ${D.feito['a:'+a.id] ? 'done' : ''}"><input type="checkbox" data-feito="a:${a.id}" ${D.feito['a:'+a.id] ? 'checked' : ''}><span>${esc(a.texto)}</span></label>`).join('')}</article>`;
+
+  if (feitos === itens.length) h += `<div class="card complete"><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="28" cy="28" r="26"/><path d="M28 6l5 22-5 22-5-22z" fill="currentColor" stroke="none"/></svg><h3>Dia completo.</h3><p class="muted">Agora o mais difícil: fechar a tela.</p></div>`;
+  h += `</div>`;
+  app.innerHTML = h;
+}
+
+function renderEvolucao(){
+  const hoje = new Date(), inicioAbs = parseKey(S.perfil.inicioAbsoluto);
+  const ks = Object.keys(S.dias);
+  const completos = ks.filter(diaCompleto).length;
+  const minutos = ks.reduce((a,k) => a + (S.dias[k].medMin || 0), 0);
+  const grats = ks.reduce((a,k) => a + S.dias[k].grat.filter(g => g && g.trim()).length, 0);
+
+  /* heatmap: 5 semanas terminando no sábado desta semana */
+  const fim = addDays(hoje, 6 - hoje.getDay()), ini = addDays(fim, -34);
+  let heat = '';
+  for (let i = 0; i < 35; i++){
+    const d = addDays(ini, i), k = dkey(d), fut = d > hoje;
+    heat += `<i data-l="${fut ? 0 : nivel(k)}" class="${k === dkey() ? 'today' : ''}" title="${fmtDate(d, {day:'numeric',month:'short'})}: ${fut ? '' : nivel(k) + '/3'}" style="${fut ? 'opacity:.35' : ''}"></i>`;
+  }
+
+  /* energia e paz, últimos 30 dias */
+  const W = 320, H = 120, pl = 18, pb = 18;
+  const pts = (campo) => {
+    const out = [];
+    for (let i = 29; i >= 0; i--){ const k = dkey(addDays(hoje, -i)), D = S.dias[k]; if (D && D[campo]) out.push([pl + (29 - i) / 29 * (W - pl - 4), (H - pb) - (D[campo] - 1) / 4 * (H - pb - 8)]); }
+    return out;
+  };
+  const line = (p, cor) => p.length ? `<polyline fill="none" stroke="${cor}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="${p.map(x => x.join(',')).join(' ')}"/>${p.map(x => `<circle cx="${x[0]}" cy="${x[1]}" r="2.5" fill="${cor}"/>`).join('')}` : '';
+  const pe = pts('energia'), pp = pts('paz');
+  const grid = [1,3,5].map(v => { const y = (H - pb) - (v - 1) / 4 * (H - pb - 8); return `<line x1="${pl}" x2="${W}" y1="${y}" y2="${y}" stroke="var(--line)" stroke-dasharray="2 4"/><text x="0" y="${y + 3}">${v}</text>`; }).join('');
+  const chart = (pe.length || pp.length) ? `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Energia e paz nos últimos 30 dias">${grid}<text x="${pl}" y="${H - 2}">30 dias atrás</text><text x="${W}" y="${H - 2}" text-anchor="end">hoje</text>${line(pe,'var(--tide)')}${line(pp,'var(--accent)')}</svg>` : `<p class="muted">Registre energia e paz no diário para ver a linha aparecer aqui.</p>`;
+
+  /* radar da roda */
+  const R = 92, cx = 130, cy = 120, ang = i => -Math.PI/2 + i * 2*Math.PI/6;
+  const poly = notas => PILAR_IDS.map((id,i) => { const r = R * notas[id] / 10; return [cx + r*Math.cos(ang(i)), cy + r*Math.sin(ang(i))].map(n => n.toFixed(1)).join(','); }).join(' ');
+  const primeira = S.roda[0], ultima = S.roda[S.roda.length-1];
+  const radar = `<svg class="chart" viewBox="0 0 260 240" role="img" aria-label="Roda da vida">
+    ${[.25,.5,.75,1].map(f => `<polygon points="${PILAR_IDS.map((_,i) => [cx + R*f*Math.cos(ang(i)), cy + R*f*Math.sin(ang(i))].join(',')).join(' ')}" fill="none" stroke="var(--line)"/>`).join('')}
+    ${PILAR_IDS.map((id,i) => `<line x1="${cx}" y1="${cy}" x2="${cx + R*Math.cos(ang(i))}" y2="${cy + R*Math.sin(ang(i))}" stroke="var(--line)"/><text x="${cx + (R+16)*Math.cos(ang(i))}" y="${cy + (R+16)*Math.sin(ang(i)) + 3}" text-anchor="middle">${PILARES[id].nome.toUpperCase()}</text>`).join('')}
+    ${S.roda.length > 1 ? `<polygon points="${poly(primeira.notas)}" fill="none" stroke="var(--muted)" stroke-dasharray="4 4" stroke-width="1.5"/>` : ''}
+    <polygon points="${poly(ultima.notas)}" fill="color-mix(in srgb, var(--accent) 22%, transparent)" stroke="var(--accent)" stroke-width="2"/>
+  </svg>`;
+
+  const ultimos = ks.filter(k => S.dias[k].grat.some(g => g && g.trim()) || S.dias[k].resposta).sort().reverse().slice(0, 14);
+  const ultAval = S.avaliacoes[S.avaliacoes.length-1];
+
+  app.innerHTML = topo() + `
+  <div class="greet"><p class="mono">Evolução</p><h1>A carta da sua travessia</h1></div>
+  <div class="stack">
+    <div class="stats">
+      <div class="stat"><span class="mono">Sequência</span><b>${sequencia()}</b><span class="muted" style="font-size:.78rem">dias · uma falha não quebra</span></div>
+      <div class="stat"><span class="mono">Dias completos</span><b>${completos}</b><span class="muted" style="font-size:.78rem">desde ${fmtDate(inicioAbs, {day:'numeric',month:'short'})}</span></div>
+      <div class="stat"><span class="mono">Meditação</span><b>${minutos}</b><span class="muted" style="font-size:.78rem">minutos no total</span></div>
+      <div class="stat"><span class="mono">Gratidões</span><b>${grats}</b><span class="muted" style="font-size:.78rem">motivos registrados</span></div>
+    </div>
+
+    <section class="card"><div class="between"><h3>Últimas 5 semanas</h3><span class="mono">0–3 práticas</span></div>
+      <div class="heat-days mono">${DIAS_SEMANA.map(d => `<span>${d[0]}</span>`).join('')}</div>
+      <div class="heat">${heat}</div></section>
+
+    <section class="card"><h3>Energia e paz</h3><div class="legend"><span style="--c:var(--tide)">Energia</span><span style="--c:var(--accent)">Paz</span></div>${chart}</section>
+
+    <section class="card" id="roda"><div class="between"><h3>Roda da vida</h3><button class="btn btn-small" data-act="toggle-roda">${ui.rodaForm ? 'Cancelar' : 'Atualizar'}</button></div>
+      <div class="legend"><span style="--c:var(--accent)">Agora · ${fmtDate(parseKey(ultima.data), {day:'numeric',month:'short'})}</span>${S.roda.length > 1 ? `<span style="--c:var(--muted)">Início · ${fmtDate(parseKey(primeira.data), {day:'numeric',month:'short'})}</span>` : ''}</div>
+      ${ui.rodaForm ? `<div class="stack">${PILAR_IDS.map(id => `<div class="slider"><label for="nr-${id}">${PILARES[id].nome}</label><input type="range" min="1" max="10" id="nr-${id}" data-nova-roda="${id}" value="${ultima.notas[id]}"><output id="no-${id}">${ultima.notas[id]}</output></div>`).join('')}<button class="btn btn-primary" data-act="salvar-roda">Salvar a roda de hoje</button></div>` : radar}
+    </section>
+
+    <section class="card" id="avaliacao"><h3>Avaliação do painel</h3>
+      <p class="muted" style="font-size:.9rem">Você está validando a ferramenta. Uma vez por semana, diga o que funciona. Isso vira a lista de melhorias.</p>
+      ${ui.revisao ? `<div class="stack">
+        <label class="field">De 0 a 10, o quanto o painel te ajudou esta semana?<input type="text" inputmode="numeric" id="av-nota" maxlength="2"></label>
+        <label class="field">O que mais ajudou?<textarea id="av-ajudou"></textarea></label>
+        <label class="field">O que atrapalhou ou faltou?<textarea id="av-faltou"></textarea></label>
+        <p class="muted" id="av-msg" style="font-size:.86rem" hidden></p>
+        <button class="btn btn-primary" data-act="salvar-avaliacao">Salvar avaliação</button></div>`
+        : `<button class="btn btn-small" data-act="abrir-avaliacao">Avaliar esta semana</button>`}
+      ${ultAval ? `<p style="font-size:.9rem;margin-top:14px"><span class="mono">Última · ${fmtDate(parseKey(ultAval.data), {day:'numeric',month:'short'})} · nota ${esc(ultAval.nota)}</span><br>Ajudou: ${esc(ultAval.ajudou)}<br>Faltou: ${esc(ultAval.faltou)}</p>` : ''}
+    </section>
+
+    <section class="card"><h3>Diário de bordo</h3>
+      ${ultimos.length ? ultimos.map(k => { const D = S.dias[k]; return `<details class="entry"><summary><span>${fmtDate(parseKey(k), {weekday:'short', day:'numeric', month:'short'})}</span><span class="mono">${nivel(k)}/3</span></summary>
+        <ul>${D.grat.filter(g => g && g.trim()).map(g => `<li>${esc(g)}</li>`).join('')}</ul>${D.resposta ? `<p><em class="muted">${esc(D.pergunta || '')}</em><br>${esc(D.resposta)}</p>` : ''}</details>`; }).join('') : '<p class="muted">Seus registros vão aparecer aqui.</p>'}
+    </section>
+  </div>`;
+  if (ui.revisao) setTimeout(() => document.getElementById('avaliacao')?.scrollIntoView({ behavior:'smooth', block:'start' }), 50);
+}
+
+function renderRumo(){
+  const P = S.perfil, n = diaTrilha(), sug = [...new Set(P.foco.flatMap(f => ACOES_SUGERIDAS[f]))].filter(a => !P.acoes.some(x => x.texto === a));
+  app.innerHTML = topo() + `
+  <div class="greet"><p class="mono">Rumo</p><h1>Para onde você vai</h1><p class="muted">Tudo aqui é editável. As mudanças salvam sozinhas.</p></div>
+  <div class="stack">
+    <section class="card"><h3>O sonho</h3>
+      <label class="field">Daqui a 5 anos, num dia comum<textarea id="p-sonho" data-perfil="sonho">${esc(P.sonho)}</textarea></label>
+      <label class="field">O que te fazia perder a noção do tempo na infância<textarea id="p-infancia" data-perfil="infancia">${esc(P.infancia)}</textarea></label></section>
+
+    <section class="card"><h3>Meta de 90 dias</h3>
+      ${[['desejo','Desejo'],['resultado','Resultado'],['obstaculo','Obstáculo'],['plano','Plano · se… então…']].map(([id,l]) => `<label class="field">${l}<textarea id="pw-${id}" data-woop="${id}">${esc(P.woop[id])}</textarea></label>`).join('')}</section>
+
+    <section class="card"><h3>Foco</h3><p class="muted" style="font-size:.9rem">Até 2 pilares. Ele muda as perguntas, as ações sugeridas e as próximas pílulas.</p>
+      <div class="chips">${PILAR_IDS.map(id => `<button class="chip" data-act="foco" data-id="${id}" aria-pressed="${P.foco.includes(id)}">${PILARES[id].nome}</button>`).join('')}</div></section>
+
+    <section class="card"><h3>Minhas ações diárias</h3><p class="muted" style="font-size:.9rem">No máximo 3. Menos é mais.</p>
+      ${P.acoes.map(a => `<div class="action-item"><span>${esc(a.texto)}</span><button class="btn-link" data-act="rm-acao" data-id="${a.id}">Remover</button></div>`).join('')}
+      ${P.acoes.length < 3 ? `<div class="row"><input type="text" id="nova-acao" placeholder="Nova ação" style="flex:1;min-width:0"><button class="btn btn-small" data-act="add-acao">Adicionar</button></div>
+      <div class="chips">${sug.slice(0,6).map(a => `<button class="chip" data-act="add-sug" data-txt="${esc(a)}">+ ${esc(a)}</button>`).join('')}</div>` : ''}</section>
+
+    <section class="card"><h3>Plano de meditação</h3><p class="muted" style="font-size:.9rem">5 minutos por dia. O plano sugerido alterna respiração, atenção e reflexão.</p>
+      <div class="med-plan">${[1,2,3,4,5,6,0].map(d => `<label>${DIAS_SEMANA[d]}<select id="plano-${d}" data-plano="${d}">${Object.entries(MEDITACOES).map(([id,m]) => `<option value="${id}" ${P.plano[d] === id ? 'selected' : ''}>${esc(m.nome)}</option>`).join('')}</select></label>`).join('')}</div>
+      <button class="btn-link" data-act="plano-padrao">Voltar ao plano sugerido</button></section>
+
+    <section class="card"><h3>Tradições</h3><div class="chips">${Object.entries(TRADICOES).map(([id,nm]) => `<button class="chip" data-act="trad" data-id="${id}" aria-pressed="${P.tradicoes.includes(id)}">${nm}</button>`).join('')}</div>
+      <p class="muted" style="font-size:.84rem">Mudar tradições ou foco refaz só os dias que ainda não chegaram.</p></section>
+
+    <section class="card"><h3>Sua trilha</h3>
+      <div class="trail">${P.trilha.map((id,i) => { const p = pill(id), d = i + 1; return `<div class="${d < n ? 'past' : d === n ? 'now' : ''}"><span class="mono">${pad(d)}</span><span>${esc(p.titulo)}</span><span class="mono">${FASES[faseDoDia(d)].nome}</span></div>`; }).join('')}</div></section>
+
+    <section class="card"><h3>Seus dados</h3>
+      <p class="muted" style="font-size:.9rem">Tudo fica só neste aparelho e neste navegador. Faça um backup toda semana.</p>
+      <div class="row"><button class="btn btn-small" data-act="exportar">Baixar backup</button><button class="btn btn-small" data-act="copiar">Copiar backup</button><button class="btn btn-small" data-act="tema">Tema: ${document.documentElement.dataset.theme === 'dark' ? 'escuro' : document.documentElement.dataset.theme === 'light' ? 'claro' : 'automático'}</button></div>
+      <label class="field">Restaurar backup<textarea id="imp" placeholder="Cole aqui o texto do backup"></textarea></label>
+      <div class="row"><button class="btn btn-small" data-act="importar">Restaurar</button></div>
+      <p class="muted" id="dados-msg" style="font-size:.86rem" hidden></p>
+      ${ui.confirmApagar ? `<p class="danger">Isso apaga todo o seu diário deste aparelho. Não dá para desfazer.</p><div class="row"><button class="btn btn-small" data-act="apagar-sim">Apagar tudo</button><button class="btn btn-small" data-act="apagar-nao">Cancelar</button></div>` : `<button class="btn-link danger" data-act="apagar">Apagar tudo e recomeçar</button>`}
+    </section>
+  </div>`;
+}
+
+function render(){
+  if (!S){ if (!ob) iniciarOnboarding(); renderOnboarding(); return; }
+  tabsEl.hidden = false;
+  tabsEl.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-current', b.dataset.tab === tab ? 'page' : 'false'));
+  if (tab === 'hoje') renderHoje();
+  if (tab === 'evolucao') renderEvolucao();
+  if (tab === 'rumo') renderRumo();
+}
+function ir(t){ tab = t; ui.lerMais = false; render(); window.scrollTo({ top:0 }); }
+
+/* ======================================================================
+   MEDITAÇÃO
+   ====================================================================== */
+let medTimer = null, wake = null;
+function abrirMeditacao(tipo){
+  const M = MEDITACOES[tipo], TOTAL = 300;
+  let t = 0, pausado = false, fasesIdx = -1, faseFim = 0;
+  medEl.hidden = false; document.body.style.overflow = 'hidden';
+  medEl.innerHTML = `<div><p class="mono">${esc(M.origem)}</p><h2 style="margin-top:6px">${esc(M.nome)}</h2></div>
+    <div class="orb-wrap"><div><div class="orb" id="orb"></div><p class="phase" id="mphase"></p></div></div>
+    <div class="stack" style="justify-items:center;width:100%"><p class="cue" id="mcue">${esc(M.cues[0][1])}</p><p class="time" id="mtime">5:00</p>
+    <div class="row" style="justify-content:center"><button class="btn" id="mpause">Pausar</button><button class="btn" id="mstop">Encerrar</button></div></div>`;
+  const orb = document.getElementById('orb'), ph = document.getElementById('mphase'), cue = document.getElementById('mcue'), tm = document.getElementById('mtime');
+  sino();
+  try { navigator.wakeLock?.request('screen').then(w => wake = w).catch(() => {}); } catch(e){}
+  const ciclo = M.respiracao ? M.respiracao.reduce((a,f) => a + f[1], 0) : 0;
+  const passo = () => {
+    if (pausado) return;
+    t += .25;
+    if (M.respiracao){
+      const pos = t % ciclo; let acc = 0, idx = 0;
+      for (; idx < M.respiracao.length; idx++){ acc += M.respiracao[idx][1]; if (pos < acc) break; }
+      if (idx !== fasesIdx){ fasesIdx = idx; const f = M.respiracao[idx]; orb.style.transitionDuration = f[1] + 's'; orb.style.transform = `scale(${f[2]})`; ph.textContent = f[0]; }
+    } else {
+      orb.style.transitionDuration = '6s'; orb.style.transform = `scale(${Math.floor(t / 6) % 2 ? .62 : .8})`;
+    }
+    const c = M.cues.filter(x => x[0] <= t).pop(); if (c && cue.textContent !== c[1]) cue.textContent = c[1];
+    const rest = Math.max(0, TOTAL - Math.floor(t)); tm.textContent = Math.floor(rest/60) + ':' + pad(rest % 60);
+    if (t >= TOTAL) fim(true);
+  };
+  const fim = (completo) => {
+    clearInterval(medTimer); medTimer = null; try { wake?.release(); } catch(e){}
+    const min = completo ? 5 : Math.floor(t / 60);
+    const D = dia();
+    if (completo || t >= 240){ D.feito.med = true; }
+    D.medMin = (D.medMin || 0) + min; save();
+    if (completo){ sino(); medEl.innerHTML = `<div></div><div class="stack" style="justify-items:center"><h2>Feito. 5 minutos.</h2><p class="muted">Repare como o corpo está agora.</p><button class="btn btn-primary" id="mclose">Voltar ao painel</button></div><div></div>`; document.getElementById('mclose').onclick = fechar; }
+    else fechar();
+  };
+  const fechar = () => { medEl.hidden = true; medEl.innerHTML = ''; document.body.style.overflow = ''; render(); };
+  document.getElementById('mpause').onclick = e => { pausado = !pausado; e.target.textContent = pausado ? 'Continuar' : 'Pausar'; };
+  document.getElementById('mstop').onclick = () => fim(false);
+  medTimer = setInterval(passo, 250); passo();
+}
+
+/* ======================================================================
+   EVENTOS
+   ====================================================================== */
+tabsEl.addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) ir(b.dataset.tab); });
+
+app.addEventListener('click', e => {
+  const go = e.target.closest('[data-tab-go]'); if (go){ ir(go.dataset.tabGo); return; }
+  const esc_ = e.target.closest('[data-escala]');
+  if (esc_){ dia()[esc_.dataset.escala] = +esc_.dataset.v; save(); esc_.parentElement.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b === esc_)); return; }
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const a = b.dataset.act;
+
+  /* onboarding */
+  if (a === 'ob-proximo'){ if (ob.passo === OB_TOTAL) return concluirOnboarding(); ob.passo++; renderOnboarding(); window.scrollTo({top:0}); }
+  if (a === 'ob-voltar'){ ob.passo--; renderOnboarding(); }
+  if (a === 'ob-foco'){ const id = b.dataset.id; ob.foco = ob.foco.includes(id) ? ob.foco.filter(x => x !== id) : [...ob.foco, id].slice(-2); ob.woop = null; ob.acoes = []; renderOnboarding(); }
+  if (a === 'ob-trad'){ const id = b.dataset.id; ob.tradicoes = ob.tradicoes.includes(id) ? ob.tradicoes.filter(x => x !== id) : [...ob.tradicoes, id]; renderOnboarding(); }
+  if (a === 'ob-acao'){ const t = b.dataset.txt; ob.acoes = ob.acoes.includes(t) ? ob.acoes.filter(x => x !== t) : (ob.acoes.length < 3 ? [...ob.acoes, t] : ob.acoes); renderOnboarding(); }
+  if (a === 'ob-add-acao'){ const v = document.getElementById('ob-nova-acao').value.trim(); if (v && ob.acoes.length < 3 && !ob.acoes.includes(v)){ ob.acoes.push(v); renderOnboarding(); } }
+  if (a === 'demo') carregarExemplo();
+  if (a === 'importar-inicio'){ app.insertAdjacentHTML('beforeend', `<div class="card" style="margin-top:16px"><label class="field">Cole o texto do backup<textarea id="imp"></textarea></label><button class="btn btn-small" data-act="importar" style="margin-top:10px">Restaurar</button><p class="muted" id="dados-msg" hidden></p></div>`); b.remove(); }
+  if (a === 'sair-exemplo'){ try { localStorage.removeItem(KEY); } catch(e){} S = null; ob = null; render(); }
+
+  /* hoje */
+  if (a === 'ler-mais'){ ui.lerMais = true; render(); }
+  if (a === 'meditar') abrirMeditacao(b.dataset.tipo);
+  if (a === 'salvar-diario'){
+    const D = dia(), msg = document.getElementById('diario-msg');
+    const ok = D.grat.filter(g => g && g.trim()).length === 3;
+    if (!ok){ msg.hidden = false; msg.textContent = 'Escreva os três motivos de gratidão para registrar o dia. Pode ser algo bem pequeno.'; return; }
+    D.feito.diario = true; saveNow(); render();
+    setTimeout(() => document.getElementById('diario')?.scrollIntoView({ block:'center' }), 30);
+  }
+  if (a === 'abrir-revisao'){ ui.revisao = true; ui.rodaForm = true; ir('evolucao'); setTimeout(() => document.getElementById('roda')?.scrollIntoView({ behavior:'smooth' }), 60); }
+  if (a === 'nova-trilha'){
+    const P = S.perfil; P.trilha = gerarTrilha(P.tradicoes, P.foco, hash(dkey() + 'n'), P.trilha); P.inicio = dkey(); P.trilhasConcluidas = (P.trilhasConcluidas || 0) + 1; ui.rodaForm = true; saveNow(); ir('evolucao');
+  }
+
+  /* evolução */
+  if (a === 'toggle-roda'){ ui.rodaForm = !ui.rodaForm; render(); }
+  if (a === 'salvar-roda'){
+    const notas = Object.fromEntries(PILAR_IDS.map(id => [id, +document.getElementById('nr-' + id).value]));
+    const k = dkey(), last = S.roda[S.roda.length-1];
+    if (last.data === k && S.roda.length > 1) last.notas = notas; else S.roda.push({ data:k, notas });
+    ui.rodaForm = false; saveNow(); render();
+  }
+  if (a === 'abrir-avaliacao'){ ui.revisao = true; render(); }
+  if (a === 'salvar-avaliacao'){
+    const nota = document.getElementById('av-nota').value.trim(), m = document.getElementById('av-msg');
+    if (!/^(10|[0-9])$/.test(nota)){ m.hidden = false; m.textContent = 'Dê uma nota de 0 a 10.'; return; }
+    S.avaliacoes.push({ data:dkey(), nota:+nota, ajudou:document.getElementById('av-ajudou').value.trim(), faltou:document.getElementById('av-faltou').value.trim() });
+    ui.revisao = false; saveNow(); render();
+  }
+
+  /* rumo */
+  const P = S && S.perfil;
+  if (a === 'foco'){ const id = b.dataset.id; let f = P.foco.includes(id) ? P.foco.filter(x => x !== id) : [...P.foco, id].slice(-2); if (!f.length) return; P.foco = f; refazerFuturo(); saveNow(); render(); }
+  if (a === 'trad'){ const id = b.dataset.id; let t = P.tradicoes.includes(id) ? P.tradicoes.filter(x => x !== id) : [...P.tradicoes, id]; if (!t.length) return; P.tradicoes = t; refazerFuturo(); saveNow(); render(); }
+  if (a === 'rm-acao'){ P.acoes = P.acoes.filter(x => x.id !== b.dataset.id); saveNow(); render(); }
+  if (a === 'add-acao' || a === 'add-sug'){
+    const v = a === 'add-sug' ? b.dataset.txt : document.getElementById('nova-acao').value.trim();
+    if (v && P.acoes.length < 3){ P.acoes.push({ id:'a' + Date.now().toString(36), texto:v }); saveNow(); render(); }
+  }
+  if (a === 'plano-padrao'){ P.plano = { ...PLANO_MEDITACAO }; saveNow(); render(); }
+  if (a === 'exportar'){
+    const blob = new Blob([JSON.stringify(S, null, 2)], { type:'application/json' }), url = URL.createObjectURL(blob);
+    const l = document.createElement('a'); l.href = url; l.download = 'travessia-backup-' + dkey() + '.json'; document.body.appendChild(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    msgDados('Se o download não começar, use "Copiar backup" e cole num bloco de notas.');
+  }
+  if (a === 'copiar'){
+    const txt = JSON.stringify(S);
+    navigator.clipboard?.writeText(txt).then(() => msgDados('Backup copiado. Cole num lugar seguro, como suas notas.'))
+      .catch(() => { const t = document.getElementById('imp'); t.value = txt; t.select(); msgDados('Não deu para copiar automaticamente. O backup está selecionado no campo acima: copie manualmente.'); });
+  }
+  if (a === 'importar'){
+    try {
+      const d = JSON.parse(document.getElementById('imp').value);
+      if (!d || !d.perfil || !d.dias) throw 0;
+      S = d; delete S.exemplo; saveNow(); ob = null; tab = 'hoje'; render();
+    } catch(e){ msgDados('Esse texto não parece um backup da Travessia. Copie o conteúdo inteiro do arquivo e tente de novo.'); }
+  }
+  if (a === 'tema'){
+    const r = document.documentElement, cur = r.dataset.theme, next = !cur ? 'dark' : cur === 'dark' ? 'light' : '';
+    if (next) r.dataset.theme = next; else delete r.dataset.theme;
+    try { next ? localStorage.setItem(KEY + '.tema', next) : localStorage.removeItem(KEY + '.tema'); } catch(e){}
+    render();
+  }
+  if (a === 'apagar'){ ui.confirmApagar = true; render(); }
+  if (a === 'apagar-nao'){ ui.confirmApagar = false; render(); }
+  if (a === 'apagar-sim'){ try { localStorage.removeItem(KEY); } catch(e){} S = null; ob = null; ui.confirmApagar = false; render(); }
+});
+function msgDados(t){ const m = document.getElementById('dados-msg'); if (m){ m.hidden = false; m.textContent = t; } }
+function refazerFuturo(){
+  const P = S.perfil, n = Math.max(1, diaTrilha());
+  if (n >= 30) return;
+  const fixos = P.trilha.slice(0, n), nova = gerarTrilha(P.tradicoes, P.foco, hash(dkey() + P.foco.join() + P.tradicoes.join()), fixos);
+  P.trilha = fixos.concat(nova.slice(n));
+}
+
+app.addEventListener('change', e => {
+  const t = e.target;
+  if (t.dataset.feito){
+    const D = dia();
+    if (t.dataset.feito === 'diario') return;
+    D.feito[t.dataset.feito] = t.checked;
+    if (t.dataset.feito === 'med' && t.checked && !D.medMin) D.medMin = 5;
+    saveNow(); render();
+  }
+  if (t.dataset.actChange === 'trocar-med'){ abrirMeditacao(t.value); }
+  if (t.dataset.plano !== undefined){ S.perfil.plano[t.dataset.plano] = t.value; save(); }
+});
+
+app.addEventListener('input', e => {
+  const t = e.target;
+  if (ob){
+    if (t.dataset.ob){ ob[t.dataset.ob] = t.value; if (t.dataset.ob === 'nome'){ const btn = app.querySelector('[data-act="ob-proximo"]'); if (btn) btn.disabled = !t.value.trim(); } }
+    if (t.dataset.obRoda){ ob.roda[t.dataset.obRoda] = +t.value; document.getElementById('o-' + t.dataset.obRoda).textContent = t.value; }
+    if (t.dataset.obWoop){ ob.woop[t.dataset.obWoop] = t.value; }
+    return;
+  }
+  if (t.dataset.grat !== undefined){ dia().grat[+t.dataset.grat] = t.value; save(); }
+  if (t.dataset.dia){ dia()[t.dataset.dia] = t.value; save(); }
+  if (t.dataset.perfil){ S.perfil[t.dataset.perfil] = t.value; save(); }
+  if (t.dataset.woop){ S.perfil.woop[t.dataset.woop] = t.value; save(); }
+  if (t.dataset.novaRoda){ document.getElementById('no-' + t.dataset.novaRoda).textContent = t.value; }
+});
+app.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.id === 'ob-nome' && ob.nome.trim()){ ob.passo++; renderOnboarding(); }
+});
+
+/* tema salvo, e redesenho quando vira o dia com o painel aberto */
+try { const tm = localStorage.getItem(KEY + '.tema'); if (tm) document.documentElement.dataset.theme = tm; } catch(e){}
+let diaAtual = dkey();
+document.addEventListener('visibilitychange', () => { if (!document.hidden && dkey() !== diaAtual){ diaAtual = dkey(); ui.lerMais = false; if (S) render(); } });
+render();
+</script>
+</body>
+</html>
