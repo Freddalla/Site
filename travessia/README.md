@@ -52,3 +52,6 @@ https://SEU-DOMINIO/travessia/?utm_source=meta&utm_medium=paid&utm_campaign=vali
 | `posts.html` | Fábrica de Pílulas: transforma cada pílula em 6 slides 1080×1350, legenda e roteiro de Reel |
 
 Os dados do painel ficam só no aparelho (localStorage). Para usar no celular, abra `/travessia/painel/` e use "Adicionar à tela inicial". Faça o backup na aba Rumo.
+| `marca.html` | Estudo de nome e símbolo (5 candidatos com logo e avatar em PNG), perfil do Instagram simulado e recomendação de preço |
+
+Para trocar o nome da marca dentro do diário, edite `MARCA` no fim de `painel/conteudo.js`.

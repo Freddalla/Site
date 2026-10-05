@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Diário de Bordo</title>
-<meta name="description" content="Travessia · seu painel diário: uma pílula de sabedoria com protocolo, 5 minutos de meditação, 3 gratidões e a sua evolução.">
+<meta name="description" content="Diga como você chega no dia e receba a pílula de sabedoria e o mantra certos para ele, com protocolo prático, 5 minutos de meditação e gratidão.">
 <meta name="theme-color" content="#0e1c20">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Travessia">
@@ -170,6 +170,29 @@ details.entry p{font-size:.92rem;margin-top:8px}
 .med .cue{font-family:var(--display);font-size:1.5rem;line-height:1.25;max-width:22ch;min-height:3.8em}
 .med .time{font:500 1rem var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
 @media (prefers-reduced-motion: reduce){.orb{transition:none!important}}
+
+/* v2 · check-in e mantra */
+.checkin .chips{gap:8px}
+.mantra{background:var(--sea, #0e1c20);color:#e8e3d6;border-color:transparent;text-align:center;padding:34px 22px}
+.mantra .mono{color:#93a5a2}
+.mantra p.m{font-family:var(--display);font-size:clamp(1.9rem,8vw,2.6rem);line-height:1.12;margin-block:12px 10px;text-wrap:balance}
+.mantra .sub{font-size:.85rem;color:#93a5a2}
+.mantra .row{justify-content:center}
+.mantra .btn{color:#e8e3d6;border-color:#3a5654}
+.mantra .btn:hover{border-color:#e8e3d6}
+.why{font-size:.9rem;color:var(--muted)}
+.why b{color:var(--fg)}
+.wall{display:grid;justify-items:center;gap:8px}
+.wall img{width:180px;border-radius:14px;border:1px solid var(--line)}
+.bars{display:grid;gap:10px}
+.bar{display:grid;grid-template-columns:150px 1fr 28px;gap:10px;align-items:center;font-size:.88rem}
+.bar .track{height:8px;background:var(--line);border-radius:6px;overflow:hidden}
+.bar .track i{display:block;height:100%;background:var(--tide);border-radius:6px}
+.bar .n{font-family:var(--mono);font-size:.78rem;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+.mantras{display:grid;gap:8px}
+.mantras div{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.mantras span:first-child{font-family:var(--display);font-size:1.15rem;line-height:1.25}
+@media (max-width:420px){.bar{grid-template-columns:110px 1fr 24px}}
 </style>
 </head>
 <body>
@@ -186,18 +209,20 @@ details.entry p{font-size:.92rem;margin-top:8px}
 <script src="conteudo.js"></script>
 <script>
 /* ======================================================================
-   TRAVESSIA · Diário de Bordo
-   Tudo fica salvo neste aparelho (localStorage). Exporte o backup no Rumo.
+   DIÁRIO · v2
+   Todo dia começa com um check-in de 30 segundos. A partir dele o painel
+   escolhe a pílula e o mantra do dia e sugere a prática de 5 minutos.
+   Tudo fica salvo neste aparelho (localStorage). Backup na aba Rumo.
    ====================================================================== */
 const KEY = 'travessia.painel.v1';
 const PILAR_IDS = Object.keys(PILARES);
 const DIAS_SEMANA = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const app = document.getElementById('app'), tabsEl = document.getElementById('tabs'), medEl = document.getElementById('med');
 
-let S = load();
+let S = migrar(load());
 let tab = 'hoje';
-let ob = null;           // rascunho do onboarding
-let ui = { revisao:false, rodaForm:false, confirmApagar:false, lerMais:false };
+let ob = null;
+let ui = { revisao:false, rodaForm:false, confirmApagar:false, lerMais:false, refazer:false, sel:[], wall:null };
 
 /* ---------------- utilidades ---------------- */
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -208,75 +233,75 @@ const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); r
 const diffDays = (a, b) => Math.round((parseKey(dkey(b)) - parseKey(dkey(a))) / 864e5);
 const hash = s => { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 const rng = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 const pill = id => PILULAS.find(p => p.id === id);
 const fmtDate = (d, opt) => d.toLocaleDateString('pt-BR', opt || { weekday:'long', day:'numeric', month:'long' });
 
 function load(){ try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e){ return null; } }
-let saveT; function save(){ clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }, 150); }
-function saveNow(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
-
-function faseDoDia(d){ return d <= 7 ? 'clareza' : d <= 14 ? 'corpo' : d <= 21 ? 'coragem' : 'direcao'; }
-function diaTrilha(){ return diffDays(parseKey(S.perfil.inicio), new Date()) + 1; }
-
-function gerarTrilha(trads, foco, seed, evitar = []){
-  const r = rng(seed), pool = PILULAS.filter(p => trads.includes(p.trad));
-  const used = new Set(evitar), out = [];
-  for (let d = 1; d <= 30; d++){
-    const fase = faseDoDia(d);
-    let c = pool.filter(p => !used.has(p.id) && p.fase === fase);
-    if (!c.length) c = pool.filter(p => !used.has(p.id));
-    if (!c.length){ used.clear(); c = pool.slice(); }
-    const score = p => (p.pilares.some(x => foco.includes(x)) ? 2 : 0) + r() + (d === 1 && p.id === 'mito-sisifo' ? 10 : 0);
-    c.sort((a,b) => score(b) - score(a));
-    used.add(c[0].id); out.push(c[0].id);
-  }
-  return out;
+function migrar(s){
+  if (!s || !s.perfil) return s;
+  if ((s.versao || 1) < 2){ s.versao = 2; }
+  s.perfil.woop = s.perfil.woop || { ...WOOP_SUGESTOES[s.perfil.foco[0]], resultado:'' };
+  s.avaliacoes = s.avaliacoes || []; s.roda = s.roda || [];
+  return s;
 }
+let saveT; function save(){ clearTimeout(saveT); saveT = setTimeout(saveNow, 150); }
+function saveNow(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
 
 function dia(k = dkey()){
   if (!S.dias[k]) S.dias[k] = { feito:{}, grat:['','',''], resposta:'', energia:null, paz:null, medMin:0 };
   return S.dias[k];
 }
-function pilulaDe(k){
-  const d = diffDays(parseKey(S.perfil.inicio), parseKey(k)) + 1;
-  if (d >= 1 && d <= 30) return pill(S.perfil.trilha[d-1]);
-  const pool = PILULAS.filter(p => S.perfil.tradicoes.includes(p.trad));
-  return pool[hash(k) % pool.length];
-}
-function perguntaDe(k){
-  const D = dia(k);
-  if (D.pergunta) return D.pergunta;
-  const n = diffDays(parseKey(S.perfil.inicio), parseKey(k)) + 1;
-  if (n % 2 === 1) D.pergunta = pilulaDe(k).pergunta;
-  else {
-    const f = S.perfil.foco, arr = [...(PERGUNTAS[f[0]]||[]), ...(PERGUNTAS[f[1]]||[]), ...PERGUNTAS.geral];
-    D.pergunta = arr[hash(k + 'q') % arr.length];
-  }
-  return D.pergunta;
-}
-function itensDoDia(k){
-  const D = dia(k);
-  const base = [['pilula', D.feito.pilula], ['med', D.feito.med], ['diario', D.feito.diario]];
-  S.perfil.acoes.forEach(a => base.push(['a:' + a.id, !!D.feito['a:' + a.id]]));
-  return base;
-}
 function diaCompleto(k){ const D = S.dias[k]; return !!(D && D.feito.pilula && D.feito.med && D.feito.diario); }
-function nivel(k){
-  const D = S.dias[k]; if (!D) return 0;
-  const n = ['pilula','med','diario'].filter(x => D.feito[x]).length;
-  return n;
-}
-/* Sequência com a regra "nunca falhe duas vezes": uma falha isolada não quebra. */
+function nivel(k){ const D = S.dias[k]; return D ? ['pilula','med','diario'].filter(x => D.feito[x]).length : 0; }
 function sequencia(){
   let d = new Date(), n = 0, falhas = 0;
   if (!diaCompleto(dkey(d))) d = addDays(d, -1);
   const inicio = parseKey(S.perfil.inicioAbsoluto || S.perfil.inicio);
   while (d >= inicio){
-    if (diaCompleto(dkey(d))){ n++; falhas = 0; }
-    else { falhas++; if (falhas >= 2) break; }
+    if (diaCompleto(dkey(d))){ n++; falhas = 0; } else { falhas++; if (falhas >= 2) break; }
     d = addDays(d, -1);
   }
   return n;
+}
+
+/* ---------------- o coração: escolher a pílula do dia ---------------- */
+function inferir(texto){
+  const t = norm(texto), out = [];
+  for (const [est, palavras] of Object.entries(LEXICO)) if (palavras.some(p => t.includes(p))) out.push(est);
+  return out;
+}
+function ranquear(k, checkin){
+  const inf = inferir(checkin.texto).filter(e => !checkin.estados.includes(e));
+  const recentes = new Set();
+  for (let i = 1; i <= 14; i++){ const D = S.dias[dkey(addDays(parseKey(k), -i))]; if (D && D.pilulaId) recentes.add(D.pilulaId); }
+  const r = rng(hash(k + checkin.estados.join()));
+  const pool = PILULAS.filter(p => S.perfil.tradicoes.includes(p.trad));
+  const score = p => 3 * p.estados.filter(e => checkin.estados.includes(e)).length
+                   + 1.5 * p.estados.filter(e => inf.includes(e)).length
+                   + (p.pilares.some(x => S.perfil.foco.includes(x)) ? 1 : 0)
+                   - (recentes.has(p.id) ? 4 : 0) + r() * .9;
+  const sc = pool.map(p => [p.id, score(p)]).sort((a,b) => b[1] - a[1]);
+  return { ranking: sc.slice(0, 6).map(x => x[0]), inferidos: inf };
+}
+function fazerCheckin(estados, energia, texto){
+  const k = dkey(), D = dia(k), checkin = { estados, energia, texto, hora:new Date().toTimeString().slice(0,5) };
+  const { ranking, inferidos } = ranquear(k, checkin);
+  D.checkin = { ...checkin, inferidos }; D.energia = energia;
+  D.ranking = ranking; D.idx = 0; D.pilulaId = ranking[0];
+  D.pergunta = pill(ranking[0]).pergunta;
+  D.feito.pilula = false;
+  saveNow();
+}
+function medDoDia(D){
+  const h = new Date().getHours();
+  if (h >= 20 && D.checkin && !D.checkin.estados.includes('ansioso')) return 'noite';
+  const e = (D.checkin && (D.checkin.estados[0] || D.checkin.inferidos[0])) || 'bem';
+  return MED_POR_ESTADO[e] || 'suspiro';
+}
+function listaEstados(arr){
+  const n = arr.map(e => ESTADOS[e].toLowerCase());
+  return n.length > 1 ? n.slice(0,-1).join(', ') + ' e ' + n[n.length-1] : n[0] || '';
 }
 
 /* ---------------- som (sino) ---------------- */
@@ -294,123 +319,102 @@ function sino(){
   } catch(e){}
 }
 
-/* ======================================================================
-   ONBOARDING · diagnóstico do momento
-   ====================================================================== */
-function iniciarOnboarding(){
-  ob = { passo:0, nome:'', roda:Object.fromEntries(PILAR_IDS.map(p => [p, 5])), foco:[], sonho:'', infancia:'',
-         woop:null, tradicoes:Object.keys(TRADICOES), acoes:[] };
+/* ---------------- fundo de tela com o mantra ---------------- */
+async function gerarFundo(P){
+  try { await document.fonts.ready; } catch(e){}
+  const c = document.createElement('canvas'); c.width = 1080; c.height = 1920;
+  const x = c.getContext('2d');
+  const g = x.createLinearGradient(0, 0, 0, 1920); g.addColorStop(0, '#0e1c20'); g.addColorStop(1, '#16302f');
+  x.fillStyle = g; x.fillRect(0, 0, 1080, 1920);
+  const glow = x.createRadialGradient(540, 520, 0, 540, 520, 420); glow.addColorStop(0, 'rgba(217,179,106,.22)'); glow.addColorStop(1, 'rgba(217,179,106,0)');
+  x.fillStyle = glow; x.fillRect(0, 0, 1080, 1100);
+  x.fillStyle = '#d9b36a'; x.beginPath(); x.moveTo(540, 440); x.lineTo(556, 520); x.lineTo(540, 600); x.lineTo(524, 520); x.closePath(); x.fill();
+  x.textAlign = 'center'; x.fillStyle = '#93a5a2'; x.font = '500 30px "JetBrains Mono", monospace';
+  x.fillText('MANTRA DO DIA', 540, 760);
+  x.fillStyle = '#e8e3d6'; x.font = '400 104px "Instrument Serif", Georgia, serif';
+  const palavras = P.mantra.split(' '), linhas = []; let l = '';
+  for (const w of palavras){ const t = l ? l + ' ' + w : w; if (x.measureText(t).width > 860 && l){ linhas.push(l); l = w; } else l = t; }
+  linhas.push(l);
+  const y0 = 960 - (linhas.length - 1) * 60;
+  linhas.forEach((ln, i) => x.fillText(ln, 540, y0 + i * 120));
+  x.fillStyle = '#93a5a2'; x.font = '400 34px Manrope, system-ui, sans-serif';
+  x.fillText(P.ref.length > 48 ? P.ref.slice(0, 46) + '…' : P.ref, 540, y0 + linhas.length * 120 + 40);
+  x.font = '500 28px "JetBrains Mono", monospace'; x.fillText(MARCA.nome.toUpperCase().split('').join(' '), 540, 1760);
+  return c.toDataURL('image/png');
 }
-const OB_TOTAL = 7;
+
+/* ======================================================================
+   ONBOARDING · diagnóstico do momento (5 passos, ~3 min)
+   ====================================================================== */
+const OB_TOTAL = 5;
+function iniciarOnboarding(){ ob = { passo:0, nome:'', roda:Object.fromEntries(PILAR_IDS.map(p => [p, 5])), foco:[], sonho:'', infancia:'', tradicoes:Object.keys(TRADICOES) }; }
 function renderOnboarding(){
   tabsEl.hidden = true;
   const p = ob.passo;
   const bar = `<div class="ob-bar" aria-hidden="true"><i style="width:${p / OB_TOTAL * 100}%"></i></div>`;
   const nav = (proximo = 'Continuar', ok = true) => `<div class="ob-nav">${p > 0 ? '<button class="btn" data-act="ob-voltar">Voltar</button>' : '<span></span>'}<button class="btn btn-primary" data-act="ob-proximo" ${ok ? '' : 'disabled'}>${proximo}</button></div>`;
   let h = '';
-  if (p === 0){
-    h = `<div class="ob">
-      ${marca()}
-      <p class="mono">Travessia · diário de bordo</p>
-      <h1>Menos tela.<br><em style="color:var(--accent)">Mais rumo.</em></h1>
-      <p class="lead">Um painel para cinco minutos de manhã e cinco à noite. Todo dia: uma pílula de sabedoria (Buda, estoicos, Jesus, mitologia) com um protocolo prático, 5 minutos de meditação, 3 gratidões e uma pergunta. Você acompanha a própria evolução.</p>
-      <p class="muted" style="font-size:.9rem">Antes, um diagnóstico de 4 minutos para montar a sua trilha de 30 dias. Seus dados ficam só neste aparelho.</p>
+  if (p === 0) h = `<div class="ob">${marca()}
+      <p class="mono">${esc(MARCA.nome)} · ${esc(MARCA.produto)}</p>
+      <h1>Como você chega hoje?</h1>
+      <p class="lead">Todo dia você diz em 30 segundos como está. O diário responde com a pílula certa para esse dia: um ensinamento de Buda, dos estoicos, de Jesus ou da mitologia, um mantra para repetir e um protocolo prático.</p>
+      <p class="muted" style="font-size:.9rem">Antes, um diagnóstico de 3 minutos para conhecer você. Seus dados ficam só neste aparelho.</p>
       <div class="ob-nav" style="flex-direction:column;align-items:stretch">
-        <button class="btn btn-primary" data-act="ob-proximo">Fazer meu diagnóstico</button>
-        <button class="btn" data-act="demo">Explorar com dados de exemplo</button>
+        <button class="btn btn-primary" data-act="ob-proximo">Começar</button>
+        <button class="btn" data-act="demo">Ver com dados de exemplo</button>
         <button class="btn-link" data-act="importar-inicio" style="align-self:center;margin-top:6px">Tenho um backup</button>
-      </div>
-    </div>`;
-  }
-  if (p === 1){
-    h = `<div class="ob">${bar}<p class="mono">1 de 6 · você</p><h1>Como você quer ser chamado?</h1>
-      <label class="field">Nome<input type="text" id="ob-nome" data-ob="nome" value="${esc(ob.nome)}" autocomplete="given-name"></label>
-      ${nav('Continuar', !!ob.nome.trim())}</div>`;
-  }
-  if (p === 2){
-    h = `<div class="ob">${bar}<p class="mono">2 de 6 · a roda</p><h1>Onde você está hoje?</h1>
-      <p class="lead">De 1 a 10, sem pensar muito. É uma foto do momento, não uma nota de prova.</p>
-      <div class="stack">${PILAR_IDS.map(id => `<div><div class="slider"><label for="r-${id}">${PILARES[id].nome}</label><input type="range" min="1" max="10" id="r-${id}" data-ob-roda="${id}" value="${ob.roda[id]}"><output id="o-${id}">${ob.roda[id]}</output></div><p class="muted" style="font-size:.78rem;margin-left:108px">${PILARES[id].desc}</p></div>`).join('')}</div>
-      ${nav()}</div>`;
-  }
+      </div></div>`;
+  if (p === 1) h = `<div class="ob">${bar}<p class="mono">1 de 4 · você</p><h1>Como você quer ser chamado?</h1>
+      <label class="field">Nome<input type="text" id="ob-nome" data-ob="nome" value="${esc(ob.nome)}" autocomplete="given-name"></label>${nav('Continuar', !!ob.nome.trim())}</div>`;
+  if (p === 2) h = `<div class="ob">${bar}<p class="mono">2 de 4 · a roda</p><h1>Onde você está hoje?</h1>
+      <p class="lead">De 1 a 10, sem pensar muito. É uma foto do momento.</p>
+      <div class="stack">${PILAR_IDS.map(id => `<div><div class="slider"><label for="r-${id}">${PILARES[id].nome}</label><input type="range" min="1" max="10" id="r-${id}" data-ob-roda="${id}" value="${ob.roda[id]}"><output id="o-${id}">${ob.roda[id]}</output></div><p class="muted" style="font-size:.78rem;margin-left:108px">${PILARES[id].desc}</p></div>`).join('')}</div>${nav()}</div>`;
   if (p === 3){
     if (!ob.foco.length) ob.foco = PILAR_IDS.slice().sort((a,b) => ob.roda[a] - ob.roda[b]).slice(0,1);
-    h = `<div class="ob">${bar}<p class="mono">3 de 6 · o foco</p><h1>O que você quer impulsionar agora?</h1>
-      <p class="lead">Escolha até 2. Já marcamos o pilar com a nota mais baixa, mas a escolha é sua.</p>
+    h = `<div class="ob">${bar}<p class="mono">3 de 4 · o foco</p><h1>O que você quer impulsionar?</h1>
+      <p class="lead">Até 2. Marcamos o pilar com a nota mais baixa, mas a escolha é sua.</p>
       <div class="chips">${PILAR_IDS.map(id => `<button class="chip" data-act="ob-foco" data-id="${id}" aria-pressed="${ob.foco.includes(id)}">${PILARES[id].nome} · ${ob.roda[id]}</button>`).join('')}</div>
+      <label class="field" style="margin-top:8px">Daqui a 5 anos, num dia comum, como é a sua vida? <small>Opcional. Aparece de vez em quando para lembrar o seu rumo.</small><textarea id="ob-sonho" data-ob="sonho">${esc(ob.sonho)}</textarea></label>
       ${nav('Continuar', ob.foco.length > 0)}</div>`;
   }
-  if (p === 4){
-    h = `<div class="ob">${bar}<p class="mono">4 de 6 · o sonho</p><h1>Para onde é a travessia?</h1>
-      <label class="field">Daqui a 5 anos, num dia comum, como é a sua vida? <small>Onde você acorda, com quem, o que faz.</small><textarea id="ob-sonho" data-ob="sonho" placeholder="Ex.: acordo cedo perto do mar, trabalho no meu próprio projeto, tenho tempo para treinar e para quem eu amo.">${esc(ob.sonho)}</textarea></label>
-      <label class="field">O que você fazia quando criança que te fazia perder a noção do tempo? <small>Costuma esconder uma pista do seu propósito.</small><textarea id="ob-infancia" data-ob="infancia" placeholder="Ex.: pulava da escada tentando voar.">${esc(ob.infancia)}</textarea></label>
-      ${nav()}</div>`;
-  }
-  if (p === 5){
-    if (!ob.woop){ const s = WOOP_SUGESTOES[ob.foco[0]]; ob.woop = { desejo:s.desejo, resultado:'', obstaculo:s.obstaculo, plano:s.plano }; }
-    h = `<div class="ob">${bar}<p class="mono">5 de 6 · a meta de 90 dias</p><h1>Uma meta, quatro linhas</h1>
-      <p class="lead">Método WOOP, da psicóloga Gabriele Oettingen: desejo, resultado, obstáculo e plano. Já deixamos uma sugestão para você editar.</p>
-      <label class="field">Desejo · o que você quer em 90 dias<textarea id="w-desejo" data-ob-woop="desejo">${esc(ob.woop.desejo)}</textarea></label>
-      <label class="field">Resultado · como vai ser quando conseguir <small>Imagine por 30 segundos antes de escrever.</small><textarea id="w-resultado" data-ob-woop="resultado" placeholder="Ex.: vou me sentir leve, orgulhoso e com tempo.">${esc(ob.woop.resultado)}</textarea></label>
-      <label class="field">Obstáculo · o que dentro de você atrapalha<textarea id="w-obstaculo" data-ob-woop="obstaculo">${esc(ob.woop.obstaculo)}</textarea></label>
-      <label class="field">Plano · "Se [obstáculo], então eu [ação]"<textarea id="w-plano" data-ob-woop="plano">${esc(ob.woop.plano)}</textarea></label>
-      ${nav()}</div>`;
-  }
-  if (p === 6){
-    if (!ob.acoes.length) ob.acoes = ob.foco.flatMap(f => ACOES_SUGERIDAS[f].slice(0,1));
-    const sug = [...new Set(ob.foco.flatMap(f => ACOES_SUGERIDAS[f]))];
-    h = `<div class="ob">${bar}<p class="mono">6 de 6 · o dia a dia</p><h1>Menos é mais</h1>
-      <p class="lead">Escolha de onde vêm as suas pílulas diárias e até 3 ações para repetir todo dia.</p>
-      <div><p class="mono" style="margin-bottom:8px">Tradições</p><div class="chips">${Object.entries(TRADICOES).map(([id,n]) => `<button class="chip" data-act="ob-trad" data-id="${id}" aria-pressed="${ob.tradicoes.includes(id)}">${n}</button>`).join('')}</div></div>
-      <div><p class="mono" style="margin-bottom:8px">Ações diárias · ${ob.acoes.length} de 3</p><div class="chips">${sug.map(a => `<button class="chip" data-act="ob-acao" data-txt="${esc(a)}" aria-pressed="${ob.acoes.includes(a)}">${esc(a)}</button>`).join('')}</div>
-      <div class="row" style="margin-top:10px"><input type="text" id="ob-nova-acao" placeholder="Ou escreva a sua" style="flex:1;min-width:0"><button class="btn btn-small" data-act="ob-add-acao">Adicionar</button></div>
-      ${ob.acoes.filter(a => !sug.includes(a)).map(a => `<p style="margin-top:8px">· ${esc(a)} <button class="btn-link" data-act="ob-acao" data-txt="${esc(a)}">remover</button></p>`).join('')}</div>
-      ${nav('Ver minha trilha', ob.tradicoes.length > 0)}</div>`;
-  }
-  if (p === 7){
-    const trilha = gerarTrilha(ob.tradicoes, ob.foco, hash(ob.nome + Date.now()));
-    ob.trilha = trilha;
-    const first = pill(trilha[0]);
-    h = `<div class="ob">${bar}<p class="mono">Pronto, ${esc(ob.nome)}</p><h1>Sua trilha de 30 dias</h1>
-      <p class="lead">Quatro trechos, com foco em ${ob.foco.map(f => PILARES[f].nome).join(' e ')}. Todo dia uma pílula termina num protocolo: uma ação específica, pequena e verificável.</p>
-      <div class="phases">${Object.entries(FASES).map(([id,f], i) => `<div><span class="mono">Semana ${i+1}</span><b>${f.nome}</b><span class="muted" style="font-size:.86rem">${f.pergunta}</span></div>`).join('')}</div>
-      <div class="card"><span class="mono">Dia 1</span><h3>${esc(first.titulo)}</h3><p class="muted">${esc(TRADICOES[first.trad])} · ${esc(first.ref)}</p></div>
-      ${nav('Começar hoje')}</div>`;
-  }
+  if (p === 4) h = `<div class="ob">${bar}<p class="mono">4 de 4 · as fontes</p><h1>De onde vem a sua sabedoria?</h1>
+      <p class="lead">Escolha as tradições das suas pílulas. Dá para mudar depois.</p>
+      <div class="chips">${Object.entries(TRADICOES).map(([id,n]) => `<button class="chip" data-act="ob-trad" data-id="${id}" aria-pressed="${ob.tradicoes.includes(id)}">${n}</button>`).join('')}</div>
+      ${nav('Começar meu primeiro dia', ob.tradicoes.length > 0)}</div>`;
   app.innerHTML = h;
-  const f = app.querySelector('input[type=text],textarea'); if (f && p > 0 && p < 6) f.focus({preventScroll:true});
+  const f = app.querySelector('input[type=text]'); if (f) f.focus({ preventScroll:true });
 }
 function concluirOnboarding(){
   const hoje = dkey();
-  S = { versao:1, perfil:{ nome:ob.nome.trim(), inicio:hoje, inicioAbsoluto:hoje, foco:ob.foco, sonho:ob.sonho, infancia:ob.infancia, woop:ob.woop,
-        tradicoes:ob.tradicoes, acoes:ob.acoes.map((t,i) => ({ id:'a' + Date.now().toString(36) + i, texto:t })), plano:{...PLANO_MEDITACAO}, trilha:ob.trilha, trilhasConcluidas:0 },
+  S = { versao:2, perfil:{ nome:ob.nome.trim(), inicio:hoje, inicioAbsoluto:hoje, foco:ob.foco, sonho:ob.sonho, infancia:'',
+        woop:{ ...WOOP_SUGESTOES[ob.foco[0]], resultado:'' }, tradicoes:ob.tradicoes },
         roda:[{ data:hoje, notas:ob.roda }], dias:{}, avaliacoes:[] };
   ob = null; saveNow(); tab = 'hoje'; render();
 }
 
-/* ---------------- dados de exemplo ---------------- */
 function carregarExemplo(){
-  const hoje = new Date(), inicio = addDays(hoje, -11), r = rng(7);
-  const trads = Object.keys(TRADICOES), foco = ['proposito','coragem'];
-  S = { versao:1, exemplo:true, perfil:{ nome:'Exemplo', inicio:dkey(inicio), inicioAbsoluto:dkey(inicio), foco, sonho:'Acordar perto do mar, viver do meu próprio projeto e ter tempo para treinar e para quem eu amo.', infancia:'Pulava da escada tentando voar.',
-        woop:{ ...WOOP_SUGESTOES.proposito, desejo:WOOP_SUGESTOES.proposito.desejo, resultado:'Orgulho de ter começado.' }, tradicoes:trads,
-        acoes:[{id:'e1',texto:'30 min no meu projeto'},{id:'e2',texto:'Primeira hora sem celular'}], plano:{...PLANO_MEDITACAO}, trilha:gerarTrilha(trads, foco, 42), trilhasConcluidas:0 },
-        roda:[{ data:dkey(inicio), notas:{corpo:5,mente:4,proposito:3,relacoes:6,coragem:3,presenca:4} }, { data:dkey(addDays(hoje,-4)), notas:{corpo:6,mente:5,proposito:5,relacoes:6,coragem:5,presenca:5} }],
-        dias:{}, avaliacoes:[{ data:dkey(addDays(hoje,-4)), nota:8, ajudou:'A pílula com protocolo. Saber o que fazer no dia.', faltou:'Um lembrete no celular.' }] };
-  const grats = [['Café com minha mãe','Dormi bem','O sol no caminho'],['Um amigo me ligou','Treinei','Terminei uma tarefa chata'],['Risada no almoço','Caminhei sem fone','Uma ideia nova'],['Conversa honesta','Comida boa','Tempo livre à noite']];
-  for (let i = 0; i < 11; i++){
-    if (i === 6) continue; // um dia em branco, de propósito
-    const k = dkey(addDays(inicio, i)), g = grats[i % grats.length];
-    S.dias[k] = { feito:{ pilula:true, med: i !== 3, diario:true, 'a:e1': r() > .3, 'a:e2': r() > .5 }, grat:g, resposta:'(exemplo) Percebi que adio por medo de não estar pronto.',
-                  energia: Math.min(5, 2 + Math.round(i/4 + r())), paz: Math.min(5, 2 + Math.round(i/5 + r())), medMin: i !== 3 ? 5 : 0 };
+  const hoje = new Date(), inicio = addDays(hoje, -13), r = rng(11);
+  S = { versao:2, exemplo:true, perfil:{ nome:'Exemplo', inicio:dkey(inicio), inicioAbsoluto:dkey(inicio), foco:['proposito','coragem'],
+        sonho:'Acordar perto do mar, viver do meu próprio projeto e ter tempo para quem eu amo.', infancia:'',
+        woop:{ ...WOOP_SUGESTOES.proposito, resultado:'Orgulho de ter começado.' }, tradicoes:Object.keys(TRADICOES) },
+        roda:[{ data:dkey(inicio), notas:{corpo:5,mente:4,proposito:3,relacoes:6,coragem:3,presenca:4} }, { data:dkey(addDays(hoje,-6)), notas:{corpo:6,mente:5,proposito:5,relacoes:6,coragem:5,presenca:5} }],
+        dias:{}, avaliacoes:[{ data:dkey(addDays(hoje,-6)), nota:8, ajudou:'O mantra. Repeti antes de uma reunião difícil.', faltou:'Um lembrete no celular.' }] };
+  const est = Object.keys(ESTADOS), grats = [['Café com minha mãe','Dormi bem','O sol no caminho'],['Um amigo me ligou','Treinei','Terminei uma tarefa chata'],['Risada no almoço','Caminhei sem fone','Uma ideia nova']];
+  for (let i = 0; i < 13; i++){
+    if (i === 7) continue;
+    const k = dkey(addDays(inicio, i)), e = [est[Math.floor(r() * 4)], ...(r() > .6 ? [est[4 + Math.floor(r() * 5)]] : [])];
+    const ck = { estados:[...new Set(e)], energia: 2 + Math.round(r() * 2 + i / 8), texto:'', hora:'07:40' };
+    const { ranking } = ranquear(k, ck);
+    S.dias[k] = { feito:{ pilula:true, med: i !== 3, diario:true }, checkin:{ ...ck, inferidos:[] }, ranking, idx:0, pilulaId:ranking[0], pergunta:pill(ranking[0]).pergunta,
+                  grat:grats[i % 3], resposta:'(exemplo) Percebi que adio por medo de não estar pronto.', energia:Math.min(5, ck.energia), paz:Math.min(5, 2 + Math.round(r() * 2 + i / 7)), medMin: i !== 3 ? 5 : 0 };
   }
   saveNow(); tab = 'hoje'; render();
 }
 
 /* ======================================================================
-   TELAS PRINCIPAIS
+   TELAS
    ====================================================================== */
-function marca(){ return `<div class="brand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><circle cx="12" cy="12" r="10.5"/><path d="M12 3.5 14.4 12 12 20.5 9.6 12Z" fill="var(--accent)" stroke="none"/><path d="M12 3.5 14.4 12H9.6Z" fill="currentColor" stroke="none"/></svg>TRAVESSIA</div>`; }
+function marca(){ return `<div class="brand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><circle cx="12" cy="12" r="10.5"/><path d="M12 3.5 14.4 12 12 20.5 9.6 12Z" fill="var(--accent)" stroke="none"/><path d="M12 3.5 14.4 12H9.6Z" fill="currentColor" stroke="none"/></svg>${esc(MARCA.nome.toUpperCase())}</div>`; }
 function topo(){
   return `${S.exemplo ? `<div class="demo"><span>Você está vendo dados de exemplo.</span><button class="btn btn-small btn-primary" data-act="sair-exemplo">Começar o meu</button></div>` : ''}
     <div class="top">${marca()}<span class="mono">${fmtDate(new Date(), { day:'numeric', month:'short' })}</span></div>`;
@@ -419,74 +423,86 @@ function ring(done, total){
   const C = 2 * Math.PI * 22, off = C * (1 - (total ? done / total : 0));
   return `<svg class="ring" viewBox="0 0 54 54" aria-hidden="true"><circle class="bg" cx="27" cy="27" r="22"/><circle class="fg" cx="27" cy="27" r="22" stroke-dasharray="${C}" stroke-dashoffset="${off}" transform="rotate(-90 27 27)"/><text x="27" y="31" text-anchor="middle">${done}/${total}</text></svg>`;
 }
+function saudacao(){ const h = new Date().getHours(); return h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite'; }
+
+function renderCheckin(D){
+  const sel = ui.sel.length ? ui.sel : (D.checkin ? D.checkin.estados.slice() : []); ui.sel = sel;
+  return `<article class="card checkin">
+    <span class="tag">Check-in · 30 segundos</span>
+    <h2>Como você chega hoje?</h2>
+    <p class="muted" style="font-size:.9rem">Escolha até 2.</p>
+    <div class="chips">${Object.entries(ESTADOS).map(([id,n]) => `<button class="chip" data-act="estado" data-id="${id}" aria-pressed="${sel.includes(id)}">${n}</button>`).join('')}</div>
+    <div><p class="mono" style="margin-bottom:6px">Energia agora</p><div class="scale" role="group" aria-label="Energia de 1 a 5">${[1,2,3,4,5].map(v => `<button type="button" data-escala="ck-energia" data-v="${v}" aria-pressed="${(ui.energia ?? D.energia) === v}">${v}</button>`).join('')}</div></div>
+    <label class="field" for="ck-texto">O que está pesando ou pedindo atenção? <small>Opcional. Uma frase ajuda a escolher melhor.</small><textarea id="ck-texto" placeholder="Ex.: reunião difícil hoje e eu sigo adiando a conversa com meu sócio.">${esc(ui.texto ?? (D.checkin ? D.checkin.texto : ''))}</textarea></label>
+    <p class="muted" id="ck-msg" style="font-size:.86rem" hidden></p>
+    <button class="btn btn-primary" data-act="checkin">Receber minha pílula</button>
+    ${D.checkin ? '<button class="btn-link" data-act="cancelar-refazer" style="margin-left:14px">Cancelar</button>' : ''}
+  </article>`;
+}
 
 function renderHoje(){
-  const k = dkey(), D = dia(k), n = diaTrilha();
-  const P = pilulaDe(k), fase = n >= 1 && n <= 30 ? FASES[faseDoDia(n)] : null;
-  const itens = itensDoDia(k), feitos = itens.filter(x => x[1]).length;
-  const hora = new Date().getHours(), saud = hora < 12 ? 'Bom dia' : hora < 18 ? 'Boa tarde' : 'Boa noite';
-  const tipoMed = S.perfil.plano[new Date().getDay()] || 'suspiro', M = MEDITACOES[tipoMed];
+  const k = dkey(), D = dia(k);
+  let h = topo() + `<div class="greet"><p class="mono">${fmtDate(new Date())}</p><h1>${saudacao()}, ${esc(S.perfil.nome)}.</h1></div>`;
+
+  if (!D.checkin || ui.refazer){
+    h += `<div class="stack">${renderCheckin(D)}`;
+    const ontem = dkey(addDays(new Date(), -1));
+    if (S.dias[ontem] && S.dias[ontem].pilulaId){ const P0 = pill(S.dias[ontem].pilulaId); h += `<p class="nudge">Mantra de ontem: <em>${esc(P0.mantra)}</em></p>`; }
+    h += `</div>`;
+    app.innerHTML = h; return;
+  }
+
+  const P = pill(D.pilulaId), feitos = nivel(k);
+  const tipoMed = D.medTipo || medDoDia(D), M = MEDITACOES[tipoMed];
   const angulos = GRATIDAO_ANGULOS[hash(k) % GRATIDAO_ANGULOS.length];
-  const ontem = dkey(addDays(new Date(), -1)), anteontem = dkey(addDays(new Date(), -2));
-  const falhouOntem = parseKey(ontem) >= parseKey(S.perfil.inicioAbsoluto) && !diaCompleto(ontem);
-  const ultRoda = S.roda[S.roda.length-1], revisaoDevida = diffDays(parseKey(ultRoda.data), new Date()) >= 7;
-  const ligado = P.pilares.some(x => S.perfil.foco.includes(x));
+  const ultRoda = S.roda[S.roda.length-1], revisaoDevida = ultRoda && diffDays(parseKey(ultRoda.data), new Date()) >= 7;
+  const motivo = [...D.checkin.estados, ...(D.checkin.inferidos || [])].filter(e => P.estados.includes(e));
   const textoCurto = P.texto.split('. ')[0] + '.';
 
-  let h = topo() + `
-  <div class="greet">
-    <p class="mono">${n >= 1 && n <= 30 ? `Dia ${n} de 30 · ${fase.nome}` : 'Trilha concluída'}</p>
-    <h1>${saud}, ${esc(S.perfil.nome)}.</h1>
-    ${fase ? `<p class="muted">${fase.pergunta}</p>` : ''}
-  </div>
-  <div class="progress">${ring(feitos, itens.length)}<p class="muted" style="font-size:.92rem">${feitos === itens.length ? 'Tudo feito. Feche a tela e vá viver.' : `Faltam ${itens.length - feitos}. Depois, feche a tela.`}</p></div>
+  h += `<div class="progress">${ring(feitos, 3)}<p class="muted" style="font-size:.92rem">${feitos === 3 ? 'Dia completo. Feche a tela e vá viver.' : `Faltam ${3 - feitos}: ${[!D.feito.pilula && 'protocolo', !D.feito.med && 'meditação', !D.feito.diario && 'gratidão'].filter(Boolean).join(', ')}.`}</p></div>
   <div class="stack">`;
+  if (revisaoDevida) h += `<div class="card"><span class="tag tide">Revisão semanal · 1 min</span><p>Faz 7 dias desde a última roda. Atualize as notas e diga o que o diário está ajudando ou atrapalhando.</p><button class="btn btn-small" data-act="abrir-revisao">Fazer revisão</button></div>`;
 
-  if (n > 30) h += `<div class="card"><h3>Você atravessou 30 dias.</h3><p>Refaça a roda para ver o quanto mudou e comece uma nova trilha com outras pílulas.</p><button class="btn btn-primary" data-act="nova-trilha">Começar nova trilha</button></div>`;
-  if (falhouOntem && !diaCompleto(anteontem) && parseKey(anteontem) >= parseKey(S.perfil.inicioAbsoluto)) h += `<p class="nudge">Dois dias em branco. Sem culpa: recomece pelo menor passo de hoje, a pílula.</p>`;
-  else if (falhouOntem) h += `<p class="nudge">Ontem ficou em branco. Tudo bem. A regra é só uma: nunca duas vezes seguidas.</p>`;
-  if (revisaoDevida) h += `<div class="card"><div class="between"><span class="tag tide">Revisão semanal · 1 min</span></div><p>Faz 7 dias desde a última roda. Atualize suas notas e diga o que o painel está ajudando ou atrapalhando.</p><button class="btn btn-small" data-act="abrir-revisao">Fazer revisão</button></div>`;
+  h += `<article class="card mantra">
+      <span class="mono">Mantra do dia</span>
+      <p class="m">${esc(P.mantra)}</p>
+      <p class="sub">Repita ao acordar, antes de uma decisão e antes de dormir.</p>
+      <div class="row"><button class="btn btn-small" data-act="copiar-mantra">Copiar</button><button class="btn btn-small" data-act="fundo">Fundo de tela</button></div>
+      ${ui.wall ? `<div class="wall"><img src="${ui.wall}" alt="Fundo de tela com o mantra do dia"><span class="sub">Se o download não começar, segure o dedo na imagem para salvar.</span></div>` : ''}
+    </article>
 
-  /* pílula */
-  h += `<article class="card">
-    <div class="task-head"><span class="tag">${esc(TRADICOES[P.trad])}</span>${D.feito.pilula ? '<span class="done-mark">Protocolo feito</span>' : ''}</div>
-    <h2>${esc(P.titulo)}</h2>
-    <p class="quote">“${esc(P.citacao)}”</p>
-    <p class="ref">${esc(P.ref)}</p>
-    <p>${esc(ui.lerMais ? P.texto : textoCurto)} ${ui.lerMais ? '' : '<button class="btn-link" data-act="ler-mais">Ler mais</button>'}</p>
-    ${ligado ? `<p class="personal">Isso conversa com a sua meta: ${esc(S.perfil.woop.desejo)}</p>` : (n % 5 === 0 && S.perfil.sonho ? `<p class="personal">Lembre para onde você vai: ${esc(S.perfil.sonho)}</p>` : '')}
-    <div class="protocol"><span class="mono">Protocolo de hoje</span><p>${esc(P.protocolo)}</p></div>
-    <label class="check ${D.feito.pilula ? 'done' : ''}"><input type="checkbox" data-feito="pilula" ${D.feito.pilula ? 'checked' : ''}><span>Fiz o protocolo</span></label>
-  </article>`;
+    <article class="card">
+      <p class="why">Você chegou <b>${esc(listaEstados(D.checkin.estados) || 'sem marcar como estava')}</b>${D.checkin.texto ? ' e escreveu sobre o que pesa' : ''}. ${motivo.length ? `Esta pílula fala de quem está ${esc(listaEstados([...new Set(motivo)]))}.` : 'Esta pílula conversa com o seu foco.'}</p>
+      <div class="task-head"><span class="tag">${esc(TRADICOES[P.trad])}</span>${D.feito.pilula ? '<span class="done-mark">Protocolo feito</span>' : ''}</div>
+      <h2>${esc(P.titulo)}</h2>
+      <p class="quote">“${esc(P.citacao)}”</p>
+      <p class="ref">${esc(P.ref)}</p>
+      <p>${esc(ui.lerMais ? P.texto : textoCurto)} ${ui.lerMais ? '' : '<button class="btn-link" data-act="ler-mais">Ler mais</button>'}</p>
+      ${S.perfil.sonho && hash(k) % 4 === 0 ? `<p class="personal">Lembre para onde você vai: ${esc(S.perfil.sonho)}</p>` : ''}
+      <div class="protocol"><span class="mono">Protocolo de hoje</span><p>${esc(P.protocolo)}</p></div>
+      <label class="check ${D.feito.pilula ? 'done' : ''}"><input type="checkbox" data-feito="pilula" ${D.feito.pilula ? 'checked' : ''}><span>Fiz o protocolo</span></label>
+      <div class="row"><button class="btn-link" data-act="outra">Ver outra pílula para hoje</button><button class="btn-link" data-act="refazer" style="color:var(--muted)">Mudou como você está? Refazer check-in</button></div>
+    </article>
 
-  /* meditação */
-  h += `<article class="card">
-    <div class="task-head"><span class="tag tide">5 min · meditação</span>${D.feito.med ? `<span class="done-mark">Feito · ${D.medMin || 5} min</span>` : ''}</div>
-    <h3>${esc(M.nome)}</h3>
-    <p class="muted" style="font-size:.92rem">${esc(M.desc)}</p>
-    <div class="row"><button class="btn btn-primary" data-act="meditar" data-tipo="${tipoMed}">${D.feito.med ? 'Meditar de novo' : 'Começar'}</button>
-      <select id="med-troca" data-act-change="trocar-med" aria-label="Trocar prática de hoje" style="width:auto;flex:1;min-width:0">${Object.entries(MEDITACOES).map(([id,m]) => `<option value="${id}" ${id === tipoMed ? 'selected' : ''}>${esc(m.nome)}</option>`).join('')}</select></div>
-    <label class="check ${D.feito.med ? 'done' : ''}"><input type="checkbox" data-feito="med" ${D.feito.med ? 'checked' : ''}><span>Meditei sem o timer</span></label>
-  </article>`;
+    <article class="card">
+      <div class="task-head"><span class="tag tide">5 min · para o seu momento</span>${D.feito.med ? `<span class="done-mark">Feito · ${D.medMin || 5} min</span>` : ''}</div>
+      <h3>${esc(M.nome)}</h3>
+      <p class="muted" style="font-size:.92rem">${esc(M.desc)}</p>
+      <div class="row"><button class="btn btn-primary" data-act="meditar" data-tipo="${tipoMed}">${D.feito.med ? 'Meditar de novo' : 'Começar'}</button>
+        <select id="med-troca" data-act-change="trocar-med" aria-label="Trocar prática" style="width:auto;flex:1;min-width:0">${Object.entries(MEDITACOES).map(([id,m]) => `<option value="${id}" ${id === tipoMed ? 'selected' : ''}>${esc(m.nome)}</option>`).join('')}</select></div>
+      <label class="check ${D.feito.med ? 'done' : ''}"><input type="checkbox" data-feito="med" ${D.feito.med ? 'checked' : ''}><span>Meditei sem o timer</span></label>
+    </article>
 
-  /* diário */
-  h += `<article class="card" id="diario">
-    <div class="task-head"><span class="tag">Diário de bordo</span>${D.feito.diario ? '<span class="done-mark">Registrado</span>' : ''}</div>
-    <h3>Três motivos de gratidão de hoje</h3>
-    <p class="muted" style="font-size:.88rem">Algo que aconteceu hoje. Os temas mudam todo dia para não virar repetição.</p>
-    <div class="grat">${[0,1,2].map(i => `<label for="g${i}"><b>${i+1}</b><input type="text" id="g${i}" data-grat="${i}" value="${esc(D.grat[i])}" placeholder="${esc(angulos[i])}…"></label>`).join('')}</div>
-    <label class="field" for="resposta" style="margin-top:18px">${esc(perguntaDe(k))}<textarea id="resposta" data-dia="resposta" placeholder="Escreva o que vier. Ninguém mais lê.">${esc(D.resposta)}</textarea></label>
-    <div><p class="mono" style="margin-bottom:6px">Energia hoje</p><div class="scale" role="group" aria-label="Energia de 1 a 5">${[1,2,3,4,5].map(v => `<button type="button" data-escala="energia" data-v="${v}" aria-pressed="${D.energia === v}">${v}</button>`).join('')}</div></div>
-    <div><p class="mono" style="margin-bottom:6px">Paz hoje</p><div class="scale" role="group" aria-label="Paz de 1 a 5">${[1,2,3,4,5].map(v => `<button type="button" data-escala="paz" data-v="${v}" aria-pressed="${D.paz === v}">${v}</button>`).join('')}</div></div>
-    <button class="btn ${D.feito.diario ? '' : 'btn-primary'}" data-act="salvar-diario">${D.feito.diario ? 'Atualizar registro' : 'Registrar o dia'}</button>
-    <p class="form-msg muted" id="diario-msg" style="font-size:.86rem" hidden></p>
-  </article>`;
-
-  /* ações */
-  if (S.perfil.acoes.length) h += `<article class="card"><div class="task-head"><span class="tag tide">Minhas ações</span><button class="btn-link" data-tab-go="rumo">Editar</button></div>
-    ${S.perfil.acoes.map(a => `<label class="check ${D.feito['a:'+a.id] ? 'done' : ''}"><input type="checkbox" data-feito="a:${a.id}" ${D.feito['a:'+a.id] ? 'checked' : ''}><span>${esc(a.texto)}</span></label>`).join('')}</article>`;
-
-  if (feitos === itens.length) h += `<div class="card complete"><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="28" cy="28" r="26"/><path d="M28 6l5 22-5 22-5-22z" fill="currentColor" stroke="none"/></svg><h3>Dia completo.</h3><p class="muted">Agora o mais difícil: fechar a tela.</p></div>`;
+    <article class="card" id="diario">
+      <div class="task-head"><span class="tag">À noite · fechar o dia</span>${D.feito.diario ? '<span class="done-mark">Registrado</span>' : ''}</div>
+      <h3>Três motivos de gratidão de hoje</h3>
+      <div class="grat">${[0,1,2].map(i => `<label for="g${i}"><b>${i+1}</b><input type="text" id="g${i}" data-grat="${i}" value="${esc(D.grat[i])}" placeholder="${esc(angulos[i])}…"></label>`).join('')}</div>
+      <label class="field" for="resposta" style="margin-top:14px">${esc(D.pergunta || P.pergunta)}<textarea id="resposta" data-dia="resposta" placeholder="Opcional. Ninguém mais lê.">${esc(D.resposta)}</textarea></label>
+      <div><p class="mono" style="margin-bottom:6px">Paz no fim do dia</p><div class="scale" role="group" aria-label="Paz de 1 a 5">${[1,2,3,4,5].map(v => `<button type="button" data-escala="paz" data-v="${v}" aria-pressed="${D.paz === v}">${v}</button>`).join('')}</div></div>
+      <button class="btn ${D.feito.diario ? '' : 'btn-primary'}" data-act="salvar-diario">${D.feito.diario ? 'Atualizar' : 'Fechar o dia'}</button>
+      <p class="muted" id="diario-msg" style="font-size:.86rem" hidden></p>
+    </article>`;
+  if (feitos === 3) h += `<div class="card complete"><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="28" cy="28" r="26"/><path d="M28 6l5 22-5 22-5-22z" fill="currentColor" stroke="none"/></svg><h3>Dia completo.</h3><p class="muted">Agora o mais difícil: fechar a tela.</p></div>`;
   h += `</div>`;
   app.innerHTML = h;
 }
@@ -498,27 +514,25 @@ function renderEvolucao(){
   const minutos = ks.reduce((a,k) => a + (S.dias[k].medMin || 0), 0);
   const grats = ks.reduce((a,k) => a + S.dias[k].grat.filter(g => g && g.trim()).length, 0);
 
-  /* heatmap: 5 semanas terminando no sábado desta semana */
   const fim = addDays(hoje, 6 - hoje.getDay()), ini = addDays(fim, -34);
   let heat = '';
-  for (let i = 0; i < 35; i++){
-    const d = addDays(ini, i), k = dkey(d), fut = d > hoje;
-    heat += `<i data-l="${fut ? 0 : nivel(k)}" class="${k === dkey() ? 'today' : ''}" title="${fmtDate(d, {day:'numeric',month:'short'})}: ${fut ? '' : nivel(k) + '/3'}" style="${fut ? 'opacity:.35' : ''}"></i>`;
-  }
+  for (let i = 0; i < 35; i++){ const d = addDays(ini, i), k = dkey(d), fut = d > hoje;
+    heat += `<i data-l="${fut ? 0 : nivel(k)}" class="${k === dkey() ? 'today' : ''}" title="${fmtDate(d, {day:'numeric',month:'short'})}${fut ? '' : ': ' + nivel(k) + '/3'}" style="${fut ? 'opacity:.35' : ''}"></i>`; }
 
-  /* energia e paz, últimos 30 dias */
+  /* estados mais frequentes em 30 dias */
+  const cont = {};
+  for (let i = 0; i < 30; i++){ const D = S.dias[dkey(addDays(hoje, -i))]; if (D && D.checkin) D.checkin.estados.forEach(e => cont[e] = (cont[e] || 0) + 1); }
+  const ord = Object.entries(cont).sort((a,b) => b[1] - a[1]), max = ord.length ? ord[0][1] : 1;
+  const bars = ord.length ? `<div class="bars">${ord.map(([e,n]) => `<div class="bar"><span>${esc(ESTADOS[e])}</span><span class="track"><i style="width:${n / max * 100}%"></i></span><span class="n">${n}</span></div>`).join('')}</div>`
+    : '<p class="muted">Faça o check-in para ver aqui como você tem chegado aos dias.</p>';
+
   const W = 320, H = 120, pl = 18, pb = 18;
-  const pts = (campo) => {
-    const out = [];
-    for (let i = 29; i >= 0; i--){ const k = dkey(addDays(hoje, -i)), D = S.dias[k]; if (D && D[campo]) out.push([pl + (29 - i) / 29 * (W - pl - 4), (H - pb) - (D[campo] - 1) / 4 * (H - pb - 8)]); }
-    return out;
-  };
+  const pts = campo => { const out = []; for (let i = 29; i >= 0; i--){ const D = S.dias[dkey(addDays(hoje, -i))]; if (D && D[campo]) out.push([pl + (29 - i) / 29 * (W - pl - 4), (H - pb) - (D[campo] - 1) / 4 * (H - pb - 8)]); } return out; };
   const line = (p, cor) => p.length ? `<polyline fill="none" stroke="${cor}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="${p.map(x => x.join(',')).join(' ')}"/>${p.map(x => `<circle cx="${x[0]}" cy="${x[1]}" r="2.5" fill="${cor}"/>`).join('')}` : '';
   const pe = pts('energia'), pp = pts('paz');
   const grid = [1,3,5].map(v => { const y = (H - pb) - (v - 1) / 4 * (H - pb - 8); return `<line x1="${pl}" x2="${W}" y1="${y}" y2="${y}" stroke="var(--line)" stroke-dasharray="2 4"/><text x="0" y="${y + 3}">${v}</text>`; }).join('');
-  const chart = (pe.length || pp.length) ? `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Energia e paz nos últimos 30 dias">${grid}<text x="${pl}" y="${H - 2}">30 dias atrás</text><text x="${W}" y="${H - 2}" text-anchor="end">hoje</text>${line(pe,'var(--tide)')}${line(pp,'var(--accent)')}</svg>` : `<p class="muted">Registre energia e paz no diário para ver a linha aparecer aqui.</p>`;
+  const chart = (pe.length || pp.length) ? `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Energia de manhã e paz à noite, últimos 30 dias">${grid}<text x="${pl}" y="${H - 2}">30 dias atrás</text><text x="${W}" y="${H - 2}" text-anchor="end">hoje</text>${line(pe,'var(--tide)')}${line(pp,'var(--accent)')}</svg>` : `<p class="muted">A energia vem do check-in e a paz do fechamento do dia.</p>`;
 
-  /* radar da roda */
   const R = 92, cx = 130, cy = 120, ang = i => -Math.PI/2 + i * 2*Math.PI/6;
   const poly = notas => PILAR_IDS.map((id,i) => { const r = R * notas[id] / 10; return [cx + r*Math.cos(ang(i)), cy + r*Math.sin(ang(i))].map(n => n.toFixed(1)).join(','); }).join(' ');
   const primeira = S.roda[0], ultima = S.roda[S.roda.length-1];
@@ -526,10 +540,9 @@ function renderEvolucao(){
     ${[.25,.5,.75,1].map(f => `<polygon points="${PILAR_IDS.map((_,i) => [cx + R*f*Math.cos(ang(i)), cy + R*f*Math.sin(ang(i))].join(',')).join(' ')}" fill="none" stroke="var(--line)"/>`).join('')}
     ${PILAR_IDS.map((id,i) => `<line x1="${cx}" y1="${cy}" x2="${cx + R*Math.cos(ang(i))}" y2="${cy + R*Math.sin(ang(i))}" stroke="var(--line)"/><text x="${cx + (R+16)*Math.cos(ang(i))}" y="${cy + (R+16)*Math.sin(ang(i)) + 3}" text-anchor="middle">${PILARES[id].nome.toUpperCase()}</text>`).join('')}
     ${S.roda.length > 1 ? `<polygon points="${poly(primeira.notas)}" fill="none" stroke="var(--muted)" stroke-dasharray="4 4" stroke-width="1.5"/>` : ''}
-    <polygon points="${poly(ultima.notas)}" fill="color-mix(in srgb, var(--accent) 22%, transparent)" stroke="var(--accent)" stroke-width="2"/>
-  </svg>`;
+    <polygon points="${poly(ultima.notas)}" fill="color-mix(in srgb, var(--accent) 22%, transparent)" stroke="var(--accent)" stroke-width="2"/></svg>`;
 
-  const ultimos = ks.filter(k => S.dias[k].grat.some(g => g && g.trim()) || S.dias[k].resposta).sort().reverse().slice(0, 14);
+  const ultimos = ks.filter(k => S.dias[k].pilulaId || S.dias[k].grat.some(g => g && g.trim())).sort().reverse().slice(0, 14);
   const ultAval = S.avaliacoes[S.avaliacoes.length-1];
 
   app.innerHTML = topo() + `
@@ -541,32 +554,28 @@ function renderEvolucao(){
       <div class="stat"><span class="mono">Meditação</span><b>${minutos}</b><span class="muted" style="font-size:.78rem">minutos no total</span></div>
       <div class="stat"><span class="mono">Gratidões</span><b>${grats}</b><span class="muted" style="font-size:.78rem">motivos registrados</span></div>
     </div>
-
+    <section class="card"><h3>Como você tem chegado</h3><p class="muted" style="font-size:.88rem">Estados marcados no check-in, últimos 30 dias.</p>${bars}</section>
     <section class="card"><div class="between"><h3>Últimas 5 semanas</h3><span class="mono">0–3 práticas</span></div>
-      <div class="heat-days mono">${DIAS_SEMANA.map(d => `<span>${d[0]}</span>`).join('')}</div>
-      <div class="heat">${heat}</div></section>
-
-    <section class="card"><h3>Energia e paz</h3><div class="legend"><span style="--c:var(--tide)">Energia</span><span style="--c:var(--accent)">Paz</span></div>${chart}</section>
-
+      <div class="heat-days mono">${DIAS_SEMANA.map(d => `<span>${d[0]}</span>`).join('')}</div><div class="heat">${heat}</div></section>
+    <section class="card"><h3>Energia e paz</h3><div class="legend"><span style="--c:var(--tide)">Energia de manhã</span><span style="--c:var(--accent)">Paz à noite</span></div>${chart}</section>
     <section class="card" id="roda"><div class="between"><h3>Roda da vida</h3><button class="btn btn-small" data-act="toggle-roda">${ui.rodaForm ? 'Cancelar' : 'Atualizar'}</button></div>
       <div class="legend"><span style="--c:var(--accent)">Agora · ${fmtDate(parseKey(ultima.data), {day:'numeric',month:'short'})}</span>${S.roda.length > 1 ? `<span style="--c:var(--muted)">Início · ${fmtDate(parseKey(primeira.data), {day:'numeric',month:'short'})}</span>` : ''}</div>
       ${ui.rodaForm ? `<div class="stack">${PILAR_IDS.map(id => `<div class="slider"><label for="nr-${id}">${PILARES[id].nome}</label><input type="range" min="1" max="10" id="nr-${id}" data-nova-roda="${id}" value="${ultima.notas[id]}"><output id="no-${id}">${ultima.notas[id]}</output></div>`).join('')}<button class="btn btn-primary" data-act="salvar-roda">Salvar a roda de hoje</button></div>` : radar}
     </section>
-
-    <section class="card" id="avaliacao"><h3>Avaliação do painel</h3>
-      <p class="muted" style="font-size:.9rem">Você está validando a ferramenta. Uma vez por semana, diga o que funciona. Isso vira a lista de melhorias.</p>
+    <section class="card" id="avaliacao"><h3>Avaliação do diário</h3>
+      <p class="muted" style="font-size:.9rem">Você está validando a ferramenta. Uma vez por semana, diga o que funciona.</p>
       ${ui.revisao ? `<div class="stack">
-        <label class="field">De 0 a 10, o quanto o painel te ajudou esta semana?<input type="text" inputmode="numeric" id="av-nota" maxlength="2"></label>
+        <label class="field">De 0 a 10, o quanto o diário te ajudou esta semana?<input type="text" inputmode="numeric" id="av-nota" maxlength="2"></label>
         <label class="field">O que mais ajudou?<textarea id="av-ajudou"></textarea></label>
         <label class="field">O que atrapalhou ou faltou?<textarea id="av-faltou"></textarea></label>
         <p class="muted" id="av-msg" style="font-size:.86rem" hidden></p>
-        <button class="btn btn-primary" data-act="salvar-avaliacao">Salvar avaliação</button></div>`
-        : `<button class="btn btn-small" data-act="abrir-avaliacao">Avaliar esta semana</button>`}
+        <button class="btn btn-primary" data-act="salvar-avaliacao">Salvar avaliação</button></div>` : `<button class="btn btn-small" data-act="abrir-avaliacao">Avaliar esta semana</button>`}
       ${ultAval ? `<p style="font-size:.9rem;margin-top:14px"><span class="mono">Última · ${fmtDate(parseKey(ultAval.data), {day:'numeric',month:'short'})} · nota ${esc(ultAval.nota)}</span><br>Ajudou: ${esc(ultAval.ajudou)}<br>Faltou: ${esc(ultAval.faltou)}</p>` : ''}
     </section>
-
-    <section class="card"><h3>Diário de bordo</h3>
-      ${ultimos.length ? ultimos.map(k => { const D = S.dias[k]; return `<details class="entry"><summary><span>${fmtDate(parseKey(k), {weekday:'short', day:'numeric', month:'short'})}</span><span class="mono">${nivel(k)}/3</span></summary>
+    <section class="card"><h3>Diário</h3>
+      ${ultimos.length ? ultimos.map(k => { const D = S.dias[k], P = D.pilulaId && pill(D.pilulaId); return `<details class="entry"><summary><span>${fmtDate(parseKey(k), {weekday:'short', day:'numeric', month:'short'})}</span><span class="mono">${nivel(k)}/3</span></summary>
+        ${D.checkin ? `<p class="muted">Chegou ${esc(listaEstados(D.checkin.estados))}${D.checkin.texto ? ': “' + esc(D.checkin.texto) + '”' : ''}</p>` : ''}
+        ${P ? `<p><em style="font-family:var(--display);font-size:1.1rem">${esc(P.mantra)}</em> <span class="muted">· ${esc(P.titulo)}</span></p>` : ''}
         <ul>${D.grat.filter(g => g && g.trim()).map(g => `<li>${esc(g)}</li>`).join('')}</ul>${D.resposta ? `<p><em class="muted">${esc(D.pergunta || '')}</em><br>${esc(D.resposta)}</p>` : ''}</details>`; }).join('') : '<p class="muted">Seus registros vão aparecer aqui.</p>'}
     </section>
   </div>`;
@@ -574,35 +583,21 @@ function renderEvolucao(){
 }
 
 function renderRumo(){
-  const P = S.perfil, n = diaTrilha(), sug = [...new Set(P.foco.flatMap(f => ACOES_SUGERIDAS[f]))].filter(a => !P.acoes.some(x => x.texto === a));
+  const P = S.perfil;
+  const mantras = Object.keys(S.dias).filter(k => S.dias[k].pilulaId).sort().reverse().slice(0, 30);
   app.innerHTML = topo() + `
   <div class="greet"><p class="mono">Rumo</p><h1>Para onde você vai</h1><p class="muted">Tudo aqui é editável. As mudanças salvam sozinhas.</p></div>
   <div class="stack">
+    <section class="card"><h3>Seus mantras</h3>
+      ${mantras.length ? `<div class="mantras">${mantras.map(k => { const p = pill(S.dias[k].pilulaId); return `<div><span>${esc(p.mantra)}</span><span class="mono">${fmtDate(parseKey(k), {day:'numeric',month:'short'})}</span></div>`; }).join('')}</div>` : '<p class="muted">Cada check-in deixa um mantra aqui.</p>'}</section>
     <section class="card"><h3>O sonho</h3>
       <label class="field">Daqui a 5 anos, num dia comum<textarea id="p-sonho" data-perfil="sonho">${esc(P.sonho)}</textarea></label>
       <label class="field">O que te fazia perder a noção do tempo na infância<textarea id="p-infancia" data-perfil="infancia">${esc(P.infancia)}</textarea></label></section>
-
-    <section class="card"><h3>Meta de 90 dias</h3>
+    <section class="card"><h3>Meta de 90 dias</h3><p class="muted" style="font-size:.9rem">Método WOOP: desejo, resultado, obstáculo e plano. Já deixamos uma sugestão para editar.</p>
       ${[['desejo','Desejo'],['resultado','Resultado'],['obstaculo','Obstáculo'],['plano','Plano · se… então…']].map(([id,l]) => `<label class="field">${l}<textarea id="pw-${id}" data-woop="${id}">${esc(P.woop[id])}</textarea></label>`).join('')}</section>
-
-    <section class="card"><h3>Foco</h3><p class="muted" style="font-size:.9rem">Até 2 pilares. Ele muda as perguntas, as ações sugeridas e as próximas pílulas.</p>
+    <section class="card"><h3>Foco</h3><p class="muted" style="font-size:.9rem">Até 2 pilares. Desempata a escolha das pílulas.</p>
       <div class="chips">${PILAR_IDS.map(id => `<button class="chip" data-act="foco" data-id="${id}" aria-pressed="${P.foco.includes(id)}">${PILARES[id].nome}</button>`).join('')}</div></section>
-
-    <section class="card"><h3>Minhas ações diárias</h3><p class="muted" style="font-size:.9rem">No máximo 3. Menos é mais.</p>
-      ${P.acoes.map(a => `<div class="action-item"><span>${esc(a.texto)}</span><button class="btn-link" data-act="rm-acao" data-id="${a.id}">Remover</button></div>`).join('')}
-      ${P.acoes.length < 3 ? `<div class="row"><input type="text" id="nova-acao" placeholder="Nova ação" style="flex:1;min-width:0"><button class="btn btn-small" data-act="add-acao">Adicionar</button></div>
-      <div class="chips">${sug.slice(0,6).map(a => `<button class="chip" data-act="add-sug" data-txt="${esc(a)}">+ ${esc(a)}</button>`).join('')}</div>` : ''}</section>
-
-    <section class="card"><h3>Plano de meditação</h3><p class="muted" style="font-size:.9rem">5 minutos por dia. O plano sugerido alterna respiração, atenção e reflexão.</p>
-      <div class="med-plan">${[1,2,3,4,5,6,0].map(d => `<label>${DIAS_SEMANA[d]}<select id="plano-${d}" data-plano="${d}">${Object.entries(MEDITACOES).map(([id,m]) => `<option value="${id}" ${P.plano[d] === id ? 'selected' : ''}>${esc(m.nome)}</option>`).join('')}</select></label>`).join('')}</div>
-      <button class="btn-link" data-act="plano-padrao">Voltar ao plano sugerido</button></section>
-
-    <section class="card"><h3>Tradições</h3><div class="chips">${Object.entries(TRADICOES).map(([id,nm]) => `<button class="chip" data-act="trad" data-id="${id}" aria-pressed="${P.tradicoes.includes(id)}">${nm}</button>`).join('')}</div>
-      <p class="muted" style="font-size:.84rem">Mudar tradições ou foco refaz só os dias que ainda não chegaram.</p></section>
-
-    <section class="card"><h3>Sua trilha</h3>
-      <div class="trail">${P.trilha.map((id,i) => { const p = pill(id), d = i + 1; return `<div class="${d < n ? 'past' : d === n ? 'now' : ''}"><span class="mono">${pad(d)}</span><span>${esc(p.titulo)}</span><span class="mono">${FASES[faseDoDia(d)].nome}</span></div>`; }).join('')}</div></section>
-
+    <section class="card"><h3>Tradições</h3><div class="chips">${Object.entries(TRADICOES).map(([id,nm]) => `<button class="chip" data-act="trad" data-id="${id}" aria-pressed="${P.tradicoes.includes(id)}">${nm}</button>`).join('')}</div></section>
     <section class="card"><h3>Seus dados</h3>
       <p class="muted" style="font-size:.9rem">Tudo fica só neste aparelho e neste navegador. Faça um backup toda semana.</p>
       <div class="row"><button class="btn btn-small" data-act="exportar">Baixar backup</button><button class="btn btn-small" data-act="copiar">Copiar backup</button><button class="btn btn-small" data-act="tema">Tema: ${document.documentElement.dataset.theme === 'dark' ? 'escuro' : document.documentElement.dataset.theme === 'light' ? 'claro' : 'automático'}</button></div>
@@ -622,7 +617,7 @@ function render(){
   if (tab === 'evolucao') renderEvolucao();
   if (tab === 'rumo') renderRumo();
 }
-function ir(t){ tab = t; ui.lerMais = false; render(); window.scrollTo({ top:0 }); }
+function ir(t){ tab = t; ui.lerMais = false; ui.wall = null; render(); window.scrollTo({ top:0 }); }
 
 /* ======================================================================
    MEDITAÇÃO
@@ -630,7 +625,7 @@ function ir(t){ tab = t; ui.lerMais = false; render(); window.scrollTo({ top:0 }
 let medTimer = null, wake = null;
 function abrirMeditacao(tipo){
   const M = MEDITACOES[tipo], TOTAL = 300;
-  let t = 0, pausado = false, fasesIdx = -1, faseFim = 0;
+  let t = 0, pausado = false, faseIdx = -1;
   medEl.hidden = false; document.body.style.overflow = 'hidden';
   medEl.innerHTML = `<div><p class="mono">${esc(M.origem)}</p><h2 style="margin-top:6px">${esc(M.nome)}</h2></div>
     <div class="orb-wrap"><div><div class="orb" id="orb"></div><p class="phase" id="mphase"></p></div></div>
@@ -640,30 +635,27 @@ function abrirMeditacao(tipo){
   sino();
   try { navigator.wakeLock?.request('screen').then(w => wake = w).catch(() => {}); } catch(e){}
   const ciclo = M.respiracao ? M.respiracao.reduce((a,f) => a + f[1], 0) : 0;
+  const fechar = () => { medEl.hidden = true; medEl.innerHTML = ''; document.body.style.overflow = ''; render(); };
+  const fim = completo => {
+    clearInterval(medTimer); medTimer = null; try { wake?.release(); } catch(e){}
+    const D = dia(); D.medTipo = tipo;
+    if (completo || t >= 240) D.feito.med = true;
+    D.medMin = (D.medMin || 0) + (completo ? 5 : Math.floor(t / 60)); saveNow();
+    if (completo){ sino(); medEl.innerHTML = `<div></div><div class="stack" style="justify-items:center"><h2>Feito. 5 minutos.</h2><p class="muted">Repare como o corpo está agora.</p><button class="btn btn-primary" id="mclose">Voltar</button></div><div></div>`; document.getElementById('mclose').onclick = fechar; }
+    else fechar();
+  };
   const passo = () => {
     if (pausado) return;
     t += .25;
     if (M.respiracao){
       const pos = t % ciclo; let acc = 0, idx = 0;
       for (; idx < M.respiracao.length; idx++){ acc += M.respiracao[idx][1]; if (pos < acc) break; }
-      if (idx !== fasesIdx){ fasesIdx = idx; const f = M.respiracao[idx]; orb.style.transitionDuration = f[1] + 's'; orb.style.transform = `scale(${f[2]})`; ph.textContent = f[0]; }
-    } else {
-      orb.style.transitionDuration = '6s'; orb.style.transform = `scale(${Math.floor(t / 6) % 2 ? .62 : .8})`;
-    }
+      if (idx !== faseIdx){ faseIdx = idx; const f = M.respiracao[idx]; orb.style.transitionDuration = f[1] + 's'; orb.style.transform = `scale(${f[2]})`; ph.textContent = f[0]; }
+    } else { orb.style.transitionDuration = '6s'; orb.style.transform = `scale(${Math.floor(t / 6) % 2 ? .62 : .8})`; }
     const c = M.cues.filter(x => x[0] <= t).pop(); if (c && cue.textContent !== c[1]) cue.textContent = c[1];
     const rest = Math.max(0, TOTAL - Math.floor(t)); tm.textContent = Math.floor(rest/60) + ':' + pad(rest % 60);
     if (t >= TOTAL) fim(true);
   };
-  const fim = (completo) => {
-    clearInterval(medTimer); medTimer = null; try { wake?.release(); } catch(e){}
-    const min = completo ? 5 : Math.floor(t / 60);
-    const D = dia();
-    if (completo || t >= 240){ D.feito.med = true; }
-    D.medMin = (D.medMin || 0) + min; save();
-    if (completo){ sino(); medEl.innerHTML = `<div></div><div class="stack" style="justify-items:center"><h2>Feito. 5 minutos.</h2><p class="muted">Repare como o corpo está agora.</p><button class="btn btn-primary" id="mclose">Voltar ao painel</button></div><div></div>`; document.getElementById('mclose').onclick = fechar; }
-    else fechar();
-  };
-  const fechar = () => { medEl.hidden = true; medEl.innerHTML = ''; document.body.style.overflow = ''; render(); };
   document.getElementById('mpause').onclick = e => { pausado = !pausado; e.target.textContent = pausado ? 'Continuar' : 'Pausar'; };
   document.getElementById('mstop').onclick = () => fim(false);
   medTimer = setInterval(passo, 250); passo();
@@ -674,38 +666,66 @@ function abrirMeditacao(tipo){
    ====================================================================== */
 tabsEl.addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) ir(b.dataset.tab); });
 
-app.addEventListener('click', e => {
-  const go = e.target.closest('[data-tab-go]'); if (go){ ir(go.dataset.tabGo); return; }
-  const esc_ = e.target.closest('[data-escala]');
-  if (esc_){ dia()[esc_.dataset.escala] = +esc_.dataset.v; save(); esc_.parentElement.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b === esc_)); return; }
+app.addEventListener('click', async e => {
+  const sc = e.target.closest('[data-escala]');
+  if (sc){
+    const v = +sc.dataset.v, campo = sc.dataset.escala;
+    if (campo === 'ck-energia') ui.energia = v; else { dia()[campo] = v; save(); }
+    sc.parentElement.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b === sc));
+    return;
+  }
   const b = e.target.closest('[data-act]'); if (!b) return;
   const a = b.dataset.act;
 
   /* onboarding */
-  if (a === 'ob-proximo'){ if (ob.passo === OB_TOTAL) return concluirOnboarding(); ob.passo++; renderOnboarding(); window.scrollTo({top:0}); }
+  if (a === 'ob-proximo'){ if (ob.passo === OB_TOTAL - 1) return concluirOnboarding(); ob.passo++; renderOnboarding(); window.scrollTo({ top:0 }); }
   if (a === 'ob-voltar'){ ob.passo--; renderOnboarding(); }
-  if (a === 'ob-foco'){ const id = b.dataset.id; ob.foco = ob.foco.includes(id) ? ob.foco.filter(x => x !== id) : [...ob.foco, id].slice(-2); ob.woop = null; ob.acoes = []; renderOnboarding(); }
+  if (a === 'ob-foco'){ const id = b.dataset.id; ob.foco = ob.foco.includes(id) ? ob.foco.filter(x => x !== id) : [...ob.foco, id].slice(-2); renderOnboarding(); }
   if (a === 'ob-trad'){ const id = b.dataset.id; ob.tradicoes = ob.tradicoes.includes(id) ? ob.tradicoes.filter(x => x !== id) : [...ob.tradicoes, id]; renderOnboarding(); }
-  if (a === 'ob-acao'){ const t = b.dataset.txt; ob.acoes = ob.acoes.includes(t) ? ob.acoes.filter(x => x !== t) : (ob.acoes.length < 3 ? [...ob.acoes, t] : ob.acoes); renderOnboarding(); }
-  if (a === 'ob-add-acao'){ const v = document.getElementById('ob-nova-acao').value.trim(); if (v && ob.acoes.length < 3 && !ob.acoes.includes(v)){ ob.acoes.push(v); renderOnboarding(); } }
   if (a === 'demo') carregarExemplo();
   if (a === 'importar-inicio'){ app.insertAdjacentHTML('beforeend', `<div class="card" style="margin-top:16px"><label class="field">Cole o texto do backup<textarea id="imp"></textarea></label><button class="btn btn-small" data-act="importar" style="margin-top:10px">Restaurar</button><p class="muted" id="dados-msg" hidden></p></div>`); b.remove(); }
   if (a === 'sair-exemplo'){ try { localStorage.removeItem(KEY); } catch(e){} S = null; ob = null; render(); }
 
+  /* check-in */
+  if (a === 'estado'){
+    const id = b.dataset.id;
+    ui.sel = ui.sel.includes(id) ? ui.sel.filter(x => x !== id) : [...ui.sel, id].slice(-2);
+    b.parentElement.querySelectorAll('[data-act="estado"]').forEach(c => c.setAttribute('aria-pressed', ui.sel.includes(c.dataset.id)));
+  }
+  if (a === 'checkin'){
+    const texto = document.getElementById('ck-texto').value.trim(), D = dia();
+    const energia = ui.energia ?? D.energia ?? null;
+    if (!ui.sel.length && !inferir(texto).length){ const m = document.getElementById('ck-msg'); m.hidden = false; m.textContent = 'Marque como você está ou escreva uma frase sobre o seu dia.'; return; }
+    fazerCheckin(ui.sel.slice(), energia, texto);
+    ui = { ...ui, refazer:false, sel:[], energia:null, texto:null, lerMais:false, wall:null };
+    render(); window.scrollTo({ top:0 });
+  }
+  if (a === 'refazer'){ ui.refazer = true; ui.sel = []; render(); window.scrollTo({ top:0 }); }
+  if (a === 'cancelar-refazer'){ ui.refazer = false; ui.sel = []; render(); }
+
   /* hoje */
   if (a === 'ler-mais'){ ui.lerMais = true; render(); }
+  if (a === 'outra'){
+    const D = dia(); D.idx = ((D.idx || 0) + 1) % D.ranking.length; D.pilulaId = D.ranking[D.idx]; D.pergunta = pill(D.pilulaId).pergunta; D.feito.pilula = false;
+    ui.lerMais = false; ui.wall = null; saveNow(); render();
+  }
+  if (a === 'copiar-mantra'){
+    const P = pill(dia().pilulaId), txt = `${P.mantra}\n${P.ref}`;
+    navigator.clipboard?.writeText(txt).then(() => { b.textContent = 'Copiado'; }).catch(() => { b.textContent = 'Não deu para copiar'; });
+  }
+  if (a === 'fundo'){
+    const P = pill(dia().pilulaId), url = await gerarFundo(P);
+    ui.wall = url; render();
+    try { const l = document.createElement('a'); l.href = url; l.download = 'mantra-' + dkey() + '.png'; document.body.appendChild(l); l.click(); l.remove(); } catch(e){}
+  }
   if (a === 'meditar') abrirMeditacao(b.dataset.tipo);
   if (a === 'salvar-diario'){
     const D = dia(), msg = document.getElementById('diario-msg');
-    const ok = D.grat.filter(g => g && g.trim()).length === 3;
-    if (!ok){ msg.hidden = false; msg.textContent = 'Escreva os três motivos de gratidão para registrar o dia. Pode ser algo bem pequeno.'; return; }
+    if (D.grat.filter(g => g && g.trim()).length < 3){ msg.hidden = false; msg.textContent = 'Escreva os três motivos de gratidão para fechar o dia. Pode ser algo bem pequeno.'; return; }
     D.feito.diario = true; saveNow(); render();
     setTimeout(() => document.getElementById('diario')?.scrollIntoView({ block:'center' }), 30);
   }
   if (a === 'abrir-revisao'){ ui.revisao = true; ui.rodaForm = true; ir('evolucao'); setTimeout(() => document.getElementById('roda')?.scrollIntoView({ behavior:'smooth' }), 60); }
-  if (a === 'nova-trilha'){
-    const P = S.perfil; P.trilha = gerarTrilha(P.tradicoes, P.foco, hash(dkey() + 'n'), P.trilha); P.inicio = dkey(); P.trilhasConcluidas = (P.trilhasConcluidas || 0) + 1; ui.rodaForm = true; saveNow(); ir('evolucao');
-  }
 
   /* evolução */
   if (a === 'toggle-roda'){ ui.rodaForm = !ui.rodaForm; render(); }
@@ -725,17 +745,11 @@ app.addEventListener('click', e => {
 
   /* rumo */
   const P = S && S.perfil;
-  if (a === 'foco'){ const id = b.dataset.id; let f = P.foco.includes(id) ? P.foco.filter(x => x !== id) : [...P.foco, id].slice(-2); if (!f.length) return; P.foco = f; refazerFuturo(); saveNow(); render(); }
-  if (a === 'trad'){ const id = b.dataset.id; let t = P.tradicoes.includes(id) ? P.tradicoes.filter(x => x !== id) : [...P.tradicoes, id]; if (!t.length) return; P.tradicoes = t; refazerFuturo(); saveNow(); render(); }
-  if (a === 'rm-acao'){ P.acoes = P.acoes.filter(x => x.id !== b.dataset.id); saveNow(); render(); }
-  if (a === 'add-acao' || a === 'add-sug'){
-    const v = a === 'add-sug' ? b.dataset.txt : document.getElementById('nova-acao').value.trim();
-    if (v && P.acoes.length < 3){ P.acoes.push({ id:'a' + Date.now().toString(36), texto:v }); saveNow(); render(); }
-  }
-  if (a === 'plano-padrao'){ P.plano = { ...PLANO_MEDITACAO }; saveNow(); render(); }
+  if (a === 'foco'){ const id = b.dataset.id, f = P.foco.includes(id) ? P.foco.filter(x => x !== id) : [...P.foco, id].slice(-2); if (!f.length) return; P.foco = f; saveNow(); render(); }
+  if (a === 'trad'){ const id = b.dataset.id, t = P.tradicoes.includes(id) ? P.tradicoes.filter(x => x !== id) : [...P.tradicoes, id]; if (!t.length) return; P.tradicoes = t; saveNow(); render(); }
   if (a === 'exportar'){
     const blob = new Blob([JSON.stringify(S, null, 2)], { type:'application/json' }), url = URL.createObjectURL(blob);
-    const l = document.createElement('a'); l.href = url; l.download = 'travessia-backup-' + dkey() + '.json'; document.body.appendChild(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    const l = document.createElement('a'); l.href = url; l.download = 'diario-backup-' + dkey() + '.json'; document.body.appendChild(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
     msgDados('Se o download não começar, use "Copiar backup" e cole num bloco de notas.');
   }
   if (a === 'copiar'){
@@ -744,65 +758,45 @@ app.addEventListener('click', e => {
       .catch(() => { const t = document.getElementById('imp'); t.value = txt; t.select(); msgDados('Não deu para copiar automaticamente. O backup está selecionado no campo acima: copie manualmente.'); });
   }
   if (a === 'importar'){
-    try {
-      const d = JSON.parse(document.getElementById('imp').value);
-      if (!d || !d.perfil || !d.dias) throw 0;
-      S = d; delete S.exemplo; saveNow(); ob = null; tab = 'hoje'; render();
-    } catch(e){ msgDados('Esse texto não parece um backup da Travessia. Copie o conteúdo inteiro do arquivo e tente de novo.'); }
+    try { const d = migrar(JSON.parse(document.getElementById('imp').value)); if (!d || !d.perfil || !d.dias) throw 0; S = d; delete S.exemplo; saveNow(); ob = null; tab = 'hoje'; render(); }
+    catch(err){ msgDados('Esse texto não parece um backup do diário. Copie o conteúdo inteiro do arquivo e tente de novo.'); }
   }
   if (a === 'tema'){
     const r = document.documentElement, cur = r.dataset.theme, next = !cur ? 'dark' : cur === 'dark' ? 'light' : '';
     if (next) r.dataset.theme = next; else delete r.dataset.theme;
-    try { next ? localStorage.setItem(KEY + '.tema', next) : localStorage.removeItem(KEY + '.tema'); } catch(e){}
+    try { next ? localStorage.setItem(KEY + '.tema', next) : localStorage.removeItem(KEY + '.tema'); } catch(err){}
     render();
   }
   if (a === 'apagar'){ ui.confirmApagar = true; render(); }
   if (a === 'apagar-nao'){ ui.confirmApagar = false; render(); }
-  if (a === 'apagar-sim'){ try { localStorage.removeItem(KEY); } catch(e){} S = null; ob = null; ui.confirmApagar = false; render(); }
+  if (a === 'apagar-sim'){ try { localStorage.removeItem(KEY); } catch(err){} S = null; ob = null; ui.confirmApagar = false; render(); }
 });
 function msgDados(t){ const m = document.getElementById('dados-msg'); if (m){ m.hidden = false; m.textContent = t; } }
-function refazerFuturo(){
-  const P = S.perfil, n = Math.max(1, diaTrilha());
-  if (n >= 30) return;
-  const fixos = P.trilha.slice(0, n), nova = gerarTrilha(P.tradicoes, P.foco, hash(dkey() + P.foco.join() + P.tradicoes.join()), fixos);
-  P.trilha = fixos.concat(nova.slice(n));
-}
 
 app.addEventListener('change', e => {
   const t = e.target;
-  if (t.dataset.feito){
-    const D = dia();
-    if (t.dataset.feito === 'diario') return;
-    D.feito[t.dataset.feito] = t.checked;
-    if (t.dataset.feito === 'med' && t.checked && !D.medMin) D.medMin = 5;
-    saveNow(); render();
-  }
-  if (t.dataset.actChange === 'trocar-med'){ abrirMeditacao(t.value); }
-  if (t.dataset.plano !== undefined){ S.perfil.plano[t.dataset.plano] = t.value; save(); }
+  if (t.dataset.feito){ const D = dia(); D.feito[t.dataset.feito] = t.checked; if (t.dataset.feito === 'med' && t.checked && !D.medMin) D.medMin = 5; saveNow(); render(); }
+  if (t.dataset.actChange === 'trocar-med'){ dia().medTipo = t.value; save(); abrirMeditacao(t.value); }
 });
-
 app.addEventListener('input', e => {
   const t = e.target;
   if (ob){
     if (t.dataset.ob){ ob[t.dataset.ob] = t.value; if (t.dataset.ob === 'nome'){ const btn = app.querySelector('[data-act="ob-proximo"]'); if (btn) btn.disabled = !t.value.trim(); } }
     if (t.dataset.obRoda){ ob.roda[t.dataset.obRoda] = +t.value; document.getElementById('o-' + t.dataset.obRoda).textContent = t.value; }
-    if (t.dataset.obWoop){ ob.woop[t.dataset.obWoop] = t.value; }
     return;
   }
+  if (t.id === 'ck-texto') ui.texto = t.value;
   if (t.dataset.grat !== undefined){ dia().grat[+t.dataset.grat] = t.value; save(); }
   if (t.dataset.dia){ dia()[t.dataset.dia] = t.value; save(); }
   if (t.dataset.perfil){ S.perfil[t.dataset.perfil] = t.value; save(); }
   if (t.dataset.woop){ S.perfil.woop[t.dataset.woop] = t.value; save(); }
   if (t.dataset.novaRoda){ document.getElementById('no-' + t.dataset.novaRoda).textContent = t.value; }
 });
-app.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && e.target.id === 'ob-nome' && ob.nome.trim()){ ob.passo++; renderOnboarding(); }
-});
+app.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'ob-nome' && ob.nome.trim()){ ob.passo++; renderOnboarding(); } });
 
-/* tema salvo, e redesenho quando vira o dia com o painel aberto */
 try { const tm = localStorage.getItem(KEY + '.tema'); if (tm) document.documentElement.dataset.theme = tm; } catch(e){}
 let diaAtual = dkey();
-document.addEventListener('visibilitychange', () => { if (!document.hidden && dkey() !== diaAtual){ diaAtual = dkey(); ui.lerMais = false; if (S) render(); } });
+document.addEventListener('visibilitychange', () => { if (!document.hidden && dkey() !== diaAtual){ diaAtual = dkey(); ui = { ...ui, lerMais:false, wall:null, refazer:false, sel:[] }; if (S) render(); } });
 render();
 </script>
 </body>

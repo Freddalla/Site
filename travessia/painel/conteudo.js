@@ -408,3 +408,89 @@ const WOOP_SUGESTOES = {
   coragem:   { desejo:'Tomar a decisão que venho adiando', obstaculo:'Espero o momento perfeito', plano:'Se eu pensar "depois", então marco uma data no calendário na hora' },
   presenca:  { desejo:'Usar menos tela e viver mais o que está na minha frente', obstaculo:'Abro as redes no automático', plano:'Se eu abrir uma rede sem querer, então fecho e saio para caminhar 5 minutos' }
 };
+
+/* =====================================================================
+   v2 · CHECK-IN DIÁRIO → PÍLULA E MANTRA DO DIA
+   A pessoa diz como chega no dia; o painel escolhe a pílula que mais
+   conversa com isso. Troque o nome da marca aqui quando decidir.
+   ===================================================================== */
+const MARCA = { nome: 'Travessia', produto: 'Diário de Bordo' };
+
+const ESTADOS = {
+  ansioso:        'Ansioso',
+  cansado:        'Sem energia',
+  travado:        'Travado, adiando',
+  perdido:        'Sem rumo',
+  medo:           'Com medo de decidir',
+  irritado:       'Irritado',
+  sobrecarregado: 'Sobrecarregado',
+  sozinho:        'Sozinho',
+  disperso:       'Disperso, muita tela',
+  bem:            'Bem, quero ir além'
+};
+
+/* Palavras do texto livre que puxam um estado (busca por pedaço de palavra, sem acento) */
+const LEXICO = {
+  ansioso:        ['ansie','ansio','preocup','nervos','angust','aflit','inquiet'],
+  cansado:        ['cansa','exaust','esgot','sem energia','desanim','sono','dormi mal'],
+  travado:        ['procrastin','adiand','adio','travad','parado','preguic','nao consigo comecar'],
+  perdido:        ['perdid','sem rumo','sentido','proposito','nao sei o que','vazio'],
+  medo:           ['medo','receio','insegur','decisao','decidir','arrisc'],
+  irritado:       ['raiva','irrit','brig','odio','injust','chatead','discut'],
+  sobrecarregado: ['muita coisa','sobrecarreg','prazo','correria','trabalho demais','pressao','atrasad'],
+  sozinho:        ['sozinh','solid','isolad','ninguem','saudade','abandon'],
+  disperso:       ['celular','tela','instagram','redes','distra','foco','disperso','scroll'],
+  bem:            ['grato','feliz','animad','otimo','bem demais','realizad','em paz']
+};
+
+/* Prática de 5 minutos recomendada para cada estado */
+const MED_POR_ESTADO = {
+  ansioso:'suspiro', medo:'suspiro', sobrecarregado:'visao', perdido:'visao', irritado:'contagem',
+  cansado:'caixa', travado:'caixa', disperso:'contagem', sozinho:'metta', bem:'silencio'
+};
+
+MEDITACOES.metta = { nome:'Bem-querer', origem:'Metta · Karaniya Metta Sutta',
+  desc:'Desejar o bem de forma deliberada: a você, a quem ama, a um desconhecido e a alguém difícil.',
+  respiracao:null,
+  cues:[[0,'Respire com calma. Pense em você mesmo.'],[20,'Repita por dentro: que eu esteja bem, que eu esteja em paz.'],[85,'Agora alguém que você ama. Que você esteja bem.'],[150,'Um desconhecido que você viu hoje. Que você esteja bem.'],[215,'Alguém difícil. Só o quanto conseguir. Que você esteja bem.'],[270,'Todos os seres, ao mesmo tempo. Que estejamos bem.']] };
+
+/* Mantra e estados de cada pílula */
+const EXTRAS = {
+  'epicteto-controle':      ['Faço a minha parte. Solto o resto.', ['ansioso','sobrecarregado']],
+  'epicteto-julgamento':    ['O fato é um. A história é minha.', ['irritado','ansioso']],
+  'seneca-brevidade':       ['Meu tempo é a minha vida.', ['disperso','perdido']],
+  'seneca-imaginacao':      ['O medo escrito tem tamanho.', ['medo','ansioso']],
+  'seneca-exame':           ['Hoje eu revejo. Amanhã eu ajusto.', ['perdido','bem']],
+  'marco-amanhecer':        ['Levanto para o meu trabalho.', ['cansado','perdido']],
+  'marco-refugio':          ['Meu refúgio está a uma respiração.', ['sobrecarregado','ansioso']],
+  'marco-obstaculo':        ['O obstáculo é o caminho.', ['travado','medo']],
+  'marco-cooperar':         ['Ninguém atravessa sozinho.', ['sozinho','irritado']],
+  'buda-mente':             ['Minha mente vem primeiro.', ['disperso','bem']],
+  'buda-segunda-flecha':    ['Não atiro a segunda flecha.', ['irritado','ansioso']],
+  'buda-jangada':           ['A jangada fica na margem.', ['perdido','travado']],
+  'buda-flecha-envenenada': ['Primeiro eu tiro a flecha.', ['travado','medo']],
+  'buda-kalama':            ['Eu testo. Depois acredito.', ['perdido']],
+  'buda-vencer':            ['Venço a mim primeiro.', ['cansado','travado']],
+  'buda-respiracao':        ['Inspiro, eu sei. Expiro, eu sei.', ['ansioso','disperso']],
+  'buda-irrigador':         ['Eu me moldo um pouco por dia.', ['bem','travado']],
+  'buda-metta':             ['Que eu esteja bem. Que você esteja bem.', ['sozinho','irritado']],
+  'jesus-outra-margem':     ['Eu passo para a outra margem.', ['medo','perdido']],
+  'jesus-amanha':           ['Hoje basta.', ['ansioso','sobrecarregado']],
+  'jesus-lirios':           ['Os lírios não têm pressa.', ['sobrecarregado','cansado','disperso']],
+  'jesus-talentos':         ['Meu talento não fica enterrado.', ['travado','medo','bem']],
+  'jesus-lampada':          ['Minha luz não fica escondida.', ['medo','bem']],
+  'jesus-deserto':          ['No silêncio eu escuto.', ['disperso','sobrecarregado']],
+  'jesus-pedro':            ['Olho para frente, não para o vento.', ['disperso','medo']],
+  'jesus-verdade':          ['A verdade me liberta.', ['medo','sozinho']],
+  'jesus-samaritano':       ['Eu paro para quem está no caminho.', ['sozinho','bem']],
+  'mito-sisifo':            ['Eu largo a pedra.', ['perdido','cansado']],
+  'mito-icaro':             ['Não voo baixo demais.', ['travado','bem']],
+  'mito-ulisses':           ['Eu me amarro ao que importa.', ['disperso']],
+  'mito-ariadne':           ['Só o próximo pedaço do fio.', ['perdido','sobrecarregado']],
+  'mito-kairos':            ['Agora é o momento.', ['bem','travado']],
+  'mito-narciso':           ['Olho para a vida, não para o espelho.', ['disperso']],
+  'mito-heracles':          ['Escolho o caminho árduo.', ['cansado','travado']],
+  'mito-baucis':            ['Eu abro a porta.', ['sozinho']],
+  'mito-penelope':          ['Termino o que comecei.', ['travado']]
+};
+PILULAS.forEach(p => { const x = EXTRAS[p.id]; if (x){ p.mantra = x[0]; p.estados = x[1]; } });
