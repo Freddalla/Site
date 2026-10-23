@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Dipa · Capas</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: mesa de capas. Topo com o nome e o significado; seletor de formato; grade de capas desenhadas em canvas no tamanho real, cada uma exportável. */
+:root{
+  --bg:#e9eff1; --card:#f6f9fa; --line:#c5d3d8; --fg:#0f1d25; --muted:#53666e;
+  --accent:#b8561c; --accent-soft:#f6e3d3; --on-accent:#fff7ef;
+  --display:'Instrument Serif','Iowan Old Style',Georgia,serif;
+  --body:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#0b141a; --card:#121f27; --line:#253740; --fg:#e6eef0; --muted:#8fa3ab; --accent:#eb9a52; --accent-soft:#2c241d; --on-accent:#1c1006; color-scheme:dark; } }
+:root[data-theme="dark"]{ --bg:#0b141a; --card:#121f27; --line:#253740; --fg:#e6eef0; --muted:#8fa3ab; --accent:#eb9a52; --accent-soft:#2c241d; --on-accent:#1c1006; color-scheme:dark; }
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font:400 16px/1.65 var(--body);overflow-x:hidden}
+.wrap{max-width:1180px;margin-inline:auto;padding-inline:clamp(16px,4vw,40px);padding-block:44px 96px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(3.4rem,10vw,7rem);line-height:.95;letter-spacing:-.01em}
+h1 .mac{color:var(--accent)}
+h2{font-family:var(--display);font-weight:400;font-size:1.6rem;line-height:1.1}
+p{max-width:64ch}
+em{color:var(--accent)}
+.mono{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.lead{font-size:1.15rem;color:var(--muted);margin-top:14px}
+.meaning{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:28px}
+.meaning div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.meaning b{display:block;font-family:var(--display);font-weight:400;font-size:1.5rem;line-height:1.1}
+.meaning span{font-size:.88rem;color:var(--muted)}
+@media (max-width:760px){.meaning{grid-template-columns:minmax(0,1fr)}}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-top:40px;padding-block:16px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.btn{font:600 .85rem var(--body);border:1px solid var(--line);background:transparent;color:var(--fg);border-radius:999px;padding:9px 16px;cursor:pointer}
+.btn[aria-pressed="true"],.btn-primary{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin-top:28px}
+.grid.wide{grid-template-columns:minmax(0,1fr)}
+@media (max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.grid{grid-template-columns:minmax(0,1fr)}}
+.cover{display:grid;gap:10px;align-content:start}
+.cover canvas{width:100%;height:auto;max-width:100%;display:block;border-radius:12px;box-shadow:0 1px 0 var(--line)}
+.grid.avatar .cover canvas{border-radius:50%;max-width:280px;margin-inline:auto}
+.cover .head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.cover p{font-size:.9rem;color:var(--muted)}
+.cover .row{display:flex;gap:8px;flex-wrap:wrap}
+.msg{font-size:.84rem;color:var(--muted)}
+.profile{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;margin-top:56px;padding-top:40px;border-top:1px solid var(--line)}
+@media (max-width:760px){.profile{grid-template-columns:minmax(0,1fr)}}
+.facts{display:grid;grid-template-columns:120px minmax(0,1fr);gap:8px 16px;font-size:.94rem;margin-top:14px}
+.facts dt{font:500 .66rem var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding-top:4px}
+.facts dd{min-width:0;overflow-wrap:anywhere}
+.note{background:var(--accent-soft);border-radius:14px;padding:16px 18px;margin-top:18px;font-size:.92rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="mono">Nome · capas para o Instagram</p>
+  <h1>d<span class="mac">ī</span>pa</h1>
+  <p class="lead">Em páli, a língua dos textos budistas, <em>dīpa</em> quer dizer ao mesmo tempo <strong>ilha</strong> e <strong>lâmpada</strong>. Numa das últimas falas do Buda: “Sejam uma ilha para si mesmos”, que também se traduz como “sejam uma lâmpada para si mesmos”. Parado no mar frio, aceso por dentro.</p>
+  <div class="meaning">
+    <div><b>Ilha</b><span>o que fica parado e firme no meio do mar</span></div>
+    <div><b>Lâmpada</b><span>a chama acesa por dentro, que não se apaga</span></div>
+    <div><b>O traço sobre o ī</b><span>vira o horizonte da marca: a linha calma onde tudo repousa</span></div>
+  </div>
+
+  <div class="bar" role="toolbar" aria-label="Formato">
+    <div class="seg" id="fmt">
+      <button class="btn" data-fmt="feed" aria-pressed="true">Post do feed 4:5</button>
+      <button class="btn" data-fmt="story" aria-pressed="false">Story 9:16</button>
+      <button class="btn" data-fmt="avatar" aria-pressed="false">Avatar</button>
+      <button class="btn" data-fmt="banner" aria-pressed="false">Capa larga</button>
+    </div>
+    <span class="mono" id="size">1080 × 1350</span>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="profile">
+    <div>
+      <p class="mono">Nome da página</p>
+      <h2 style="margin-top:6px">Como fica no Instagram</h2>
+      <dl class="facts">
+        <dt>Nome</dt><dd><strong>Dipa · calma e sabedoria</strong></dd>
+        <dt>Usuário</dt><dd>@dipa.diario · @sejadipa · @dipa.ilha</dd>
+        <dt>Categoria</dt><dd>Saúde e bem-estar</dd>
+        <dt>Bio</dt><dd>Seja uma ilha para si mesmo.<br>Uma pílula de sabedoria por dia.<br>Buda · estoicos · Jesus · mitos<br>Sua luz de hoje ↓</dd>
+        <dt>Fala-se</dt><dd>Dí-pa</dd>
+      </dl>
+    </div>
+    <div>
+      <p class="mono">Antes de fechar</p>
+      <div class="note">Confira se o @ está livre no Instagram e procure “Dipa” no site do INPI (busca de marcas, classes 9 e 41). Não consigo verificar daqui. A grafia com o traço (dīpa) fica para o logo. No @ e no dia a dia, use “dipa”.</div>
+      <div class="note">Os botões “Baixar PNG” funcionam no site publicado. Na prévia, tire print da capa ou segure o dedo sobre ela no celular.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const C = { noite:'#0f1d25', fundo:'#0b141a', agua:'#5f8592', nevoa:'#c5d3d8', gelo:'#e9eff1', brasa:'#e0702e', lume:'#f6c784' };
+const FMT = { feed:[1080,1350], story:[1080,1920], avatar:[1080,1080], banner:[1640,624] };
+let fmt = 'feed';
+
+/* ---------- utilitários de desenho ---------- */
+function vgrad(x, h, stops){ const g = x.createLinearGradient(0, 0, 0, h); stops.forEach(([o,c]) => g.addColorStop(o, c)); return g; }
+function glow(x, cx, cy, r, color, a){
+  const g = x.createRadialGradient(cx, cy, 0, cx, cy, r);
+  g.addColorStop(0, hexA(color, a)); g.addColorStop(1, hexA(color, 0));
+  x.fillStyle = g; x.beginPath(); x.arc(cx, cy, r, 0, Math.PI*2); x.fill();
+}
+function hexA(hex, a){ const n = parseInt(hex.slice(1), 16); return `rgba(${n>>16},${n>>8&255},${n&255},${a})`; }
+function rnd(seed){ return () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }; }
+function grain(x, w, h, amt){
+  const img = x.getImageData(0, 0, w, h), d = img.data, r = rnd(7);
+  for (let i = 0; i < d.length; i += 4){ const n = (r() - .5) * amt; d[i] += n; d[i+1] += n; d[i+2] += n; }
+  x.putImageData(img, 0, 0);
+}
+function seaLines(x, w, hz, h, color, seed, n = 46){
+  const r = rnd(seed);
+  for (let i = 0; i < n; i++){
+    const t = i / n, y = hz + Math.pow(t, 1.7) * (h - hz);
+    const len = w * (.08 + r() * .35), cx = r() * w;
+    x.strokeStyle = hexA(color, .04 + r() * .1 * (1 - t * .5)); x.lineWidth = 1 + t * 2.2;
+    x.beginPath(); x.moveTo(cx - len/2, y); x.lineTo(cx + len/2, y); x.stroke();
+  }
+}
+function reflexo(x, cx, hz, h, w, color, s){
+  for (let i = 0; i < 26; i++){
+    const t = i / 26, y = hz + 6 + Math.pow(t, 1.4) * (h - hz) * .55;
+    const wd = s * (.07 - t * .05) * (0.6 + ((i * 37) % 10) / 14);
+    x.strokeStyle = hexA(color, .55 * (1 - t)); x.lineWidth = 2 + t * 3;
+    x.beginPath(); x.moveTo(cx - wd, y); x.lineTo(cx + wd, y); x.stroke();
+  }
+}
+function ilha(x, cx, hz, wd, ht, color){
+  x.fillStyle = color; x.beginPath(); x.moveTo(cx - wd/2, hz + 1);
+  x.bezierCurveTo(cx - wd*.32, hz - ht*.9, cx - wd*.05, hz - ht*1.15, cx + wd*.08, hz - ht);
+  x.bezierCurveTo(cx + wd*.26, hz - ht*.8, cx + wd*.38, hz - ht*.3, cx + wd/2, hz + 1); x.closePath(); x.fill();
+}
+/* palavra "dīpa": o traço sobre o i é desenhado na cor de destaque */
+function palavra(x, cx, y, size, color, accent, italic){
+  x.font = `${italic ? 'italic ' : ''}400 ${size}px "Instrument Serif", Georgia, serif`;
+  x.textBaseline = 'alphabetic'; x.textAlign = 'left';
+  const total = x.measureText('dıpa').width, x0 = cx - total/2, wd = x.measureText('d').width, wi = x.measureText('ı').width;
+  x.fillStyle = color; x.fillText('dıpa', x0, y);
+  const mx = x0 + wd - size * .05, mw = wi + size * .1, my = y - size * .62;
+  glow(x, mx + mw/2, my, size * .35, C.brasa, .35);
+  x.fillStyle = accent; x.fillRect(mx, my - size * .028, mw, size * .056);
+}
+function legenda(x, cx, y, size, color, txt, spacing = .3){
+  x.font = `500 ${size}px "JetBrains Mono", monospace`; x.fillStyle = color; x.textAlign = 'center';
+  const t = txt.toUpperCase().split('').join(String.fromCharCode(8202).repeat(Math.round(spacing * 4)));
+  x.fillText(t, cx, y);
+}
+function frase(x, cx, y, size, color, txt){ x.font = `italic 400 ${size}px "Instrument Serif", Georgia, serif`; x.fillStyle = color; x.textAlign = 'center'; x.fillText(txt, cx, y); }
+
+/* ---------- as seis capas ---------- */
+const CAPAS = [
+  { id:'ilha', nome:'Ilha e lâmpada', desc:'A imagem do nome: uma ilha no horizonte calmo com uma luz acesa, refletida no mar frio.', paint(x, w, h, f){
+      const s = Math.min(w, h), hz = h * (f === 'banner' ? .62 : .58);
+      x.fillStyle = vgrad(x, hz, [[0,'#0a161d'],[.7,'#1b3340'],[1,'#3e5b67']]); x.fillRect(0, 0, w, hz);
+      x.fillStyle = vgrad(x, h, [[hz/h,'#16262f'],[1,'#081117']]); x.fillRect(0, hz, w, h - hz);
+      seaLines(x, w, hz, h, C.gelo, 11);
+      glow(x, w/2, hz - s*.03, s*.34, C.brasa, .32);
+      ilha(x, w/2, hz, s*.34, s*.05, '#071017');
+      reflexo(x, w/2, hz, h, w, C.brasa, s);
+      glow(x, w/2, hz - s*.045, s*.05, C.lume, .9);
+      x.fillStyle = C.lume; x.beginPath(); x.arc(w/2, hz - s*.045, s*.01, 0, Math.PI*2); x.fill();
+      if (f === 'avatar') return;
+      if (f === 'banner'){ palavra(x, w * .22, h * .42, s * .26, C.gelo, C.brasa); legenda(x, w * .22, h * .56, s * .035, C.nevoa, 'ilha · lâmpada'); return; }
+      palavra(x, w/2, h * .86, s * .17, C.gelo, C.brasa); legenda(x, w/2, h * .92, s * .024, C.nevoa, 'seja uma ilha para si mesmo');
+    } },
+  { id:'sol', nome:'Sol parado', desc:'O visual da Alcíone: o sol pela metade sobre o mar sem vento. Calma no inverno, fogo no centro.', paint(x, w, h, f){
+      const s = Math.min(w, h), hz = h * (f === 'story' ? .6 : .62);
+      x.fillStyle = vgrad(x, hz, [[0,'#0c1820'],[.6,'#263f4a'],[1,'#7b6a5c']]); x.fillRect(0, 0, w, hz);
+      x.fillStyle = vgrad(x, h, [[hz/h,'#1d2f37'],[1,'#0a141a']]); x.fillRect(0, hz, w, h - hz);
+      glow(x, w/2, hz, s*.55, C.brasa, .28);
+      x.save(); x.beginPath(); x.rect(0, 0, w, hz); x.clip();
+      const g = x.createRadialGradient(w/2, hz, 0, w/2, hz, s*.15); g.addColorStop(0, C.lume); g.addColorStop(1, C.brasa);
+      x.fillStyle = g; x.beginPath(); x.arc(w/2, hz, s*.15, 0, Math.PI*2); x.fill(); x.restore();
+      seaLines(x, w, hz, h, C.gelo, 23, 40);
+      reflexo(x, w/2, hz, h, w, C.lume, s * 2.2);
+      x.strokeStyle = hexA(C.gelo, .5); x.lineWidth = 2; x.beginPath(); x.moveTo(0, hz); x.lineTo(w, hz); x.stroke();
+      if (f === 'avatar') return;
+      if (f === 'banner'){ palavra(x, w * .78, h * .4, s * .24, C.gelo, C.lume); legenda(x, w * .78, h * .54, s * .034, C.nevoa, 'calma e sabedoria'); return; }
+      palavra(x, w/2, h * .2, s * .17, C.gelo, C.lume); legenda(x, w/2, h * .26, s * .024, C.nevoa, 'calma e sabedoria');
+    } },
+  { id:'aneis', nome:'Círculos na água', desc:'Vista de cima: uma luz no centro e a água parada em anéis. É o símbolo mais forte para o avatar.', paint(x, w, h, f){
+      const s = Math.min(w, h), cx = w/2, cy = f === 'banner' ? h/2 : h * .44;
+      const g = x.createRadialGradient(cx, cy, 0, cx, cy, Math.max(w, h)); g.addColorStop(0, '#1a3039'); g.addColorStop(1, '#070f14');
+      x.fillStyle = g; x.fillRect(0, 0, w, h);
+      for (let i = 1; i < 14; i++){ const r = s * .05 * i * (1 + i * .04); x.strokeStyle = hexA(C.gelo, Math.max(0, .5 - i * .035)); x.lineWidth = 2.4 - i * .1; x.beginPath(); x.arc(cx, cy, r, 0, Math.PI*2); x.stroke(); }
+      glow(x, cx, cy, s * .22, C.brasa, .55);
+      glow(x, cx, cy, s * .06, C.lume, .95);
+      if (f === 'avatar') return;
+      if (f === 'banner'){ palavra(x, w * .18, h * .55, s * .26, C.gelo, C.brasa); return; }
+      palavra(x, w/2, h * .84, s * .16, C.gelo, C.brasa); legenda(x, w/2, h * .9, s * .024, C.nevoa, 'uma pílula de sabedoria por dia');
+    } },
+  { id:'nevoa', nome:'Névoa clara', desc:'A versão clara e gelada: manhã de neblina, uma ilha quase apagada e uma única luz quente.', paint(x, w, h, f){
+      const s = Math.min(w, h), hz = h * .62;
+      x.fillStyle = vgrad(x, h, [[0,'#f2f6f7'],[.55,'#dbe5e8'],[1,'#b9cad0']]); x.fillRect(0, 0, w, h);
+      for (let i = 0; i < 7; i++){ x.fillStyle = hexA('#ffffff', .18); x.fillRect(0, hz - s*.2 + i * s*.06, w, s*.025); }
+      ilha(x, w/2, hz, s*.36, s*.05, '#9fb3ba');
+      x.strokeStyle = hexA(C.noite, .18); x.lineWidth = 2; x.beginPath(); x.moveTo(0, hz); x.lineTo(w, hz); x.stroke();
+      seaLines(x, w, hz, h, C.noite, 31, 30);
+      glow(x, w/2 + s*.02, hz - s*.05, s*.12, C.brasa, .45);
+      x.fillStyle = C.brasa; x.beginPath(); x.arc(w/2 + s*.02, hz - s*.05, s*.009, 0, Math.PI*2); x.fill();
+      if (f === 'avatar') return;
+      if (f === 'banner'){ palavra(x, w * .2, h * .44, s * .26, C.noite, C.brasa); legenda(x, w * .2, h * .58, s * .034, '#53666e', 'ilha · lâmpada'); return; }
+      palavra(x, w/2, h * .3, s * .17, C.noite, C.brasa); legenda(x, w/2, h * .36, s * .024, '#53666e', 'ilha · lâmpada');
+    } },
+  { id:'chama', nome:'Chama e reflexo', desc:'Mínima: uma chama sobre o horizonte e o reflexo dela na água. Juntas, as duas formam um losango, como uma bússola.', paint(x, w, h, f){
+      const s = Math.min(w, h), cx = w/2, hz = f === 'banner' ? h * .55 : h * .5, fh = s * .2, fw = s * .075;
+      x.fillStyle = vgrad(x, h, [[0,'#0d1a21'],[1,'#070e12']]); x.fillRect(0, 0, w, h);
+      glow(x, cx, hz - fh * .4, s * .42, C.brasa, .22);
+      const chama = (dir, alpha) => {
+        x.save(); x.globalAlpha = alpha; x.translate(cx, hz); x.scale(1, dir);
+        const g = x.createLinearGradient(0, -fh, 0, 0); g.addColorStop(0, C.brasa); g.addColorStop(1, C.lume);
+        x.fillStyle = g; x.beginPath(); x.moveTo(0, -fh);
+        x.bezierCurveTo(fw * .9, -fh * .55, fw, -fh * .2, 0, 0); x.bezierCurveTo(-fw, -fh * .2, -fw * .9, -fh * .55, 0, -fh); x.fill(); x.restore();
+      };
+      chama(1, 1); chama(-1, .28);
+      x.strokeStyle = hexA(C.gelo, .35); x.lineWidth = 2; x.beginPath(); x.moveTo(w * .18, hz); x.lineTo(w * .82, hz); x.stroke();
+      if (f === 'avatar') return;
+      if (f === 'banner'){ palavra(x, w * .2, h * .58, s * .24, C.gelo, C.brasa); legenda(x, w * .8, h * .58, s * .032, C.nevoa, 'seja a sua própria luz'); return; }
+      palavra(x, w/2, h * .82, s * .16, C.gelo, C.brasa); legenda(x, w/2, h * .88, s * .024, C.nevoa, 'seja a sua própria luz');
+    } },
+  { id:'tipo', nome:'Só o nome', desc:'Tipográfica: o traço sobre o ī é o horizonte e acende como brasa. Boa para o post fixado e para o avatar.', paint(x, w, h, f){
+      const s = Math.min(w, h);
+      const g = x.createRadialGradient(w/2, h * .45, 0, w/2, h * .45, Math.max(w, h) * .8); g.addColorStop(0, '#172b34'); g.addColorStop(1, '#0a131a');
+      x.fillStyle = g; x.fillRect(0, 0, w, h);
+      const y = f === 'avatar' ? h * .64 : h * .52;
+      palavra(x, w/2, y, s * (f === 'avatar' ? .3 : f === 'banner' ? .42 : .3), C.gelo, C.brasa);
+      if (f === 'avatar') return;
+      legenda(x, w/2, y + s * (f === 'banner' ? .2 : .1), s * (f === 'banner' ? .034 : .026), C.nevoa, 'ilha · lâmpada');
+      if (f !== 'banner'){ frase(x, w/2, h * .84, s * .045, C.nevoa, '“Sejam uma ilha para si mesmos.”'); legenda(x, w/2, h * .88, s * .02, hexA(C.nevoa, .7), 'Buda · Digha Nikaya 16'); }
+    } }
+];
+
+const grid = document.getElementById('grid');
+function desenhar(){
+  const [w, h] = FMT[fmt];
+  document.getElementById('size').textContent = `${w} × ${h}`;
+  grid.className = 'grid' + (fmt === 'avatar' ? ' avatar' : '') + (fmt === 'banner' ? ' wide' : '');
+  grid.innerHTML = CAPAS.map(c => `<article class="cover"><canvas id="cv-${c.id}" width="${w}" height="${h}" aria-label="Capa ${c.nome}"></canvas>
+    <div class="head"><h2>${c.nome}</h2></div><p>${c.desc}</p>
+    <div class="row"><button class="btn" data-png="${c.id}">Baixar PNG</button></div><p class="msg" id="m-${c.id}" hidden></p></article>`).join('');
+  CAPAS.forEach(c => { const cv = document.getElementById('cv-' + c.id), x = cv.getContext('2d'); c.paint(x, w, h, fmt); grain(x, w, h, 14); });
+}
+document.getElementById('fmt').addEventListener('click', e => {
+  const b = e.target.closest('[data-fmt]'); if (!b) return;
+  fmt = b.dataset.fmt; document.querySelectorAll('[data-fmt]').forEach(x => x.setAttribute('aria-pressed', x === b)); desenhar();
+});
+grid.addEventListener('click', e => {
+  const b = e.target.closest('[data-png]'); if (!b) return;
+  const cv = document.getElementById('cv-' + b.dataset.png), m = document.getElementById('m-' + b.dataset.png);
+  try { const a = document.createElement('a'); a.href = cv.toDataURL('image/png'); a.download = `dipa-${b.dataset.png}-${fmt}.png`; document.body.appendChild(a); a.click(); a.remove(); }
+  catch(err){}
+  m.hidden = false; m.textContent = 'Se o download não começar, segure o dedo sobre a capa para salvar ou tire um print.';
+});
+const pronto = document.fonts && document.fonts.load ? Promise.all([document.fonts.load('400 100px "Instrument Serif"'), document.fonts.load('italic 400 100px "Instrument Serif"'), document.fonts.load('500 30px "JetBrains Mono"')]) : Promise.resolve();
+desenhar();
+pronto.then(desenhar).catch(() => {});
+</script>
+</body>
+</html>
