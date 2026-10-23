@@ -55,3 +55,4 @@ Os dados do painel ficam só no aparelho (localStorage). Para usar no celular, a
 | `marca.html` | Estudo de nome e símbolo (5 candidatos com logo e avatar em PNG), perfil do Instagram simulado e recomendação de preço |
 
 Para trocar o nome da marca dentro do diário, edite `MARCA` no fim de `painel/conteudo.js`.
+| `calma.html` | Estudo de nome II: cinco nomes ligados à calma (frio por fora, fogo por dentro), com símbolo, nome da página, arte de amostra e nova paleta |
