@@ -57,3 +57,5 @@ Os dados do painel ficam só no aparelho (localStorage). Para usar no celular, a
 Para trocar o nome da marca dentro do diário, edite `MARCA` no fim de `painel/conteudo.js`.
 | `calma.html` | Estudo de nome II: cinco nomes ligados à calma (frio por fora, fogo por dentro), com símbolo, nome da página, arte de amostra e nova paleta |
 | `dipa.html` | Capas do nome Dipa em seis imagens (feed, story, avatar e capa larga), com nome da página e bio |
+| `logo/` | Logos do Dipa em PNG 1080 × 1080 para a foto do Instagram |
+| `exemplos/` | Carrossel de exemplo (pílula "Não voe baixo demais") já no visual Dipa |

@@ -414,7 +414,7 @@ const WOOP_SUGESTOES = {
    A pessoa diz como chega no dia; o painel escolhe a pílula que mais
    conversa com isso. Troque o nome da marca aqui quando decidir.
    ===================================================================== */
-const MARCA = { nome: 'Travessia', produto: 'Diário de Bordo' };
+const MARCA = { nome: 'Dipa', produto: 'Diário' };
 
 const ESTADOS = {
   ansioso:        'Ansioso',
