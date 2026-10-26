@@ -824,7 +824,8 @@ app.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 
 
 /* ---------------- acesso: só quem comprou ---------------- */
 async function sha256(t){ const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2,'0')).join(''); }
-async function chaveValida(k){ if (!k) return false; try { return ACESSO.hashes.includes(await sha256(k.trim().toLowerCase())); } catch(e){ return false; } }
+function normChave(k){ k = String(k).toLowerCase().replace(/[\u2010-\u2015\u2212]/g, '-').replace(/[^a-z0-9-]/g, ''); return k.startsWith('ilha-') ? k : 'ilha-' + k.replace(/^ilha/, ''); }
+async function chaveValida(k){ if (!k) return false; try { return ACESSO.hashes.includes(await sha256(normChave(k))); } catch(e){ return false; } }
 function liberadoAntes(){ try { return localStorage.getItem(KEY + '.acesso') === '1'; } catch(e){ return false; } }
 function lembrarAcesso(){ try { localStorage.setItem(KEY + '.acesso', '1'); } catch(e){} }
 function telaBloqueio(erro){
