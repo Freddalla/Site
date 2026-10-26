@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Dipa · Kit de Lançamento</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* Layout: caderno de lançamento. Índice à esquerda no desktop; seções em ordem de uso: identidade, Instagram, peças, conteúdo, venda, checklist. */
+:root{
+  --bg:#0b141a; --card:#121f27; --line:#253740; --fg:#e6eef0; --muted:#8fa3ab; --accent:#eb9a52; --on-accent:#1c1006; --ok:#7fb59a;
+  --display:'Instrument Serif','Iowan Old Style',Georgia,serif;
+  --body:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){ :root:not([data-theme="dark"]){ --bg:#e9eff1; --card:#f6f9fa; --line:#c5d3d8; --fg:#0f1d25; --muted:#53666e; --accent:#b8561c; --on-accent:#fff7ef; --ok:#2f6b52; color-scheme:light; } }
+:root[data-theme="light"]{ --bg:#e9eff1; --card:#f6f9fa; --line:#c5d3d8; --fg:#0f1d25; --muted:#53666e; --accent:#b8561c; --on-accent:#fff7ef; --ok:#2f6b52; color-scheme:light; }
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font:400 16px/1.65 var(--body);overflow-x:hidden}
+.page{max-width:1180px;margin-inline:auto;padding-inline:clamp(16px,4vw,40px);padding-block:40px 100px;display:grid;grid-template-columns:200px minmax(0,1fr);gap:48px}
+@media (max-width:960px){.page{grid-template-columns:minmax(0,1fr)}.toc{display:none}}
+.toc{position:sticky;top:32px;align-self:start;display:grid;gap:4px;font-size:.88rem}
+.toc a{color:var(--muted);text-decoration:none;padding:5px 0 5px 14px;border-left:1px solid var(--line)}
+.toc a:hover{color:var(--fg);border-color:var(--accent)}
+main{min-width:0}
+h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.06;text-wrap:balance}
+h1{font-size:clamp(2.6rem,6vw,4.4rem)}
+h2{font-size:clamp(1.9rem,3.6vw,2.6rem);margin-bottom:12px}
+h3{font-size:1.4rem}
+p{max-width:66ch}
+em{color:var(--accent)}
+a{color:var(--accent)}
+.mono{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lead{font-size:1.12rem;color:var(--muted);margin-top:12px}
+section{padding-block:52px;border-top:1px solid var(--line)}
+.hero{display:flex;gap:24px;align-items:center;flex-wrap:wrap;padding-bottom:36px}
+.hero .sym{width:120px;height:120px;flex:none}
+.sym svg{width:100%;height:100%;display:block}
+.btn{font:600 .84rem var(--body);border:1px solid var(--line);background:transparent;color:var(--fg);border-radius:999px;padding:9px 16px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:22px}
+.links a{display:grid;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;text-decoration:none;color:var(--fg)}
+.links a span{font-size:.88rem;color:var(--muted)}
+@media (max-width:720px){.links{grid-template-columns:minmax(0,1fr)}}
+
+.facts{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px 20px;margin-top:20px}
+.facts dt{font:500 .68rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding-top:5px}
+.facts dd{min-width:0;overflow-wrap:anywhere}
+@media (max-width:560px){.facts{grid-template-columns:minmax(0,1fr);gap:4px}.facts dd{margin-bottom:10px}}
+.copybox{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;white-space:pre-wrap;font-size:.95rem;position:relative;margin-top:10px}
+.copybox .btn{position:absolute;top:10px;right:10px;padding:6px 12px;font-size:.78rem}
+
+.swatches{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:18px}
+.sw{border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+.sw i{display:block;height:64px}
+.sw span{display:block;padding:8px 10px;font:500 .68rem var(--mono);background:var(--card)}
+@media (max-width:640px){.swatches{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.rules{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:20px}
+.rules div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.rules p{font-size:.92rem;color:var(--muted)}
+@media (max-width:720px){.rules{grid-template-columns:minmax(0,1fr)}}
+
+.assets{display:grid;gap:26px;margin-top:20px}
+.group h3{margin-bottom:12px}
+.row-imgs{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.row-imgs.wide{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.asset{display:grid;gap:8px;align-content:start}
+.asset img{width:100%;height:auto;max-width:100%;border-radius:10px;border:1px solid var(--line);display:block;background:#0a131a}
+.asset.round img{border-radius:50%}
+.asset span{font-size:.82rem;color:var(--muted)}
+.asset .btn{justify-self:start;padding:6px 12px;font-size:.78rem}
+.msg{font-size:.84rem;color:var(--muted);margin-top:10px}
+
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:.93rem}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:12px;margin-top:18px}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 .66rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:var(--card)}
+tr:last-child td{border-bottom:0}
+
+.check{list-style:none;display:grid;gap:10px;margin-top:18px}
+.check li{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.check input{width:20px;height:20px;accent-color:var(--accent);margin-top:2px}
+.check li.ok{opacity:.6}
+.check b{display:block}
+.check span{font-size:.92rem;color:var(--muted)}
+.note{background:color-mix(in srgb,var(--accent) 14%,transparent);border-radius:14px;padding:16px 18px;margin-top:18px;font-size:.94rem}
+code{font-family:var(--mono);font-size:.84em;overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<div class="page">
+<nav class="toc" aria-label="Índice">
+  <a href="#links">Links</a><a href="#identidade">Identidade</a><a href="#instagram">Instagram</a><a href="#pecas">Peças para baixar</a><a href="#conteudo">Primeiras duas semanas</a><a href="#venda">Venda e acesso</a><a href="#checklist">Checklist</a>
+</nav>
+<main>
+  <div class="hero"><span class="sym" data-sym></span><div><p class="mono">Kit de lançamento · versão final</p><h1>Dipa</h1><p class="lead" style="margin-top:6px">Tudo o que você precisa para lançar, num lugar só.</p></div></div>
+
+  <section id="links" style="border-top:0;padding-top:0">
+    <h2>Os três produtos</h2>
+    <div class="links">
+      <a href="../dipa/index.html"><b>Página de vendas</b><span>O link da bio. Leva ao checkout.</span></a>
+      <a href="../dipa/diario/index.html"><b>O diário</b><span>O que o comprador recebe. Só abre com a chave.</span></a>
+      <a href="posts.html"><b>Fábrica de Pílulas</b><span>Gera o carrossel de qualquer uma das 36 pílulas.</span></a>
+    </div>
+  </section>
+
+  <section id="identidade">
+    <p class="mono">Identidade</p>
+    <h2>Ilha e lâmpada</h2>
+    <p class="lead"><em>Dīpa</em>, em páli, é ilha e lâmpada. O símbolo é um atol, uma ilha em anel vista de cima, com a lâmpada acesa a 45°. Não há slogan: o nome e o símbolo bastam.</p>
+    <div class="swatches">
+      <div class="sw"><i style="background:radial-gradient(circle,#1c3541,#0a131a)"></i><span>Noite fria · #1C3541 → #0A131A</span></div>
+      <div class="sw"><i style="background:#c5d3d8"></i><span>Névoa · #C5D3D8</span></div>
+      <div class="sw"><i style="background:#e9eff1"></i><span>Gelo · #E9EFF1</span></div>
+      <div class="sw"><i style="background:radial-gradient(circle at 38% 35%,#f6c784,#e0702e 80%)"></i><span>Lâmpada · #F6C784 → #E0702E</span></div>
+      <div class="sw"><i style="background:#eb9a52"></i><span>Brasa para texto · #EB9A52</span></div>
+    </div>
+    <div class="rules">
+      <div><h3>Símbolo</h3><p>Sempre o mesmo desenho: anel fino em gelo e lâmpada a 45°, solta do anel. Nas pílulas, ele aparece sozinho, sem o nome.</p></div>
+      <div><h3>Tipografia</h3><p>Instrument Serif para títulos e mantras. Manrope para o texto. JetBrains Mono, em caixa alta e espaçada, para rótulos.</p></div>
+      <div><h3>Uma luz só</h3><p>Cada peça tem um único ponto quente: a lâmpada, ou uma palavra em brasa. Todo o resto fica frio e quieto, com grão leve.</p></div>
+    </div>
+  </section>
+
+  <section id="instagram">
+    <p class="mono">Instagram</p>
+    <h2>Configuração do perfil</h2>
+    <dl class="facts">
+      <dt>Nome</dt><dd><strong>Dipa · calma e sabedoria</strong><br><span class="muted" style="font-size:.88rem;color:var(--muted)">Aparece em negrito e entra na busca.</span></dd>
+      <dt>Usuário</dt><dd>@dipa.diario · alternativas: @sejadipa, @dipa.ilha<br><span style="font-size:.88rem;color:var(--muted)">Confira se está livre antes de criar.</span></dd>
+      <dt>Categoria</dt><dd>Saúde e bem-estar</dd>
+      <dt>Foto</dt><dd>01-foto-de-perfil.png (abaixo, em Peças)</dd>
+      <dt>Link</dt><dd>A página de vendas, com UTM de origem: <code>…/dipa/?utm_source=instagram&amp;utm_medium=bio</code></dd>
+      <dt>Destaques</dt><dd>Comece · Respire · Mantras · Diário · Preço</dd>
+    </dl>
+    <h3 style="margin-top:26px">Bio</h3>
+    <div class="copybox" id="bio">Uma pílula de sabedoria por dia, escolhida para como você chega.
+Buda · estoicos · Jesus · mitos
+O seu diário ↓<button class="btn" data-copy="bio">Copiar</button></div>
+  </section>
+
+  <section id="pecas">
+    <p class="mono">Peças para baixar</p>
+    <h2>Tudo no tamanho certo</h2>
+    <div class="assets" id="assets"></div>
+    <p class="msg" id="msg" hidden></p>
+  </section>
+
+  <section id="conteudo">
+    <p class="mono">Conteúdo</p>
+    <h2>As primeiras duas semanas</h2>
+    <p class="lead">Três posts por semana. Os carrosséis saem prontos da Fábrica de Pílulas: escolha a pílula, baixe os 6 slides, copie a legenda.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Dia</th><th>Formato</th><th>O que postar</th></tr></thead>
+      <tbody>
+        <tr><td>Lançamento</td><td>Carrossel fixado</td><td>Post fixado (3 slides, abaixo). Legenda abaixo da tabela.</td></tr>
+        <tr><td>Lançamento</td><td>Stories</td><td>Foto do diário aberto no seu celular + "o link está na bio". Repita no dia seguinte.</td></tr>
+        <tr><td>Semana 1 · Seg</td><td>Carrossel</td><td>Pílula 29 · Não voe baixo demais (já pronta, abaixo)</td></tr>
+        <tr><td>Semana 1 · Qua</td><td>Carrossel</td><td>Pílula 11 · A segunda flecha</td></tr>
+        <tr><td>Semana 1 · Sex</td><td>Carrossel</td><td>Pílula 01 · O que depende de você</td></tr>
+        <tr><td>Semana 2 · Seg</td><td>Carrossel</td><td>Pílula 21 · Olhai os lírios do campo</td></tr>
+        <tr><td>Semana 2 · Qua</td><td>Carrossel</td><td>Pílula 28 · Sísifo e a pedra</td></tr>
+        <tr><td>Semana 2 · Sex</td><td>Carrossel</td><td>Pílula 19 · Passemos para a outra margem</td></tr>
+        <tr><td>Todo dia</td><td>Story</td><td>O mantra do seu dia como fundo de tela (o diário gera a imagem).</td></tr>
+      </tbody>
+    </table></div>
+    <h3 style="margin-top:26px">Legenda do post fixado</h3>
+    <div class="copybox" id="leg">Dīpa, em páli, é ilha e é lâmpada.
+
+Todo dia você diz como chega: ansioso, sem energia, travado, sobrecarregado.
+O Dipa responde com a pílula de sabedoria certa para esse momento. Um ensinamento de Buda, dos estoicos, de Jesus ou da mitologia. Um mantra para repetir. Um gesto prático para fazer hoje.
+
+Depois, você fecha a tela.
+
+R$ 47, pagamento único. O link está na bio.
+
+#dipa #autoconhecimento #estoicismo #budismo #meditacao #calma<button class="btn" data-copy="leg">Copiar</button></div>
+  </section>
+
+  <section id="venda">
+    <p class="mono">Venda e acesso</p>
+    <h2>Como a compra funciona</h2>
+    <ol style="padding-left:20px;display:grid;gap:8px;margin-top:12px;max-width:70ch">
+      <li>A pessoa clica em "Comprar" na página de vendas e vai para o checkout da Kiwify.</li>
+      <li>Paga por Pix ou cartão. A Kiwify envia por e-mail o link do diário com a chave de acesso.</li>
+      <li>O diário abre e fica liberado naquele aparelho. Quem não tem a chave vê a tela "Este diário é seu depois da compra".</li>
+    </ol>
+    <dl class="facts">
+      <dt>Produto</dt><dd>Dipa · o diário · R$ 47 · pagamento único · garantia de 7 dias</dd>
+      <dt>Link de entrega</dt><dd><code>https://freddalla.github.io/Site/dipa/diario/?k=SUA-CHAVE</code><br><span style="font-size:.88rem;color:var(--muted)">A chave está na nossa conversa, não nesta página.</span></dd>
+      <dt>Onde configurar</dt><dd><code>dipa/index.html</code>: link de pagamento em CONFIG.CHECKOUT_URL, pixel em CONFIG.META_PIXEL_ID e e-mail de suporte em CONFIG.CONTATO.</dd>
+    </dl>
+    <div class="note">A chave impede o acesso de quem não comprou, mas um comprador pode repassar o link. Para o lançamento, isso é suficiente. Se vazar, a chave é trocada em minutos.</div>
+  </section>
+
+  <section id="checklist">
+    <p class="mono">Checklist</p>
+    <h2>Até o lançamento</h2>
+    <ul class="check" id="check">
+      <li><input type="checkbox" id="c1"><label for="c1"><b>Conferir o @ e o nome</b><span>Instagram (@dipa.diario) e INPI (busca de marcas "Dipa", classes 9 e 41).</span></label></li>
+      <li><input type="checkbox" id="c2"><label for="c2"><b>Criar o perfil no Instagram</b><span>Conta profissional, categoria Saúde e bem-estar, foto, bio e os 5 destaques.</span></label></li>
+      <li><input type="checkbox" id="c3"><label for="c3"><b>Criar o produto na Kiwify</b><span>R$ 47, pagamento único, garantia de 7 dias, entrega com o link do diário e a chave.</span></label></li>
+      <li><input type="checkbox" id="c4"><label for="c4"><b>Colar o link de pagamento na página de vendas</b><span>Me mande o link e eu coloco, ou edite CONFIG.CHECKOUT_URL.</span></label></li>
+      <li><input type="checkbox" id="c5"><label for="c5"><b>Colocar o site no ar</b><span>Juntar a branch na main e ligar o GitHub Pages. Depois, abrir a página de vendas e o diário no celular.</span></label></li>
+      <li><input type="checkbox" id="c6"><label for="c6"><b>Fazer uma compra de teste</b><span>Comprar o próprio produto, receber o e-mail, abrir o diário pelo link e pedir o reembolso.</span></label></li>
+      <li><input type="checkbox" id="c7"><label for="c7"><b>Publicar o post fixado e a primeira pílula</b><span>E fixar o carrossel de apresentação no topo do perfil.</span></label></li>
+      <li><input type="checkbox" id="c8"><label for="c8"><b>Opcional: pixel do Meta</b><span>Para anunciar depois. O evento de início de checkout já está pronto na página.</span></label></li>
+    </ul>
+  </section>
+</main>
+</div>
+
+<script src="../dipa/marca/simbolo.js"></script>
+<script>
+document.querySelectorAll('[data-sym]').forEach(el => el.innerHTML = dipaSimbolo());
+/* Salvar arquivo: na prévia do Claude usa a permissão de download (com confirmação); fora dela, o download normal. */
+let _dl;
+async function salvarArquivo(nome, blob){
+  try { if (window.claude && claude.use){ _dl = _dl || claude.use('downloads'); const d = await _dl; if (d){ await d.save({ filename: nome, data: blob }); return 'salvo'; } } }
+  catch(e){ return e && e.code === 'declined' ? 'recusado' : 'erro'; }
+  const url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1500);
+  return 'navegador';
+}
+const GRUPOS = [
+  ['Foto de perfil', 'round', [['01-foto-de-perfil.png','Foto de perfil · 1080 × 1080']]],
+  ['Capas dos destaques', '', [['02-destaque-comece.png','Comece'],['03-destaque-respire.png','Respire'],['04-destaque-mantras.png','Mantras'],['05-destaque-diario.png','Diário'],['06-destaque-preco.png','Preço']]],
+  ['Post fixado · apresentação', 'wide', [['07-post-fixado-1.png','1 de 3'],['08-post-fixado-2.png','2 de 3'],['09-post-fixado-3.png','3 de 3']]],
+  ['Primeira pílula · Não voe baixo demais', '', [1,2,3,4,5,6].map(n => [`10-carrossel-icaro-${n}.png`, `Slide ${n}`])],
+  ['Fundo de tela do mantra (exemplo)', '', [['11-fundo-de-tela-mantra.png','Story ou fundo de tela · 1080 × 1920']]]
+];
+document.getElementById('assets').innerHTML = GRUPOS.map(([t, cls, itens]) => `<div class="group"><h3>${t}</h3><div class="row-imgs ${cls === 'wide' ? 'wide' : ''}">${itens.map(([f, l]) => `<div class="asset ${cls === 'round' ? 'round' : ''}"><img src="lancamento/${f}" alt="${l}" loading="lazy"><span>${l}</span><button class="btn" data-file="${f}">Baixar</button></div>`).join('')}</div></div>`).join('');
+const msg = document.getElementById('msg');
+document.addEventListener('click', async e => {
+  const f = e.target.closest('[data-file]');
+  if (f){
+    try { const blob = await (await fetch('lancamento/' + f.dataset.file)).blob(); const r = await salvarArquivo('dipa-' + f.dataset.file, blob);
+      msg.hidden = false; msg.textContent = r === 'salvo' ? 'Arquivo salvo.' : r === 'recusado' ? 'Download cancelado.' : r === 'erro' ? 'Não deu para salvar aqui. Segure o dedo sobre a imagem para salvar.' : 'Se o download não começar, segure o dedo sobre a imagem para salvar.';
+    } catch(err){ msg.hidden = false; msg.textContent = 'Não deu para baixar agora. Segure o dedo sobre a imagem para salvar.'; }
+    msg.scrollIntoView({ block:'nearest' });
+    return;
+  }
+  const c = e.target.closest('[data-copy]');
+  if (c){ const box = document.getElementById(c.dataset.copy), txt = [...box.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent).join('');
+    navigator.clipboard?.writeText(txt.trim()).then(() => c.textContent = 'Copiado').catch(() => { const r = document.createRange(); r.selectNodeContents(box); const s = getSelection(); s.removeAllRanges(); s.addRange(r); c.textContent = 'Selecionado'; }); }
+});
+/* checklist lembrado neste navegador */
+const CK = 'dipa.kit.check';
+let marcado = {}; try { marcado = JSON.parse(localStorage.getItem(CK) || '{}'); } catch(e){}
+document.querySelectorAll('#check input').forEach(i => { i.checked = !!marcado[i.id]; i.closest('li').classList.toggle('ok', i.checked);
+  i.addEventListener('change', () => { marcado[i.id] = i.checked; i.closest('li').classList.toggle('ok', i.checked); try { localStorage.setItem(CK, JSON.stringify(marcado)); } catch(e){} }); });
+</script>
+</body>
+</html>

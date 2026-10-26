@@ -59,3 +59,14 @@ Para trocar o nome da marca dentro do diário, edite `MARCA` no fim de `../dipa/
 | `dipa.html` | Capas do nome Dipa em seis imagens (feed, story, avatar e capa larga), com nome da página e bio |
 | `logo/` | Logos do Dipa em PNG 1080 × 1080 para a foto do Instagram |
 | `exemplos/` | Carrossel de exemplo (pílula "Não voe baixo demais") já no visual Dipa |
+
+## Kit de lançamento (versão final · Dipa)
+
+| Arquivo | O que é |
+|---|---|
+| `kit.html` | Página consolidada: identidade, configuração do Instagram, peças para baixar, primeiras duas semanas, venda e checklist |
+| `kit-render.html` | Prancheta que gera as peças do Instagram (perfil, destaques, post fixado) |
+| `lancamento/` | As peças finais em PNG |
+| `atol.html` | Estudo do símbolo escolhido (Atol) |
+
+As páginas públicas ficam em `../dipa/` (vendas e diário). O símbolo é desenhado por `../dipa/marca/simbolo.js`.

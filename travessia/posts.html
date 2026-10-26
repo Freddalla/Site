@@ -71,6 +71,8 @@ select{font:inherit;color:inherit;background:var(--card);border:1px solid var(--
 .slide .hz::after{content:"";position:absolute;left:50%;top:-15px;width:30px;height:30px;margin-left:-15px;border-radius:50%;background:radial-gradient(circle,#f6c784 0%,#e0702e 70%);box-shadow:0 0 46px 16px rgba(224,112,46,.42)}
 .slide .sign{display:flex;flex-direction:column;align-items:center;gap:14px}
 .slide .sign .wm{font-size:96px}
+.slide .sym{display:block;width:150px;height:150px;margin:-40px 0 -40px -40px}
+.slide .sym svg{width:100%;height:100%;display:block}
 .slide .grain{position:absolute;inset:0;pointer-events:none;opacity:.16;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E")}
 
 .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-top:28px}
@@ -101,6 +103,7 @@ select{font:inherit;color:inherit;background:var(--card);border:1px solid var(--
 </div>
 
 <script src="../dipa/diario/conteudo.js"></script>
+<script src="../dipa/marca/simbolo.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 /* Salvar arquivo: na prévia do Claude usa a permissão de download (com confirmação); no site publicado, o download normal do navegador. */
@@ -113,7 +116,8 @@ async function salvarArquivo(nome, data){
   const a = document.createElement('a'); a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1500);
   return 'navegador';
 }
-const LOGO = '<span class="wm" aria-label="dīpa">d<span class="i">ı<i></i></span>pa</span>';
+const LOGO = () => `<span class="sym">${dipaSimbolo()}</span>`;
+const LOGO_CLARO = () => `<span class="sym">${dipaSimbolo({ fundo:'claro' }).replace(/<rect[^>]*fill="#e9eff1"\/>/, '')}</span>`;
 const HASHTAGS = {
   estoicismo:'#estoicismo #marcoaurelio #seneca #filosofia',
   budismo:'#budismo #meditacao #atencaoplena #sabedoria',
@@ -132,11 +136,11 @@ function tamanho(txt, base, limite){ return txt.length > limite ? Math.round(bas
 function slides(p, n){
   const [t1, t2] = dividir(p.texto);
   const trad = TRADICOES[p.trad], num = 'Nº ' + String(n).padStart(2,'0');
-  const head = (k) => `<div class="top">${LOGO}<span>${k}/6</span></div>`;
+  const head = (k) => `<div class="top">${(estilo.value === 'light' || (estilo.value === 'alt' && k % 2 === 0)) ? LOGO_CLARO() : LOGO()}<span>${k}/6</span></div>`;
   const foot = (txt) => `<div class="bot"><span>${esc(trad)}</span><span>${txt}</span></div>`;
   const titulo = p.titulo.split(' '), corte = Math.max(1, Math.ceil(titulo.length / 2));
   return [
-    `${head(1)}<div><div class="hz"></div><p class="kicker">Pílula ${num}</p><p class="big" style="font-size:${tamanho(p.titulo,132,26)}px">${esc(titulo.slice(0,corte).join(' '))}<br><em>${esc(titulo.slice(corte).join(' '))}</em></p></div>${foot('Arraste →')}`,
+    `${head(1)}<div><p class="kicker">Pílula ${num}</p><p class="big" style="font-size:${tamanho(p.titulo,132,26)}px">${esc(titulo.slice(0,corte).join(' '))}<br><em>${esc(titulo.slice(corte).join(' '))}</em></p></div>${foot('Arraste →')}`,
     `${head(2)}<div><p class="quote" style="font-size:${tamanho(p.citacao,80,110)}px">“${esc(p.citacao)}”</p><p class="ref">${esc(p.ref)}</p></div>${foot('')}`,
     `${head(3)}<div><p class="kicker">O ensinamento</p><p class="txt" style="font-size:${tamanho(t1,54,230)}px">${esc(t1)}</p></div>${foot('')}`,
     `${head(4)}<div><p class="kicker">Na vida real</p><p class="txt" style="font-size:${tamanho(t2 || t1,54,230)}px">${esc(t2 || '')}</p></div>${foot('')}`,
@@ -175,7 +179,7 @@ ${HASHTAGS[p.trad]} #dipa #autoconhecimento #calma`;
 5–9s   ${p.ref}
 9–17s  Hoje: ${p.protocolo.split('. ')[0].replace(/\.$/, '')}.
 17–23s ${p.pergunta}
-Final  dīpa · salve para fazer hoje
+Final  símbolo do Dipa · salve para fazer hoje
 
 Legenda: use a legenda acima.`;
 }

@@ -6,6 +6,7 @@
 <title>Diário Dipa</title>
 <meta name="description" content="Diga como você chega no dia e receba a pílula de sabedoria e o mantra certos para ele, com protocolo prático, 5 minutos de meditação e gratidão.">
 <meta name="theme-color" content="#0b141a">
+<link rel="apple-touch-icon" href="../marca/icone-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Dipa">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -76,7 +77,10 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent)}
 
 /* topo */
 .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
-.brand{display:inline-block;font-family:var(--display);font-size:1.75rem;line-height:1;padding-top:.12em;color:var(--fg)}
+.brand{display:inline-flex;align-items:center;gap:6px;font-family:var(--display);font-size:1.75rem;line-height:1;color:var(--fg)}
+.brand .sym{width:44px;height:44px;margin:-8px -4px -8px -10px;flex:none}
+.brand .sym svg{width:100%;height:100%;display:block}
+.brand .nm{padding-top:.12em;display:inline-block}
 .brand .i{position:relative;display:inline-block}
 .brand .i i{position:absolute;left:-.06em;right:-.06em;top:.25em;height:.07em;background:#e0702e;box-shadow:0 0 .35em .08em rgba(224,112,46,.5)}
 .demo{background:var(--accent-soft);border-radius:12px;padding:10px 14px;margin-bottom:20px;font-size:.88rem;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
@@ -85,8 +89,8 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent)}
 .greet{margin-bottom:22px}
 .greet h1{margin-block:6px 6px}
 .progress{display:flex;gap:14px;align-items:center;margin-bottom:22px}
-.ring{width:54px;height:54px;flex:none}
-.ring circle{fill:none;stroke-width:5}
+.ring{width:54px;height:54px;flex:none;overflow:visible}
+.ring .bg,.ring .fg{fill:none;stroke-width:5}
 .ring .bg{stroke:var(--line)}
 .ring .fg{stroke:var(--accent);stroke-linecap:round;transition:stroke-dashoffset .6s ease}
 .ring text{font:600 13px var(--body);fill:var(--fg)}
@@ -213,6 +217,7 @@ details.entry p{font-size:.92rem;margin-top:8px}
 <div class="med" id="med" hidden role="dialog" aria-modal="true" aria-label="Meditação"></div>
 
 <script src="conteudo.js"></script>
+<script src="../marca/simbolo.js"></script>
 <script>
 /* ======================================================================
    DIÁRIO · v2
@@ -235,6 +240,7 @@ const PILAR_IDS = Object.keys(PILARES);
 const DIAS_SEMANA = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const app = document.getElementById('app'), tabsEl = document.getElementById('tabs'), medEl = document.getElementById('med');
 
+dipaFavicon();
 let S = migrar(load());
 let tab = 'hoje';
 let ob = null;
@@ -342,11 +348,9 @@ async function gerarFundo(P){
   const x = c.getContext('2d');
   const g = x.createRadialGradient(540, 820, 0, 540, 820, 1500); g.addColorStop(0, '#172b34'); g.addColorStop(1, '#0a131a');
   x.fillStyle = g; x.fillRect(0, 0, 1080, 1920);
-  const glow = x.createRadialGradient(540, 560, 0, 540, 560, 360); glow.addColorStop(0, 'rgba(224,112,46,.4)'); glow.addColorStop(1, 'rgba(224,112,46,0)');
+  const glow = x.createRadialGradient(540, 540, 0, 540, 540, 360); glow.addColorStop(0, 'rgba(224,112,46,.18)'); glow.addColorStop(1, 'rgba(224,112,46,0)');
   x.fillStyle = glow; x.fillRect(0, 0, 1080, 1100);
-  x.fillStyle = 'rgba(233,239,241,.45)'; x.fillRect(400, 559, 280, 3);
-  const sol = x.createRadialGradient(540, 560, 0, 540, 560, 22); sol.addColorStop(0, '#f6c784'); sol.addColorStop(1, '#e0702e');
-  x.fillStyle = sol; x.beginPath(); x.arc(540, 560, 22, 0, Math.PI * 2); x.fill();
+  dipaSimboloCanvas(x, 540, 540, 300);
   x.textAlign = 'center'; x.fillStyle = '#c5d3d8'; x.font = '500 30px "JetBrains Mono", monospace';
   x.fillText('MANTRA DO DIA', 540, 760);
   x.fillStyle = '#e9eff1'; x.font = '400 104px "Instrument Serif", Georgia, serif';
@@ -357,10 +361,7 @@ async function gerarFundo(P){
   linhas.forEach((ln, i) => x.fillText(ln, 540, y0 + i * 120));
   x.fillStyle = '#93a5a2'; x.font = '400 34px Manrope, system-ui, sans-serif';
   x.fillText(P.ref.length > 48 ? P.ref.slice(0, 46) + '…' : P.ref, 540, y0 + linhas.length * 120 + 40);
-  x.font = '400 92px "Instrument Serif", Georgia, serif'; x.textAlign = 'left';
-  const tw = x.measureText('dıpa').width, x0 = 540 - tw / 2, wd = x.measureText('d').width, wi = x.measureText('ı').width;
-  x.fillStyle = '#e9eff1'; x.fillText('dıpa', x0, 1760);
-  x.fillStyle = '#e0702e'; x.shadowColor = 'rgba(224,112,46,.6)'; x.shadowBlur = 24; x.fillRect(x0 + wd - 5, 1760 - 92 * .62 - 3, wi + 10, 6); x.shadowBlur = 0;
+  x.globalAlpha = .7; dipaSimboloCanvas(x, 540, 1730, 120); x.globalAlpha = 1;
   return c.toDataURL('image/png');
 }
 
@@ -435,14 +436,20 @@ function carregarExemplo(){
 /* ======================================================================
    TELAS
    ====================================================================== */
-function marca(){ return `<div class="brand" aria-label="dīpa">d<span class="i">ı<i></i></span>pa</div>`; }
+function marca(){ const claro = matchMedia('(prefers-color-scheme: light)').matches && document.documentElement.dataset.theme !== 'dark' || document.documentElement.dataset.theme === 'light';
+  return `<div class="brand" aria-label="dīpa"><span class="sym">${claro ? dipaSimbolo({ fundo:'claro' }).replace(/<rect[^>]*fill="#e9eff1"\/>/, '') : dipaSimbolo()}</span><span class="nm">d<span class="i">ı<i></i></span>pa</span></div>`; }
 function topo(){
   return `${S.exemplo ? `<div class="demo"><span>Você está vendo dados de exemplo.</span><button class="btn btn-small btn-primary" data-act="sair-exemplo">Começar o meu</button></div>` : ''}
     <div class="top">${marca()}<span class="mono">${fmtDate(new Date(), { day:'numeric', month:'short' })}</span></div>`;
 }
 function ring(done, total){
   const C = 2 * Math.PI * 22, off = C * (1 - (total ? done / total : 0));
-  return `<svg class="ring" viewBox="0 0 54 54" aria-hidden="true"><circle class="bg" cx="27" cy="27" r="22"/><circle class="fg" cx="27" cy="27" r="22" stroke-dasharray="${C}" stroke-dashoffset="${off}" transform="rotate(-90 27 27)"/><text x="27" y="31" text-anchor="middle">${done}/${total}</text></svg>`;
+  /* o anel do dia é o atol: completa conforme as práticas e a lâmpada acende no fim */
+  const cheio = total && done >= total;
+  if (cheio){ const t = document.documentElement.dataset.theme, claro = t === 'light' || (!t && matchMedia('(prefers-color-scheme: light)').matches);
+    return claro ? dipaSimbolo({ fundo:'claro', classe:'ring' }).replace(/<rect[^>]*fill="#e9eff1"\/>/, '') : dipaSimbolo({ classe:'ring' }); }
+  const lamp = cheio ? `<circle cx="42.6" cy="11.4" r="9" fill="url(#rgh)"/><circle cx="42.6" cy="11.4" r="3.6" fill="url(#rgl)"/>` : '';
+  return `<svg class="ring" viewBox="0 0 54 54" aria-hidden="true"><defs><radialGradient id="rgl" cx="38%" cy="35%" r="70%"><stop offset="0%" stop-color="#f6c784"/><stop offset="80%" stop-color="#e0702e"/></radialGradient><radialGradient id="rgh"><stop offset="0%" stop-color="#e0702e" stop-opacity=".55"/><stop offset="100%" stop-color="#e0702e" stop-opacity="0"/></radialGradient></defs><circle class="bg" cx="27" cy="27" r="22"/><circle class="fg" cx="27" cy="27" r="22" stroke-dasharray="${C}" stroke-dashoffset="${off}" transform="rotate(-90 27 27)"/>${lamp}${cheio ? '' : `<text x="27" y="31" text-anchor="middle">${done}/${total}</text>`}</svg>`;
 }
 function saudacao(){ const h = new Date().getHours(); return h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite'; }
 

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Dipa · Peças</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* Prancheta de produção: cada peça no tamanho final, uma abaixo da outra, para exportar em PNG. */
+:root{ --noite:#0f1d25; --gelo:#e9eff1; --nevoa:#c5d3d8; --brasa:#e0702e; --brasa-clara:#eb9a52; --brasa-tinta:#b8561c;
+  --display:'Instrument Serif',Georgia,serif; --body:'Manrope',system-ui,sans-serif; --mono:'JetBrains Mono',monospace; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#444;display:grid;gap:40px;padding:40px;justify-items:start;font-family:var(--body)}
+.peca{position:relative;overflow:hidden;color:var(--gelo);background:radial-gradient(120% 90% at 50% 42%,#1c3541 0%,#0a131a 100%)}
+.peca.claro{background:linear-gradient(180deg,#f2f6f7 0%,#dbe5e8 100%);color:var(--noite)}
+.grain{position:absolute;inset:0;pointer-events:none;opacity:.14;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E")}
+.sym svg{width:100%;height:100%;display:block}
+.wm{font-family:var(--display);font-weight:400;line-height:1;display:inline-block;padding-top:.12em}
+.wm .i{position:relative;display:inline-block}
+.wm .i i{position:absolute;left:-.06em;right:-.06em;top:.25em;height:.065em;background:var(--brasa);box-shadow:0 0 .35em .08em rgba(224,112,46,.5)}
+.mono{font:500 26px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--nevoa)}
+.claro .mono{color:#53666e}
+.kicker{font:500 26px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--brasa-clara)}
+.claro .kicker{color:var(--brasa-tinta)}
+
+/* perfil e ícone: só o símbolo, inteiro */
+#perfil{width:1080px;height:1080px}
+#icone{width:180px;height:180px}
+#perfil .sym,#icone .sym{position:absolute;inset:0}
+
+/* destaques 1080 × 1920: ícone no círculo central */
+.dest{width:1080px;height:1920px}
+.dest .ic{position:absolute;left:50%;top:50%;width:600px;height:600px;transform:translate(-50%,-50%)}
+.dest .ic svg{width:100%;height:100%;display:block}
+
+/* post fixado 1080 × 1350 */
+.post{width:1080px;height:1350px;padding:96px;display:flex;flex-direction:column;justify-content:space-between}
+.post .top,.post .bot{display:flex;justify-content:space-between;align-items:center}
+.post .top .sym{width:150px;height:150px;margin:-40px 0 -40px -40px}
+.post h1,.post h2{font-family:var(--display);font-weight:400;line-height:1.02;letter-spacing:-.01em}
+.post h1{font-size:150px}
+.post h2{font-size:104px}
+.post em{color:var(--brasa-clara);font-style:italic}
+.claro.post em{color:var(--brasa-tinta)}
+.post .q{font-family:var(--display);font-style:italic;font-size:64px;line-height:1.2;margin-top:56px;padding-left:34px;border-left:2px solid var(--brasa)}
+.post .ref{font:500 24px var(--mono);letter-spacing:.14em;text-transform:uppercase;margin-top:24px;color:#53666e}
+.post ol{list-style:none;display:grid;gap:30px;margin-top:20px}
+.post li{display:grid;grid-template-columns:70px 1fr;gap:20px;font-size:46px;line-height:1.3;font-weight:500}
+.post li b{font:500 26px var(--mono);color:var(--brasa-clara);padding-top:14px}
+.post .preco{font-family:var(--display);font-size:96px;line-height:1}
+.post .preco small{font:500 30px var(--body);color:var(--nevoa);margin-left:14px}
+
+/* compartilhar 1200 × 630 */
+#og{width:1200px;height:630px;display:flex;align-items:center;gap:20px;padding:0 110px}
+#og .sym{width:300px;height:300px;flex:none;margin-left:-40px}
+#og .wm{font-size:190px;color:var(--gelo)}
+#og .mono{display:block;margin-top:18px;font-size:28px}
+</style>
+</head>
+<body>
+
+<div class="peca" id="perfil"><span class="sym" data-sym="perfil"></span><div class="grain"></div></div>
+<div class="peca" id="icone"><span class="sym" data-sym="icone"></span></div>
+
+<div class="peca dest" id="dest-comece"><div class="ic" data-ic="comece"></div><div class="grain"></div></div>
+<div class="peca dest" id="dest-respire"><div class="ic" data-ic="respire"></div><div class="grain"></div></div>
+<div class="peca dest" id="dest-mantras"><div class="ic" data-ic="mantras"></div><div class="grain"></div></div>
+<div class="peca dest" id="dest-diario"><div class="ic" data-ic="diario"></div><div class="grain"></div></div>
+<div class="peca dest" id="dest-preco"><div class="ic" data-ic="preco"></div><div class="grain"></div></div>
+
+<div class="peca post" id="fixo-1">
+  <div class="top"><span class="sym" data-sym="mini"></span><span class="mono">1/3</span></div>
+  <div><p class="kicker" style="margin-bottom:34px">Um diário diferente</p><h1>Como você chega <em>hoje?</em></h1></div>
+  <div class="bot"><span class="mono">Buda · estoicos · Jesus · mitos</span><span class="kicker">Arraste →</span></div>
+  <div class="grain"></div>
+</div>
+<div class="peca post claro" id="fixo-2">
+  <div class="top"><span class="sym" data-sym="mini-claro"></span><span class="mono">2/3</span></div>
+  <div><p class="kicker" style="margin-bottom:34px">O nome</p><h2>Em páli, <em>dīpa</em> é ilha e é lâmpada.</h2>
+    <p class="q">“Sejam uma ilha para si mesmos.”</p><p class="ref">Buda · Digha Nikaya 16</p></div>
+  <div class="bot"><span class="mono">Calmo por fora, aceso por dentro</span><span class="kicker">Arraste →</span></div>
+  <div class="grain"></div>
+</div>
+<div class="peca post" id="fixo-3">
+  <div class="top"><span class="sym" data-sym="mini"></span><span class="mono">3/3</span></div>
+  <div><p class="kicker" style="margin-bottom:24px">Como funciona</p>
+    <ol>
+      <li><b>01</b><span>Você diz como chega no dia.</span></li>
+      <li><b>02</b><span>Recebe a pílula de sabedoria e o mantra do seu momento.</span></li>
+      <li><b>03</b><span>Faz um gesto prático e 5 minutos de respiração.</span></li>
+      <li><b>04</b><span>À noite, três gratidões. Depois, fecha a tela.</span></li>
+    </ol></div>
+  <div class="bot"><p class="preco">R$ 47<small>pagamento único</small></p><span class="kicker">Link na bio</span></div>
+  <div class="grain"></div>
+</div>
+
+<div class="peca" id="og"><span class="sym" data-sym="og"></span><div><span class="wm">d<span class="i">ı<i></i></span>pa</span><span class="mono">o diário · uma pílula de sabedoria por dia</span></div><div class="grain"></div></div>
+
+<script src="../dipa/marca/simbolo.js"></script>
+<script>
+document.querySelectorAll('[data-sym]').forEach(el => {
+  const t = el.dataset.sym;
+  el.innerHTML = t === 'perfil' ? dipaSimbolo({ fundo:'escuro', grao:true })
+    : t === 'icone' ? dipaSimbolo({ fundo:'escuro' })
+    : t === 'mini-claro' ? dipaSimbolo({ fundo:'claro' }).replace(/<rect[^>]*fill="#e9eff1"\/>/, '')
+    : dipaSimbolo();
+});
+/* ícones dos destaques: mesmo traço do anel (5 em 200) e a lâmpada como único ponto quente */
+const G = '#e9eff1';
+const defs = `<defs><radialGradient id="L" cx="38%" cy="35%" r="70%"><stop offset="0%" stop-color="#f6c784"/><stop offset="80%" stop-color="#e0702e"/></radialGradient><radialGradient id="H"><stop offset="0%" stop-color="#e0702e" stop-opacity=".55"/><stop offset="100%" stop-color="#e0702e" stop-opacity="0"/></radialGradient></defs>`;
+const lamp = (x, y, r = 8.5) => `<circle cx="${x}" cy="${y}" r="${r * 3.2}" fill="url(#H)"/><circle cx="${x}" cy="${y}" r="${r}" fill="url(#L)"/>`;
+const IC = {
+  comece: dipaSimbolo().replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, ''),
+  respire: `${defs}<g fill="none" stroke="${G}" stroke-width="5" stroke-linecap="round"><path d="M46 84 Q73 70 100 84 T154 84" opacity=".45"/><path d="M38 104 Q69 88 100 104 T162 104"/><path d="M46 124 Q73 138 100 124 T154 124" opacity=".45"/></g>${lamp(100, 104, 7)}`,
+  mantras: `${defs}<line x1="52" y1="132" x2="148" y2="132" stroke="${G}" stroke-width="5" stroke-linecap="round"/><line x1="70" y1="152" x2="130" y2="152" stroke="${G}" stroke-width="5" stroke-linecap="round" opacity=".45"/>${lamp(100, 84, 10)}`,
+  diario: `${defs}<path d="M62 146 L124 70" stroke="${G}" stroke-width="5" stroke-linecap="round"/><line x1="54" y1="152" x2="150" y2="152" stroke="${G}" stroke-width="5" stroke-linecap="round" opacity=".45"/>${lamp(132, 60, 8)}`,
+  preco: `${defs}<text x="100" y="124" text-anchor="middle" font-family="Instrument Serif, Georgia, serif" font-size="66" fill="${G}">R$</text>${lamp(150, 70, 7)}`
+};
+document.querySelectorAll('[data-ic]').forEach(el => { el.innerHTML = `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">${IC[el.dataset.ic]}</svg>`; });
+</script>
+</body>
+</html>
