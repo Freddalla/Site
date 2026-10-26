@@ -103,6 +103,16 @@ em{color:var(--accent)}
 </div>
 
 <script>
+/* Salvar arquivo: na prévia do Claude usa a permissão de download (com confirmação); no site publicado, o download normal do navegador. */
+let _dl;
+function _blob(data){ if (typeof data !== 'string' || !data.startsWith('data:')) return data; const [h, b] = data.split(','), bin = atob(b), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return new Blob([u], { type: h.slice(5).split(';')[0] }); }
+async function salvarArquivo(nome, data){
+  try { if (window.claude && claude.use){ _dl = _dl || claude.use('downloads'); const d = await _dl; if (d){ await d.save({ filename: nome, data: _blob(data) }); return 'salvo'; } } }
+  catch(e){ return e && e.code === 'declined' ? 'recusado' : 'erro'; }
+  const blob = _blob(data), url = typeof blob === 'string' ? URL.createObjectURL(new Blob([blob])) : URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1500);
+  return 'navegador';
+}
 const C = { noite:'#0f1d25', fundo:'#0b141a', agua:'#5f8592', nevoa:'#c5d3d8', gelo:'#e9eff1', brasa:'#e0702e', lume:'#f6c784' };
 const FMT = { feed:[1080,1350], story:[1080,1920], avatar:[1080,1080], banner:[1640,624] };
 let fmt = 'feed';
@@ -257,12 +267,12 @@ document.getElementById('fmt').addEventListener('click', e => {
   const b = e.target.closest('[data-fmt]'); if (!b) return;
   fmt = b.dataset.fmt; document.querySelectorAll('[data-fmt]').forEach(x => x.setAttribute('aria-pressed', x === b)); desenhar();
 });
-grid.addEventListener('click', e => {
+grid.addEventListener('click', async e => {
   const b = e.target.closest('[data-png]'); if (!b) return;
   const cv = document.getElementById('cv-' + b.dataset.png), m = document.getElementById('m-' + b.dataset.png);
-  try { const a = document.createElement('a'); a.href = cv.toDataURL('image/png'); a.download = `dipa-${b.dataset.png}-${fmt}.png`; document.body.appendChild(a); a.click(); a.remove(); }
-  catch(err){}
-  m.hidden = false; m.textContent = 'Se o download não começar, segure o dedo sobre a capa para salvar ou tire um print.';
+  const r = await salvarArquivo(`dipa-${b.dataset.png}-${fmt}.png`, cv.toDataURL('image/png'));
+  m.hidden = false;
+  m.textContent = r === 'salvo' ? 'Arquivo salvo.' : r === 'recusado' ? 'Download cancelado.' : r === 'erro' ? 'Não deu para salvar aqui. Segure o dedo sobre a capa para salvar ou tire um print.' : 'Se o download não começar, segure o dedo sobre a capa para salvar.';
 });
 const pronto = document.fonts && document.fonts.load ? Promise.all([document.fonts.load('400 100px "Instrument Serif"'), document.fonts.load('italic 400 100px "Instrument Serif"'), document.fonts.load('500 30px "JetBrains Mono"')]) : Promise.resolve();
 desenhar();

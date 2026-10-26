@@ -215,6 +215,16 @@ details.entry p{font-size:.92rem;margin-top:8px}
    escolhe a pílula e o mantra do dia e sugere a prática de 5 minutos.
    Tudo fica salvo neste aparelho (localStorage). Backup na aba Rumo.
    ====================================================================== */
+/* Salvar arquivo: na prévia do Claude usa a permissão de download (com confirmação); no site publicado, o download normal do navegador. */
+let _dl;
+function _blob(data){ if (typeof data !== 'string' || !data.startsWith('data:')) return data; const [h, b] = data.split(','), bin = atob(b), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return new Blob([u], { type: h.slice(5).split(';')[0] }); }
+async function salvarArquivo(nome, data){
+  try { if (window.claude && claude.use){ _dl = _dl || claude.use('downloads'); const d = await _dl; if (d){ await d.save({ filename: nome, data: _blob(data) }); return 'salvo'; } } }
+  catch(e){ return e && e.code === 'declined' ? 'recusado' : 'erro'; }
+  const blob = _blob(data), url = typeof blob === 'string' ? URL.createObjectURL(new Blob([blob])) : URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1500);
+  return 'navegador';
+}
 const KEY = 'travessia.painel.v1';
 const PILAR_IDS = Object.keys(PILARES);
 const DIAS_SEMANA = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -722,7 +732,7 @@ app.addEventListener('click', async e => {
   if (a === 'fundo'){
     const P = pill(dia().pilulaId), url = await gerarFundo(P);
     ui.wall = url; render();
-    try { const l = document.createElement('a'); l.href = url; l.download = 'mantra-' + dkey() + '.png'; document.body.appendChild(l); l.click(); l.remove(); } catch(e){}
+    salvarArquivo('mantra-' + dkey() + '.png', url);
   }
   if (a === 'meditar') abrirMeditacao(b.dataset.tipo);
   if (a === 'salvar-diario'){
@@ -754,9 +764,8 @@ app.addEventListener('click', async e => {
   if (a === 'foco'){ const id = b.dataset.id, f = P.foco.includes(id) ? P.foco.filter(x => x !== id) : [...P.foco, id].slice(-2); if (!f.length) return; P.foco = f; saveNow(); render(); }
   if (a === 'trad'){ const id = b.dataset.id, t = P.tradicoes.includes(id) ? P.tradicoes.filter(x => x !== id) : [...P.tradicoes, id]; if (!t.length) return; P.tradicoes = t; saveNow(); render(); }
   if (a === 'exportar'){
-    const blob = new Blob([JSON.stringify(S, null, 2)], { type:'application/json' }), url = URL.createObjectURL(blob);
-    const l = document.createElement('a'); l.href = url; l.download = 'diario-backup-' + dkey() + '.json'; document.body.appendChild(l); l.click(); l.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
-    msgDados('Se o download não começar, use "Copiar backup" e cole num bloco de notas.');
+    const r = await salvarArquivo('diario-backup-' + dkey() + '.json', new Blob([JSON.stringify(S, null, 2)], { type:'application/json' }));
+    msgDados(r === 'salvo' ? 'Backup salvo.' : r === 'recusado' ? 'Download cancelado.' : 'Se o download não começar, use "Copiar backup" e cole num bloco de notas.');
   }
   if (a === 'copiar'){
     const txt = JSON.stringify(S);

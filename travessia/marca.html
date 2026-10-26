@@ -166,6 +166,17 @@ td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
 </div>
 
 <script>
+/* Salvar arquivo: na prévia do Claude usa a permissão de download (com confirmação); no site publicado, o download normal do navegador. */
+let _dl;
+function _blob(data){ if (typeof data !== 'string' || !data.startsWith('data:')) return data; const [h, b] = data.split(','), bin = atob(b), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return new Blob([u], { type: h.slice(5).split(';')[0] }); }
+async function salvarArquivo(nome, data){
+  try { if (window.claude && claude.use){ _dl = _dl || claude.use('downloads'); const d = await _dl; if (d){ await d.save({ filename: nome, data: _blob(data) }); return 'salvo'; } } }
+  catch(e){ return e && e.code === 'declined' ? 'recusado' : 'erro'; }
+  const blob = _blob(data), url = typeof blob === 'string' ? URL.createObjectURL(new Blob([blob])) : URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1500);
+  return 'navegador';
+}
+
 /* Símbolos desenhados em 200×200. c = cor principal, a = destaque, b = fundo */
 const LOGOS = {
   dedalo: (c, a, b) => `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="200" fill="${b}"/>
@@ -276,8 +287,7 @@ document.addEventListener('click', e => {
     const c = document.createElement('canvas'); c.width = c.height = 1080;
     c.getContext('2d').drawImage(img, 0, 0, 1080, 1080);
     try {
-      const a = document.createElement('a'); a.href = c.toDataURL('image/png'); a.download = `${id}-avatar-${dark ? 'escuro' : 'claro'}.png`;
-      document.body.appendChild(a); a.click(); a.remove();
+      salvarArquivo(`${id}-avatar-${dark ? 'escuro' : 'claro'}.png`, c.toDataURL('image/png'));
       m.hidden = false; m.textContent = 'PNG de 1080 × 1080 gerado. Se o download não começar, abra esta página pelo site publicado.';
     } catch(err){ m.hidden = false; m.textContent = 'Não foi possível gerar o arquivo aqui. Abra esta página pelo site publicado.'; }
   };

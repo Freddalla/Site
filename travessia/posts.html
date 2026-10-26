@@ -103,6 +103,16 @@ select{font:inherit;color:inherit;background:var(--card);border:1px solid var(--
 <script src="painel/conteudo.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
+/* Salvar arquivo: na prévia do Claude usa a permissão de download (com confirmação); no site publicado, o download normal do navegador. */
+let _dl;
+function _blob(data){ if (typeof data !== 'string' || !data.startsWith('data:')) return data; const [h, b] = data.split(','), bin = atob(b), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return new Blob([u], { type: h.slice(5).split(';')[0] }); }
+async function salvarArquivo(nome, data){
+  try { if (window.claude && claude.use){ _dl = _dl || claude.use('downloads'); const d = await _dl; if (d){ await d.save({ filename: nome, data: _blob(data) }); return 'salvo'; } } }
+  catch(e){ return e && e.code === 'declined' ? 'recusado' : 'erro'; }
+  const blob = _blob(data), url = typeof blob === 'string' ? URL.createObjectURL(new Blob([blob])) : URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1500);
+  return 'navegador';
+}
 const LOGO = '<span class="wm" aria-label="dīpa">d<span class="i">ı<i></i></span>pa</span>';
 const HASHTAGS = {
   estoicismo:'#estoicismo #marcoaurelio #seneca #filosofia',
@@ -179,15 +189,16 @@ async function baixar(k){
   try {
     await document.fonts.ready;
     const c = await html2canvas(el, { width:1080, height:1350, scale:1, backgroundColor:null });
-    const a = document.createElement('a'); a.href = c.toDataURL('image/png');
-    a.download = `dipa-${String(+sel.value + 1).padStart(2,'0')}-slide${k+1}.png`; document.body.appendChild(a); a.click(); a.remove();
+    const r = await salvarArquivo(`dipa-${String(+sel.value + 1).padStart(2,'0')}-slide${k+1}.png`, c.toDataURL('image/png'));
+    if (r === 'erro') aviso('Não deu para salvar aqui. Tire um print do slide como alternativa.');
+    if (r === 'recusado'){ el.style.transform = tr; return false; }
   } catch(e){ aviso('Não foi possível gerar a imagem aqui. Tire um print do slide como alternativa.'); }
   el.style.transform = tr;
 }
 function aviso(t){ msg.hidden = false; msg.textContent = t; }
 
 grid.addEventListener('click', e => { const b = e.target.closest('[data-baixar]'); if (b) baixar(+b.dataset.baixar); });
-document.getElementById('baixar-todos').addEventListener('click', async () => { for (let k = 0; k < 6; k++) await baixar(k); });
+document.getElementById('baixar-todos').addEventListener('click', async () => { for (let k = 0; k < 6; k++){ if (await baixar(k) === false) break; } });
 document.getElementById('aleatoria').addEventListener('click', () => { sel.value = Math.floor(Math.random() * PILULAS.length); render(); });
 document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', () => {
   const txt = document.getElementById(b.dataset.copy).textContent;
