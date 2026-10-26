@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Dipa · Meio Sol</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* Layout: estudo de um símbolo só. Seis variações do Meio sol no fundo exato do post (azul profundo em degradê, grão leve), cada uma com avatar real e assinatura. */
+:root{
+  --bg:#0b141a; --card:#121f27; --line:#253740; --fg:#e6eef0; --muted:#8fa3ab; --accent:#eb9a52; --on-accent:#1c1006;
+  --display:'Instrument Serif','Iowan Old Style',Georgia,serif;
+  --body:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){ :root:not([data-theme="dark"]){ --bg:#e9eff1; --card:#f6f9fa; --line:#c5d3d8; --fg:#0f1d25; --muted:#53666e; --accent:#b8561c; --on-accent:#fff7ef; color-scheme:light; } }
+:root[data-theme="light"]{ --bg:#e9eff1; --card:#f6f9fa; --line:#c5d3d8; --fg:#0f1d25; --muted:#53666e; --accent:#b8561c; --on-accent:#fff7ef; color-scheme:light; }
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font:400 16px/1.6 var(--body);overflow-x:hidden}
+.wrap{max-width:1120px;margin-inline:auto;padding-inline:clamp(16px,4vw,40px);padding-block:44px 96px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(2.4rem,6vw,4rem);line-height:1.05}
+h2{font-family:var(--display);font-weight:400;font-size:1.7rem;line-height:1.1}
+p{max-width:64ch}
+.mono{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lead{font-size:1.1rem;color:var(--muted);margin-top:12px}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:24px}
+.btn{font:600 .84rem var(--body);border:1px solid var(--line);background:transparent;color:var(--fg);border-radius:999px;padding:9px 16px;cursor:pointer}
+.btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:30px}
+@media (max-width:920px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.grid{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;display:grid;gap:14px;align-content:start}
+.big{aspect-ratio:1;max-width:100%;border-radius:14px;overflow:hidden}
+.big.round{border-radius:50%}
+.big > svg,.av > svg{display:block;width:100%;height:100%}
+.proofs{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.av{width:56px;height:56px;border-radius:50%;overflow:hidden;flex:none}
+.av.sm{width:30px;height:30px}
+.lock{display:flex;align-items:center;gap:10px;padding:8px 14px 8px 8px;border-radius:12px;background:radial-gradient(120% 140% at 30% 50%,#172b34,#0a131a);flex:1;min-width:0}
+.lock .av{width:40px;height:40px}
+.wm{font-family:var(--display);font-size:2rem;line-height:1;color:#e9eff1;padding-top:.12em;display:inline-block}
+.wm .i{position:relative;display:inline-block}
+.wm .i i{position:absolute;left:-.06em;right:-.06em;top:.25em;height:.065em;background:#e0702e;box-shadow:0 0 .35em .08em rgba(224,112,46,.5)}
+.card p{font-size:.92rem;color:var(--muted)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.msg{font-size:.82rem;color:var(--muted)}
+.compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-top:40px;padding-top:34px;border-top:1px solid var(--line)}
+.compare > div{min-width:0}
+.swatch{display:flex;gap:8px;margin-top:10px}
+.swatch i{width:44px;height:44px;border-radius:10px;border:1px solid var(--line);display:block}
+@media (max-width:640px){.compare{grid-template-columns:minmax(0,1fr)}}
+
+/* movimento: só na prévia, nunca no PNG */
+.anim .glow{animation:respira 5s ease-in-out infinite}
+.anim .rip{animation:onda 3.6s ease-in-out infinite}
+.anim .rip.r2{animation-delay:.5s}.anim .rip.r3{animation-delay:1s}
+.anim .sun{animation:pousa 9s ease-in-out infinite;transform-box:view-box;transform-origin:100px 104px}
+@keyframes respira{0%,100%{opacity:.55}50%{opacity:1}}
+@keyframes onda{0%,100%{opacity:var(--o,.5)}50%{opacity:calc(var(--o,.5) * .35)}}
+@keyframes pousa{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+@media (prefers-reduced-motion: reduce){.anim .glow,.anim .rip,.anim .sun{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="mono">Dipa · o símbolo</p>
+  <h1>Meio sol</h1>
+  <p class="lead">O sol que se põe na água parada: metade luz, metade reflexo. Lembra o yin e yang sem copiar o desenho. Agora com o mesmo fundo do post: azul profundo em degradê, grão leve e a brasa acesa em degradê.</p>
+  <div class="bar"><button class="btn" id="mov" aria-pressed="true">Ver em movimento</button><button class="btn" id="forma" aria-pressed="false">Ver recortado em círculo</button></div>
+  <div class="grid" id="grid"></div>
+
+  <div class="compare">
+    <div><p class="mono">Por que parecia preto</p><h2 style="margin-top:6px">Antes: azul chapado</h2><p class="lead" style="font-size:.95rem">O fundo era um azul-noite de uma cor só (#0F1D25). Sem degradê e sem grão, na tela ele lê como preto.</p><div class="swatch"><i style="background:#0f1d25"></i><i style="background:#e0702e"></i></div></div>
+    <div><p class="mono">Agora</p><h2 style="margin-top:6px">A paleta do post</h2><p class="lead" style="font-size:.95rem">Centro azul-petróleo (#1C3541) indo para a noite (#0A131A) nas bordas, grão de 12%, e o sol em degradê de lume (#F6C784) para brasa (#E0702E), igual ao ponto do post.</p><div class="swatch"><i style="background:radial-gradient(circle,#1c3541,#0a131a)"></i><i style="background:linear-gradient(#f6c784,#e0702e)"></i><i style="background:#e9eff1"></i></div></div>
+  </div>
+</div>
+<script>
+/* Salvar arquivo: na prévia do Claude usa a permissão de download (com confirmação); fora dela, o download normal. */
+let _dl;
+function _blob(data){ if (typeof data !== 'string' || !data.startsWith('data:')) return data; const [h, b] = data.split(','), bin = atob(b), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return new Blob([u], { type: h.slice(5).split(';')[0] }); }
+async function salvarArquivo(nome, data){
+  try { if (window.claude && claude.use){ _dl = _dl || claude.use('downloads'); const d = await _dl; if (d){ await d.save({ filename: nome, data: _blob(data) }); return 'salvo'; } } }
+  catch(e){ return e && e.code === 'declined' ? 'recusado' : 'erro'; }
+  const blob = _blob(data), url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1500);
+  return 'navegador';
+}
+
+let uid = 0;
+const G = '#e9eff1';
+/* fundo, brilho e sol em comum; cada variação muda só o desenho */
+function base(i, body){
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg${i}" cx="50%" cy="44%" r="72%"><stop offset="0%" stop-color="#1c3541"/><stop offset="100%" stop-color="#0a131a"/></radialGradient>
+    <radialGradient id="sol${i}" cx="50%" cy="100%" r="100%"><stop offset="0%" stop-color="#f6c784"/><stop offset="75%" stop-color="#e0702e"/></radialGradient>
+    <radialGradient id="gl${i}" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#e0702e" stop-opacity=".42"/><stop offset="100%" stop-color="#e0702e" stop-opacity="0"/></radialGradient>
+    <filter id="gr${i}" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="4"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .5 0"/></filter>
+  </defs>
+  <rect width="200" height="200" fill="url(#bg${i})"/>
+  <circle class="glow" cx="100" cy="100" r="74" fill="url(#gl${i})"/>
+  ${body(i)}
+  <rect width="200" height="200" filter="url(#gr${i})" opacity=".12"/></svg>`;
+}
+const SOL = i => `<path class="sun" d="M56 104 A44 44 0 0 1 144 104 Z" fill="url(#sol${i})"/>`;
+const LINHA = (w = 5) => `<line x1="40" y1="104" x2="160" y2="104" stroke="${G}" stroke-width="${w}" stroke-linecap="round"/>`;
+
+const V = [
+  { id:'original', nome:'Original, na paleta certa', desc:'O desenho que você escolheu, agora no azul do post e com a brasa em degradê. O reflexo é um arco suave.',
+    body: i => `${SOL(i)}${LINHA()}<path d="M56 104 A44 44 0 0 0 144 104" fill="none" stroke="${G}" stroke-width="5" opacity=".38" stroke-linecap="round"/>` },
+  { id:'ondas', nome:'Reflexo em ondas', desc:'O reflexo vira três linhas de água, cada vez mais curtas e mais apagadas. É a versão com mais movimento e a mais "pôr do sol".',
+    body: i => `${SOL(i)}${LINHA()}<line class="rip" style="--o:.65" x1="64" y1="120" x2="136" y2="120" stroke="#e0702e" stroke-width="5" stroke-linecap="round" opacity=".65"/><line class="rip r2" style="--o:.42" x1="78" y1="134" x2="122" y2="134" stroke="#e0702e" stroke-width="5" stroke-linecap="round" opacity=".42"/><line class="rip r3" style="--o:.24" x1="91" y1="147" x2="109" y2="147" stroke="#e0702e" stroke-width="5" stroke-linecap="round" opacity=".24"/>` },
+  { id:'aneis', nome:'Ondas que se abrem', desc:'Embaixo, meios anéis como a água se abrindo em volta da luz. Calmo, geométrico e redondo.',
+    body: i => `${SOL(i)}${LINHA()}<path class="rip" style="--o:.5" d="M66 112 A34 34 0 0 0 134 112" fill="none" stroke="${G}" stroke-width="4" opacity=".5" stroke-linecap="round"/><path class="rip r2" style="--o:.32" d="M54 120 A46 46 0 0 0 146 120" fill="none" stroke="${G}" stroke-width="4" opacity=".32" stroke-linecap="round"/><path class="rip r3" style="--o:.18" d="M42 128 A58 58 0 0 0 158 128" fill="none" stroke="${G}" stroke-width="4" opacity=".18" stroke-linecap="round"/>` },
+  { id:'yin', nome:'Onda yin e yang', desc:'O horizonte vira uma curva em S dentro do círculo. A luz em cima, a água embaixo, uma entrando na outra.',
+    body: i => `<path class="sun" d="M52 100 C76 80 124 120 148 100 A48 48 0 0 0 52 100 Z" fill="url(#sol${i})"/><path d="M52 100 C76 80 124 120 148 100" fill="none" stroke="${G}" stroke-width="5" stroke-linecap="round"/><path d="M52 100 A48 48 0 0 0 148 100" fill="none" stroke="${G}" stroke-width="5" opacity=".38" stroke-linecap="round"/>` },
+  { id:'arco', nome:'Só a linha', desc:'O mais minimalista: o sol é só um arco aceso sobre o horizonte, sem preenchimento e sem reflexo.',
+    body: i => `<path class="sun" d="M60 110 A40 40 0 0 1 140 110" fill="none" stroke="url(#sol${i})" stroke-width="9" stroke-linecap="round"/><line x1="38" y1="110" x2="162" y2="110" stroke="${G}" stroke-width="5" stroke-linecap="round"/>` },
+  { id:'respira', nome:'Reflexo que respira', desc:'O reflexo em tracejado, como luz quebrada na água. Parece se mexer mesmo parado.',
+    body: i => `${SOL(i)}${LINHA()}<path class="rip" style="--o:.5" d="M56 104 A44 44 0 0 0 144 104" fill="none" stroke="${G}" stroke-width="5" opacity=".5" stroke-dasharray="2 9" stroke-linecap="round"/>` }
+];
+const desenha = v => base(++uid, v.body);
+
+const grid = document.getElementById('grid');
+grid.innerHTML = V.map(v => `<article class="card">
+    <div class="big">${desenha(v)}</div>
+    <div><h2>${v.nome}</h2><p>${v.desc}</p></div>
+    <div class="proofs"><span class="av">${desenha(v)}</span><span class="av sm">${desenha(v)}</span><span class="lock"><span class="av">${desenha(v)}</span><span class="wm">d<span class="i">ı<i></i></span>pa</span></span></div>
+    <div class="row"><button class="btn" data-png="${v.id}">Baixar foto de perfil</button></div>
+    <p class="msg" id="m-${v.id}" hidden></p>
+  </article>`).join('');
+
+const mov = document.getElementById('mov'), forma = document.getElementById('forma');
+document.body.classList.add('anim');
+mov.onclick = () => { const on = mov.getAttribute('aria-pressed') !== 'true'; mov.setAttribute('aria-pressed', on); document.body.classList.toggle('anim', on); };
+forma.onclick = () => { const on = forma.getAttribute('aria-pressed') !== 'true'; forma.setAttribute('aria-pressed', on); document.querySelectorAll('.big').forEach(b => b.classList.toggle('round', on)); };
+
+grid.addEventListener('click', e => {
+  const b = e.target.closest('[data-png]'); if (!b) return;
+  const v = V.find(x => x.id === b.dataset.png), m = document.getElementById('m-' + v.id), img = new Image();
+  img.onload = async () => {
+    const c = document.createElement('canvas'); c.width = c.height = 1080; c.getContext('2d').drawImage(img, 0, 0, 1080, 1080);
+    const r = await salvarArquivo(`dipa-perfil-${v.id}.png`, c.toDataURL('image/png'));
+    m.hidden = false; m.textContent = r === 'salvo' ? 'Arquivo salvo.' : r === 'recusado' ? 'Download cancelado.' : r === 'erro' ? 'Não deu para salvar aqui. Me peça o PNG que eu envio.' : 'Se o download não começar, me peça o PNG que eu envio.';
+  };
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(desenha(v));
+});
+</script>
+</body>
+</html>
