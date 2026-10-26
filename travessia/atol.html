@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Dipa · Atol</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* Layout: revisão de design de um símbolo. Primeiro o diagnóstico (antes e depois), depois as quatro versões refinadas com avatar real, assinatura e uso no app. */
+:root{
+  --bg:#0b141a; --card:#121f27; --line:#253740; --fg:#e6eef0; --muted:#8fa3ab; --accent:#eb9a52; --on-accent:#1c1006;
+  --display:'Instrument Serif','Iowan Old Style',Georgia,serif;
+  --body:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){ :root:not([data-theme="dark"]){ --bg:#e9eff1; --card:#f6f9fa; --line:#c5d3d8; --fg:#0f1d25; --muted:#53666e; --accent:#b8561c; --on-accent:#fff7ef; color-scheme:light; } }
+:root[data-theme="light"]{ --bg:#e9eff1; --card:#f6f9fa; --line:#c5d3d8; --fg:#0f1d25; --muted:#53666e; --accent:#b8561c; --on-accent:#fff7ef; color-scheme:light; }
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font:400 16px/1.6 var(--body);overflow-x:hidden}
+.wrap{max-width:1120px;margin-inline:auto;padding-inline:clamp(16px,4vw,40px);padding-block:44px 96px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(2.4rem,6vw,4rem);line-height:1.05}
+h2{font-family:var(--display);font-weight:400;font-size:clamp(1.6rem,3vw,2.2rem);line-height:1.1}
+p{max-width:64ch}
+.mono{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lead{font-size:1.1rem;color:var(--muted);margin-top:12px}
+section{margin-top:56px;padding-top:40px;border-top:1px solid var(--line)}
+.btn{font:600 .84rem var(--body);border:1px solid var(--line);background:transparent;color:var(--fg);border-radius:999px;padding:9px 16px;cursor:pointer}
+.btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* antes e depois */
+.ba{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-top:24px}
+.ba > div{min-width:0}
+.ba .big{max-width:320px}
+.fix{list-style:none;display:grid;gap:10px;margin-top:16px;font-size:.95rem}
+.fix li{display:grid;grid-template-columns:22px 1fr;gap:8px}
+.fix li::before{content:"→";color:var(--accent);font-family:var(--mono)}
+@media (max-width:640px){.ba{grid-template-columns:minmax(0,1fr)}}
+
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin-top:26px}
+@media (max-width:720px){.grid{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:20px;display:grid;gap:16px;align-content:start;position:relative}
+.card.rec{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.rec-tag{font:500 .66rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--on-accent);background:var(--accent);padding:5px 9px;border-radius:6px;justify-self:start}
+.big{aspect-ratio:1;max-width:100%;border-radius:16px;overflow:hidden}
+.round .big{border-radius:50%}
+.big > svg,.av > svg{display:block;width:100%;height:100%}
+.proofs{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.av{width:56px;height:56px;border-radius:50%;overflow:hidden;flex:none}
+.av.sm{width:30px;height:30px}
+.lock{display:flex;align-items:center;gap:12px;padding:10px 16px 10px 10px;border-radius:14px;background:radial-gradient(120% 140% at 30% 50%,#172b34,#0a131a);flex:1;min-width:0}
+.lock .av{width:44px;height:44px}
+.wm{font-family:var(--display);font-size:2.1rem;line-height:1;color:#e9eff1;padding-top:.12em;display:inline-block}
+.wm .i{position:relative;display:inline-block}
+.wm .i i{position:absolute;left:-.06em;right:-.06em;top:.25em;height:.065em;background:#e0702e;box-shadow:0 0 .35em .08em rgba(224,112,46,.5)}
+.card p{font-size:.93rem;color:var(--muted)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.msg{font-size:.82rem;color:var(--muted)}
+
+/* uso no app */
+.app{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:24px}
+.app div{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;justify-items:center;gap:8px;text-align:center;font-size:.86rem;color:var(--muted)}
+.app svg{width:84px;height:84px}
+@media (max-width:720px){.app{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* movimento só na tela */
+.anim .gira{animation:gira 28s linear infinite;transform-origin:100px 100px}
+.anim .lume{animation:lume 5s ease-in-out infinite}
+@keyframes gira{to{transform:rotate(360deg)}}
+@keyframes lume{0%,100%{opacity:.5}50%{opacity:1}}
+@media (prefers-reduced-motion: reduce){.anim .gira,.anim .lume{animation:none}}
+</style>
+</head>
+<body class="anim">
+<div class="wrap">
+  <p class="mono">Revisão de design · símbolo</p>
+  <h1>Atol: a ilha em anel e a lâmpada acesa</h1>
+  <p class="lead">Um atol é uma ilha em forma de anel no meio do mar. O ponto é a lâmpada. O símbolo desenha o nome: <em style="color:var(--accent);font-style:italic">dīpa</em>, ilha e lâmpada. É a direção certa. Ajustei o desenho para ele não parecer outra coisa.</p>
+
+  <section style="margin-top:36px;border-top:0;padding-top:0">
+    <div class="ba">
+      <div><p class="mono">Antes</p><div class="big" style="margin-top:10px" id="antes"></div></div>
+      <div><p class="mono">O que mudei</p>
+        <ul class="fix">
+          <li><span><strong>O ponto saiu do topo.</strong> No topo, o anel lê como botão de ligar ou ícone de carregando. A 45°, ele ganha movimento, como um sol que nasce no horizonte da ilha.</span></li>
+          <li><span><strong>O ponto não encosta no anel.</strong> Ganhou um respiro em volta: a lâmpada flutua, em vez de parecer uma peça encaixada.</span></li>
+          <li><span><strong>Traço mais fino.</strong> O anel ficou mais elegante e o ponto vira o centro da atenção.</span></li>
+          <li><span><strong>A paleta do post.</strong> Azul-petróleo em degradê com grão, e a lâmpada em degradê de lume para brasa, com brilho.</span></li>
+          <li><span><strong>Margem para o recorte do Instagram.</strong> O anel ocupa pouco mais da metade da imagem, para não colar na borda do círculo do perfil.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="row" style="justify-content:space-between;align-items:end">
+      <div><p class="mono">Quatro versões refinadas</p><h2 style="margin-top:6px">Escolha a ilha</h2></div>
+      <div class="row"><button class="btn" id="mov" aria-pressed="true">Movimento</button><button class="btn" id="forma" aria-pressed="false">Recorte do Instagram</button></div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section>
+    <p class="mono">Por que o atol vence</p>
+    <h2 style="margin-top:6px">O símbolo vira o próprio app</h2>
+    <p class="lead">O anel de progresso do dia já existe no diário. Com o atol, ele passa a ser a marca: a lâmpada se acende conforme você completa o dia.</p>
+    <div class="app" id="app"></div>
+  </section>
+</div>
+<script>
+/* Salvar arquivo: na prévia do Claude usa a permissão de download (com confirmação); fora dela, o download normal. */
+let _dl;
+function _blob(data){ if (typeof data !== 'string' || !data.startsWith('data:')) return data; const [h, b] = data.split(','), bin = atob(b), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return new Blob([u], { type: h.slice(5).split(';')[0] }); }
+async function salvarArquivo(nome, data){
+  try { if (window.claude && claude.use){ _dl = _dl || claude.use('downloads'); const d = await _dl; if (d){ await d.save({ filename: nome, data: _blob(data) }); return 'salvo'; } } }
+  catch(e){ return e && e.code === 'declined' ? 'recusado' : 'erro'; }
+  const blob = _blob(data), url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1500);
+  return 'navegador';
+}
+
+let uid = 0;
+const G = '#e9eff1', R = 54, CX = 100, CY = 100;
+const pt = (deg, r = R) => { const t = deg * Math.PI / 180; return [(CX + r * Math.sin(t)).toFixed(2), (CY - r * Math.cos(t)).toFixed(2)]; };
+/* anel com uma abertura em volta do ângulo a (graus, 0 = topo, sentido horário) */
+function anel(a, gap, w, op = 1, r = R){
+  const [x1, y1] = pt(a + gap, r), [x2, y2] = pt(a - gap + 360, r);
+  return `<path d="M${x1} ${y1} A${r} ${r} 0 1 1 ${x2} ${y2}" fill="none" stroke="${G}" stroke-width="${w}" stroke-linecap="round" opacity="${op}"/>`;
+}
+function lampada(i, a, r = 8.5, rr = R){ const [x, y] = pt(a, rr); return `<circle class="lume" cx="${x}" cy="${y}" r="${r * 3.2}" fill="url(#gl${i})"/><circle cx="${x}" cy="${y}" r="${r}" fill="url(#lp${i})"/>`; }
+function base(i, body, fundo = true){
+  return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><defs>
+    <radialGradient id="bg${i}" cx="50%" cy="44%" r="72%"><stop offset="0%" stop-color="#1c3541"/><stop offset="100%" stop-color="#0a131a"/></radialGradient>
+    <radialGradient id="lp${i}" cx="38%" cy="35%" r="70%"><stop offset="0%" stop-color="#f6c784"/><stop offset="80%" stop-color="#e0702e"/></radialGradient>
+    <radialGradient id="gl${i}" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#e0702e" stop-opacity=".55"/><stop offset="100%" stop-color="#e0702e" stop-opacity="0"/></radialGradient>
+    <filter id="gr${i}" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="4"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .5 0"/></filter></defs>
+    ${fundo ? `<rect width="200" height="200" fill="url(#bg${i})"/>` : ''}${body(i)}${fundo ? `<rect width="200" height="200" filter="url(#gr${i})" opacity=".12"/>` : ''}</svg>`;
+}
+
+const V = [
+  { id:'atol', nome:'Atol', rec:true, desc:'A versão principal. A lâmpada a 45°, solta do anel, com brilho. Movimento sem perder a calma.',
+    body: i => `<g class="gira">${anel(45, 19, 5)}${lampada(i, 45)}</g>` },
+  { id:'atol-topo', nome:'Atol no topo, ajustado', desc:'Se você preferir a lâmpada no alto: com respiro e traço fino, ela deixa de parecer um botão de ligar.',
+    body: i => `${anel(0, 19, 5)}${lampada(i, 0)}` },
+  { id:'atol-laguna', nome:'Atol com laguna', desc:'Um segundo anel bem leve por dentro, como a lagoa do atol vista de cima. Mais profundidade, mesmo tão simples.',
+    body: i => `<g class="gira">${anel(45, 19, 5)}<circle cx="100" cy="100" r="36" fill="none" stroke="${G}" stroke-width="2" opacity=".22"/>${lampada(i, 45)}</g>` },
+  { id:'atol-aberto', nome:'Atol aberto', desc:'Uma abertura maior, como o círculo zen pintado num só gesto. A lâmpada fica na ponta do traço, como quem acabou de acender.',
+    body: i => `<g class="gira">${anel(40, 26, 5)}${lampada(i, 66, 8.5)}</g>` }
+];
+const desenha = (v, fundo = true) => base(++uid, v.body, fundo);
+
+document.getElementById('antes').innerHTML = `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="200" fill="#0f1d25"/><path d="M88.4 44.2 A56 56 0 1 0 111.6 44.2" fill="none" stroke="#e9eff1" stroke-width="7" stroke-linecap="round"/><circle cx="100" cy="44" r="9" fill="#e0702e"/></svg>`;
+
+document.getElementById('grid').innerHTML = V.map(v => `<article class="card ${v.rec ? 'rec' : ''}">
+    ${v.rec ? '<span class="rec-tag">Minha recomendação</span>' : ''}
+    <div class="big">${desenha(v)}</div>
+    <div><h2>${v.nome}</h2><p>${v.desc}</p></div>
+    <div class="proofs"><span class="av">${desenha(v)}</span><span class="av sm">${desenha(v)}</span><span class="lock"><span class="av">${desenha(v)}</span><span class="wm">d<span class="i">ı<i></i></span>pa</span></span></div>
+    <div class="row"><button class="btn" data-png="${v.id}">Baixar foto de perfil</button></div>
+    <p class="msg" id="m-${v.id}" hidden></p>
+  </article>`).join('');
+
+/* uso no app: a lâmpada acende conforme o dia se completa */
+const estado = (n) => { const i = ++uid; const fim = n / 3 * 360;
+  const prog = n === 0 ? '' : n === 3 ? `<circle cx="100" cy="100" r="${R}" fill="none" stroke="#e0702e" stroke-width="6"/>` : (() => { const [x, y] = pt(fim); return `<path d="M100 ${CY - R} A${R} ${R} 0 ${fim > 180 ? 1 : 0} 1 ${x} ${y}" fill="none" stroke="#e0702e" stroke-width="6" stroke-linecap="round"/>`; })();
+  return base(i, j => `<circle cx="100" cy="100" r="${R}" fill="none" stroke="${G}" stroke-width="5" opacity=".2"/>${prog}${n === 3 ? lampada(j, 45, 11) : ''}`, true); };
+document.getElementById('app').innerHTML = [0,1,2,3].map(n => `<div>${estado(n)}<span>${n === 3 ? 'Dia completo: a lâmpada acende' : n + ' de 3 feitos'}</span></div>`).join('');
+
+const mov = document.getElementById('mov'), forma = document.getElementById('forma');
+mov.onclick = () => { const on = mov.getAttribute('aria-pressed') !== 'true'; mov.setAttribute('aria-pressed', on); document.body.classList.toggle('anim', on); };
+forma.onclick = () => { const on = forma.getAttribute('aria-pressed') !== 'true'; forma.setAttribute('aria-pressed', on); document.getElementById('grid').classList.toggle('round', on); };
+
+document.getElementById('grid').addEventListener('click', e => {
+  const b = e.target.closest('[data-png]'); if (!b) return;
+  const v = V.find(x => x.id === b.dataset.png), m = document.getElementById('m-' + v.id), img = new Image();
+  img.onload = async () => {
+    const c = document.createElement('canvas'); c.width = c.height = 1080; c.getContext('2d').drawImage(img, 0, 0, 1080, 1080);
+    const r = await salvarArquivo(`dipa-perfil-${v.id}.png`, c.toDataURL('image/png'));
+    m.hidden = false; m.textContent = r === 'salvo' ? 'Arquivo salvo.' : r === 'recusado' ? 'Download cancelado.' : r === 'erro' ? 'Não deu para salvar aqui. Me peça o PNG que eu envio.' : 'Se o download não começar, me peça o PNG que eu envio.';
+  };
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(desenha(v));
+});
+</script>
+</body>
+</html>
