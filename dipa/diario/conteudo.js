@@ -494,3 +494,15 @@ const EXTRAS = {
   'mito-penelope':          ['Termino o que comecei.', ['travado']]
 };
 PILULAS.forEach(p => { const x = EXTRAS[p.id]; if (x){ p.mantra = x[0]; p.estados = x[1]; } });
+
+/* =====================================================================
+   ACESSO · só quem comprou abre o diário
+   O link entregue ao comprador é .../dipa/diario/?k=SUA-CHAVE
+   Aqui fica só o "hash" (impressão digital) da chave, nunca a chave.
+   Para trocar a chave: gere o hash SHA-256 da nova e substitua abaixo.
+   ===================================================================== */
+const ACESSO = {
+  ativo: true,
+  hashes: ['a6a7a8de93f372bd2a7bc49be3b4bd745c8dddd70eb6303210f976f81b02b6b0'],
+  compra: '../'
+};

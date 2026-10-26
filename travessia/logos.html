@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Dipa · Símbolos</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* Layout: prancheta de símbolos. Cada símbolo em três provas: grande no escuro, avatar no tamanho real (claro e escuro) e assinatura com o nome. */
+:root{
+  --bg:#e9eff1; --card:#f6f9fa; --line:#c5d3d8; --fg:#0f1d25; --muted:#53666e; --accent:#b8561c; --accent-soft:#f6e3d3;
+  --display:'Instrument Serif','Iowan Old Style',Georgia,serif;
+  --body:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#0b141a; --card:#121f27; --line:#253740; --fg:#e6eef0; --muted:#8fa3ab; --accent:#eb9a52; --accent-soft:#2c241d; color-scheme:dark; } }
+:root[data-theme="dark"]{ --bg:#0b141a; --card:#121f27; --line:#253740; --fg:#e6eef0; --muted:#8fa3ab; --accent:#eb9a52; --accent-soft:#2c241d; color-scheme:dark; }
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font:400 16px/1.6 var(--body);overflow-x:hidden}
+.wrap{max-width:1120px;margin-inline:auto;padding-inline:clamp(16px,4vw,40px);padding-block:44px 96px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(2.4rem,6vw,4rem);line-height:1.05}
+h2{font-family:var(--display);font-weight:400;font-size:1.8rem;line-height:1.1}
+p{max-width:64ch}
+.mono{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.lead{font-size:1.1rem;color:var(--muted);margin-top:12px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:34px}
+@media (max-width:920px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.grid{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;display:grid;gap:14px;align-content:start}
+.big{aspect-ratio:1;max-width:100%;border-radius:14px;overflow:hidden}
+.big > svg,.av > svg,.lockup > svg{display:block;width:100%;height:100%}
+.proofs{display:flex;gap:12px;align-items:center}
+.av{width:56px;height:56px;border-radius:50%;overflow:hidden;border:1px solid var(--line);flex:none}
+.av.sm{width:30px;height:30px}
+.lockup{height:56px;flex:1;min-width:0;border-radius:10px;overflow:hidden}
+.card p{font-size:.92rem;color:var(--muted)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font:600 .84rem var(--body);border:1px solid var(--line);background:transparent;color:var(--fg);border-radius:999px;padding:8px 14px;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.msg{font-size:.82rem;color:var(--muted)}
+.note{background:var(--accent-soft);border-radius:14px;padding:16px 18px;margin-top:30px;font-size:.94rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="mono">Dipa · símbolos geométricos</p>
+  <h1>Ilha e lâmpada em formas simples</h1>
+  <p class="lead">Seis símbolos feitos só de linhas, círculos e um ponto de luz. Todos usam as mesmas regras: traço fino em gelo, um único ponto em brasa e nenhum detalhe que suma no tamanho do avatar. A assinatura é só o nome, sem slogan.</p>
+  <div class="grid" id="grid"></div>
+  <div class="note">Escolha um símbolo e eu gero a foto de perfil, os destaques do Instagram e aplico na página de vendas e no diário. Os botões "Baixar" pedem confirmação na prévia do Claude.</div>
+</div>
+<script>
+/* Salvar arquivo: na prévia do Claude usa a permissão de download (com confirmação); fora dela, o download normal. */
+let _dl;
+function _blob(data){ if (typeof data !== 'string' || !data.startsWith('data:')) return data; const [h, b] = data.split(','), bin = atob(b), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return new Blob([u], { type: h.slice(5).split(';')[0] }); }
+async function salvarArquivo(nome, data){
+  try { if (window.claude && claude.use){ _dl = _dl || claude.use('downloads'); const d = await _dl; if (d){ await d.save({ filename: nome, data: _blob(data) }); return 'salvo'; } } }
+  catch(e){ return e && e.code === 'declined' ? 'recusado' : 'erro'; }
+  const blob = _blob(data), url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1500);
+  return 'navegador';
+}
+
+const C = { noite:'#0f1d25', gelo:'#e9eff1', brasa:'#e0702e' };
+/* cada símbolo: (traço, fundo, brasa) em 200×200 */
+const S = {
+  ilha:   (f, b, a) => `<rect width="200" height="200" fill="${b}"/><path d="M58 126 A42 42 0 0 1 142 126" fill="none" stroke="${f}" stroke-width="6"/><line x1="40" y1="126" x2="160" y2="126" stroke="${f}" stroke-width="6" stroke-linecap="round"/><circle cx="100" cy="62" r="9" fill="${a}"/>`,
+  atol:   (f, b, a) => `<rect width="200" height="200" fill="${b}"/><path d="M88.4 44.2 A56 56 0 1 0 111.6 44.2" fill="none" stroke="${f}" stroke-width="7" stroke-linecap="round"/><circle cx="100" cy="44" r="9" fill="${a}"/>`,
+  macron: (f, b, a) => `<rect width="200" height="200" fill="${b}"/><rect x="70" y="56" width="60" height="9" rx="4.5" fill="${a}"/><rect x="95.5" y="86" width="9" height="62" rx="4.5" fill="${f}"/>`,
+  reflexo:(f, b, a) => `<rect width="200" height="200" fill="${b}"/><path d="M54 104 A46 46 0 0 1 146 104 Z" fill="${a}"/><line x1="40" y1="104" x2="160" y2="104" stroke="${f}" stroke-width="5" stroke-linecap="round"/><path d="M54 104 A46 46 0 0 0 146 104" fill="none" stroke="${f}" stroke-width="5" opacity=".45"/>`,
+  arco:   (f, b, a) => `<rect width="200" height="200" fill="${b}"/><path d="M66 150 V96 A34 34 0 0 1 134 96 V150" fill="none" stroke="${f}" stroke-width="6" stroke-linecap="round"/><line x1="52" y1="150" x2="148" y2="150" stroke="${f}" stroke-width="6" stroke-linecap="round"/><circle cx="100" cy="112" r="9" fill="${a}"/>`,
+  horizonte:(f, b, a) => `<rect width="200" height="200" fill="${b}"/><circle cx="100" cy="100" r="58" fill="none" stroke="${f}" stroke-width="6"/><line x1="42" y1="112" x2="158" y2="112" stroke="${f}" stroke-width="6"/><circle cx="100" cy="86" r="9" fill="${a}"/>`
+};
+const INFO = {
+  ilha:['Ilha e ponto','Uma ilha em arco sobre o horizonte e a luz acima dela. É a leitura mais direta do nome.'],
+  atol:['Atol','A ilha vista de cima, em anel, e a lâmpada fechando o círculo. É o mais simbólico e funciona muito bem pequeno.'],
+  macron:['O traço do ī','Só o "ī" do logo: o traço em brasa sobre a haste. Liga o símbolo direto à palavra que você gostou.'],
+  reflexo:['Meio sol','A metade de cima é a luz acesa, a de baixo é o reflexo na água parada. Um círculo completo, dividido pela calma.'],
+  arco:['Nicho da lâmpada','Um arco como os nichos onde se guardam lamparinas, com a chama dentro. Abrigo e luz.'],
+  horizonte:['Horizonte','Um círculo cortado pelo horizonte, com a luz logo acima. É o mais sóbrio dos seis.']
+};
+const svg = (id, f, b, a, extra = '') => `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" ${extra}>${S[id](f, b, a)}</svg>`;
+const lock = (id) => `<svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg"><rect width="400" height="100" fill="${C.noite}"/><g transform="translate(24 10) scale(.4)">${S[id](C.gelo, 'transparent', C.brasa).replace(/<rect width="200" height="200" fill="transparent"\/>/, '')}</g><text x="122" y="66" font-family="Instrument Serif, Georgia, serif" font-size="52" fill="${C.gelo}">dıpa</text><rect x="148" y="28" width="16" height="3.4" fill="${C.brasa}"/></svg>`;
+document.getElementById('grid').innerHTML = Object.keys(S).map(id => `
+  <article class="card">
+    <div class="big">${svg(id, C.gelo, C.noite, C.brasa)}</div>
+    <div><h2>${INFO[id][0]}</h2><p>${INFO[id][1]}</p></div>
+    <div class="proofs"><span class="av">${svg(id, C.gelo, C.noite, C.brasa)}</span><span class="av">${svg(id, C.noite, C.gelo, '#b8561c')}</span><span class="av sm">${svg(id, C.gelo, C.noite, C.brasa)}</span><span class="lockup">${lock(id)}</span></div>
+    <div class="row"><button class="btn" data-png="${id}" data-v="escuro">Baixar avatar escuro</button><button class="btn" data-png="${id}" data-v="claro">Baixar avatar claro</button></div>
+    <p class="msg" id="m-${id}" hidden></p>
+  </article>`).join('');
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-png]'); if (!b) return;
+  const id = b.dataset.png, esc = b.dataset.v === 'escuro', m = document.getElementById('m-' + id);
+  const img = new Image();
+  img.onload = async () => {
+    const c = document.createElement('canvas'); c.width = c.height = 1080; c.getContext('2d').drawImage(img, 0, 0, 1080, 1080);
+    const r = await salvarArquivo(`dipa-simbolo-${id}-${b.dataset.v}.png`, c.toDataURL('image/png'));
+    m.hidden = false; m.textContent = r === 'salvo' ? 'Arquivo salvo.' : r === 'recusado' ? 'Download cancelado.' : r === 'erro' ? 'Não deu para salvar aqui. Tire um print do símbolo.' : 'Se o download não começar, tire um print do símbolo.';
+  };
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(esc ? svg(id, C.gelo, C.noite, C.brasa) : svg(id, C.noite, C.gelo, '#b8561c'));
+});
+</script>
+</body>
+</html>

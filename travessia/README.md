@@ -47,14 +47,14 @@ https://SEU-DOMINIO/travessia/?utm_source=meta&utm_medium=paid&utm_campaign=vali
 
 | Arquivo | O que é |
 |---|---|
-| `painel/index.html` | O painel diário: diagnóstico, trilha de 30 dias, pílula com protocolo, meditação de 5 min, 3 gratidões, pergunta, evolução e metas |
-| `painel/conteudo.js` | A biblioteca de conteúdo: 36 pílulas, perguntas, meditações, ações e metas sugeridas. É o arquivo para editar ou ampliar |
+| `../dipa/diario/index.html` | O painel diário: diagnóstico, trilha de 30 dias, pílula com protocolo, meditação de 5 min, 3 gratidões, pergunta, evolução e metas |
+| `../dipa/diario/conteudo.js` | A biblioteca de conteúdo: 36 pílulas, perguntas, meditações, ações e metas sugeridas. É o arquivo para editar ou ampliar |
 | `posts.html` | Fábrica de Pílulas: transforma cada pílula em 6 slides 1080×1350, legenda e roteiro de Reel |
 
-Os dados do painel ficam só no aparelho (localStorage). Para usar no celular, abra `/travessia/painel/` e use "Adicionar à tela inicial". Faça o backup na aba Rumo.
+Os dados do painel ficam só no aparelho (localStorage). Para usar no celular, abra `/dipa/diario/` e use "Adicionar à tela inicial". Faça o backup na aba Rumo.
 | `marca.html` | Estudo de nome e símbolo (5 candidatos com logo e avatar em PNG), perfil do Instagram simulado e recomendação de preço |
 
-Para trocar o nome da marca dentro do diário, edite `MARCA` no fim de `painel/conteudo.js`.
+Para trocar o nome da marca dentro do diário, edite `MARCA` no fim de `../dipa/diario/conteudo.js`.
 | `calma.html` | Estudo de nome II: cinco nomes ligados à calma (frio por fora, fogo por dentro), com símbolo, nome da página, arte de amostra e nova paleta |
 | `dipa.html` | Capas do nome Dipa em seis imagens (feed, story, avatar e capa larga), com nome da página e bio |
 | `logo/` | Logos do Dipa em PNG 1080 × 1080 para a foto do Instagram |
