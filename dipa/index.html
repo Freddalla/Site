@@ -172,7 +172,7 @@ footer .wm{font-size:1.6rem}
     <div class="phone">
       <div class="ph-top"><span class="lockup" style="font-size:1.4rem" aria-label="dīpa"><span class="sym" data-sym></span><span class="wm">d<span class="i">ı<i></i></span>pa</span></span><span class="mono">hoje</span></div>
       <div class="chips"><span>Ansioso</span><span class="on">Sobrecarregado</span><span>Sem rumo</span><span>Disperso</span></div>
-      <div class="mantra"><div class="hz"></div><span class="mono">Mantra do dia</span><p class="m">Só o próximo pedaço do fio.</p><small>Teseu e o Minotauro</small></div>
+      <div class="mantra"><span class="sym" data-sym-escuro style="display:block;width:64px;height:64px;margin:-6px auto 4px"></span><span class="mono">Mantra do dia</span><p class="m">Só o próximo pedaço do fio.</p><small>Teseu e o Minotauro</small></div>
       <div class="pc"><span class="tag">Gesto de hoje</span><b>O fio de Ariadne</b><span class="muted">Escreva o próximo passo da sua meta, pequeno o bastante para fazer em 5 minutos. Faça agora.</span></div>
     </div>
   </div>
@@ -283,6 +283,7 @@ footer .wm{font-size:1.6rem}
 /* Os links (pagamento, pixel, contato) ficam em config.js. */
 const CONFIG = DIPA_CONFIG;
 document.querySelectorAll('[data-sym]').forEach(el => el.innerHTML = dipaSimbolo({ auto:true }));
+document.querySelectorAll('[data-sym-escuro]').forEach(el => el.innerHTML = dipaSimbolo());
 dipaFavicon();
 if (CONFIG.CONTATO){ const c = document.getElementById('contato'); c.textContent = 'Dúvidas: ' + CONFIG.CONTATO; c.hidden = false; }
 if (CONFIG.META_PIXEL_ID){

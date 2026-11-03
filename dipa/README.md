@@ -7,7 +7,7 @@
 | `diario/index.html` | O diário. Só abre com a chave de acesso |
 | `diario/conteudo.js` | As 36 pílulas, mantras, meditações e o hash da chave (`ACESSO`) |
 | `manha/index.html` | Manhã Dipa: o encontro presencial e a lista de interessados |
-| `marca/simbolo.js` | O símbolo (Meio sol). Trocar aqui troca em todas as páginas |
+| `marca/simbolo.js` | O símbolo (Atol). Trocar aqui troca em todas as páginas |
 | `marca/*.png` | Foto de perfil, ícone do app e imagem de compartilhamento |
 
 ## Configurar (`config.js`)
