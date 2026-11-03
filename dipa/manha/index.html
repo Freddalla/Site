@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Manhã Dipa</title>
+<meta name="description" content="Uma manhã de sábado com um grupo pequeno: respiração diante da água, uma pílula de sabedoria em roda, café sem telas e três gratidões. Entre na lista da primeira turma.">
+<meta property="og:title" content="Manhã Dipa">
+<meta property="og:description" content="Um encontro presencial de uma manhã para quem usa o Dipa. Entre na lista da primeira turma.">
+<meta property="og:image" content="../marca/compartilhar.png">
+<meta name="theme-color" content="#0b141a">
+<link rel="apple-touch-icon" href="../marca/icone-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* Layout: convite quieto. Abertura com o símbolo nascendo, roteiro da manhã como horário, depois o formulário. Escuro primeiro, como a página de vendas. */
+:root{
+  --bg:#0b141a; --bg-2:#121f27; --line:#253740; --fg:#e6eef0; --muted:#8fa3ab; --accent:#eb9a52; --brasa:#e0702e; --on-accent:#1c1006; --danger:#e08a6e;
+  --display:'Instrument Serif','Iowan Old Style',Georgia,serif;
+  --body:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){ :root:not([data-theme="dark"]){ --bg:#e9eff1; --bg-2:#f6f9fa; --line:#c5d3d8; --fg:#0f1d25; --muted:#53666e; --accent:#b8561c; --on-accent:#fff7ef; --danger:#a24a2c; color-scheme:light; } }
+:root[data-theme="light"]{ --bg:#e9eff1; --bg-2:#f6f9fa; --line:#c5d3d8; --fg:#0f1d25; --muted:#53666e; --accent:#b8561c; --on-accent:#fff7ef; --danger:#a24a2c; color-scheme:light; }
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font:400 17px/1.65 var(--body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:980px;margin-inline:auto;padding-inline:clamp(18px,5vw,48px)}
+h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.05;text-wrap:balance}
+h1{font-size:clamp(3rem,9vw,5.6rem)}
+h2{font-size:clamp(2rem,5vw,3rem)}
+h3{font-size:1.35rem}
+p{max-width:58ch}
+em{font-style:italic;color:var(--accent)}
+.mono{font-family:var(--mono);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+section{padding-block:clamp(56px,9vw,100px);border-top:1px solid var(--line)}
+.btn{display:inline-flex;align-items:center;justify-content:center;font:600 1rem/1 var(--body);padding:17px 26px;border-radius:999px;border:1px solid var(--line);color:var(--fg);text-decoration:none;cursor:pointer;background:transparent}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.nav{display:flex;justify-content:space-between;align-items:center;padding-block:22px}
+.lockup{display:inline-flex;align-items:center;gap:4px;text-decoration:none;color:var(--fg)}
+.lockup .sym{width:52px;height:52px;margin:-10px -2px -10px -12px;flex:none}
+.sym svg{width:100%;height:100%;display:block}
+.wm{font-family:var(--display);font-size:2rem;line-height:1;padding-top:.12em;display:inline-block}
+.wm .i{position:relative;display:inline-block}
+.wm .i i{position:absolute;left:-.06em;right:-.06em;top:.25em;height:.065em;background:var(--brasa);box-shadow:0 0 .35em .08em rgba(224,112,46,.5)}
+
+.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:clamp(28px,6vw,70px);align-items:center;padding-block:clamp(36px,7vw,80px) clamp(56px,9vw,100px)}
+.hero > *{min-width:0}
+.hero h1{margin-block:14px 20px}
+.hero .lead{font-size:clamp(1.06rem,1.6vw,1.2rem);color:var(--muted)}
+.hero .big{aspect-ratio:1;max-width:340px;width:100%;margin-inline:auto}
+.facts{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:28px}
+@media (max-width:760px){.hero{grid-template-columns:1fr}.hero .big{max-width:220px}}
+
+.agenda{list-style:none;display:grid;margin-top:34px;border-top:1px solid var(--line)}
+.agenda li{display:grid;grid-template-columns:90px minmax(0,1fr);gap:20px;padding-block:20px;border-bottom:1px solid var(--line)}
+.agenda time{font:500 .9rem var(--mono);color:var(--accent);padding-top:4px}
+.agenda h3{margin-bottom:4px}
+.agenda p{color:var(--muted);font-size:.96rem}
+
+.why{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:30px}
+.why div{background:var(--bg-2);border:1px solid var(--line);border-radius:18px;padding:22px;min-width:0}
+.why p{color:var(--muted);font-size:.94rem;margin-top:6px}
+@media (max-width:760px){.why{grid-template-columns:minmax(0,1fr)}}
+
+form{display:grid;gap:18px;margin-top:30px;max-width:640px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.row > *{min-width:0}
+@media (max-width:560px){.row{grid-template-columns:1fr}}
+label{display:grid;gap:8px;font-size:.9rem;font-weight:600}
+label small{font-weight:400;color:var(--muted)}
+input[type=text],input[type=email],input[type=tel],textarea{font:400 1rem var(--body);color:var(--fg);background:var(--bg-2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;width:100%}
+textarea{min-height:90px;resize:vertical}
+input:focus,textarea:focus{outline:none;border-color:var(--accent)}
+fieldset{border:0;display:grid;gap:10px}
+legend{font-size:.9rem;font-weight:600;margin-bottom:8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.chips label{display:inline-flex;font-weight:500;padding:10px 16px;border:1px solid var(--line);border-radius:999px;cursor:pointer;font-size:.92rem}
+.chips input:checked + label{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.chips input:focus-visible + label{outline:2px solid var(--accent);outline-offset:2px}
+.erro{color:var(--danger);font-size:.92rem}
+.nota{font-size:.84rem;color:var(--muted)}
+.cfg{font-size:.84rem;color:var(--accent)}
+.ok{border:1px solid var(--accent);border-radius:20px;padding:30px;max-width:640px;margin-top:30px}
+.ok h3{font-size:2rem;margin-bottom:10px}
+footer{border-top:1px solid var(--line);padding-block:30px}
+</style>
+</head>
+<body>
+<header class="wrap nav">
+  <a class="lockup" href="../" aria-label="dīpa, página inicial"><span class="sym" data-sym></span><span class="wm">d<span class="i">ı<i></i></span>pa</span></a>
+  <a class="btn" href="#lista" style="padding:11px 18px;font-size:.88rem">Entrar na lista</a>
+</header>
+
+<main>
+<div class="wrap hero">
+  <div>
+    <p class="mono">Presencial · primeira turma</p>
+    <h1>Manhã <em>Dipa</em></h1>
+    <p class="lead">Uma manhã de sábado, com um grupo pequeno, para fazer junto o que o diário propõe todo dia: parar, respirar, ouvir uma pílula de sabedoria e voltar para casa mais calmo e mais aceso.</p>
+    <div class="facts"><span class="mono">Sábado · 7h às 10h30</span><span class="mono">Até 15 pessoas</span><span class="mono">Ao ar livre, perto da água</span></div>
+  </div>
+  <div class="big sym" data-sym-big aria-hidden="true"></div>
+</div>
+
+<section aria-labelledby="t-roteiro">
+  <div class="wrap">
+    <p class="mono">Como é a manhã</p>
+    <h2 id="t-roteiro">Três horas e meia, <em>sem pressa.</em></h2>
+    <ol class="agenda">
+      <li><time>7h00</time><div><h3>Chegada em silêncio</h3><p>Os celulares ficam numa caixa até o café. Um chá quente e nenhuma apresentação formal ainda.</p></div></li>
+      <li><time>7h15</time><div><h3>Respirar diante da água</h3><p>Cinco minutos de suspiro cíclico, de pé, olhando para o horizonte. Depois, uma caminhada lenta e calada.</p></div></li>
+      <li><time>7h50</time><div><h3>A pílula da manhã</h3><p>Uma das pílulas do diário lida em voz alta. Conversa em trios a partir da pergunta dela, com tempo para ouvir.</p></div></li>
+      <li><time>8h40</time><div><h3>O gesto</h3><p>Cada pessoa escreve o protocolo da pílula para a própria semana e conta ao seu trio. Quem ouve, cobra depois.</p></div></li>
+      <li><time>9h10</time><div><h3>Café juntos</h3><p>Mesa posta e conversa sem tela. É aqui que a comunidade nasce de verdade.</p></div></li>
+      <li><time>10h00</time><div><h3>Três gratidões</h3><p>Quem quiser fala uma gratidão em voz alta. Fechamos com o mantra do dia repetido em grupo.</p></div></li>
+      <li><time>10h30</time><div><h3>Volta para casa</h3><p>Com um cartão do mantra da manhã e o trio para se acompanhar durante o mês.</p></div></li>
+    </ol>
+  </div>
+</section>
+
+<section aria-labelledby="t-porque">
+  <div class="wrap">
+    <p class="mono">Por que presencial</p>
+    <h2 id="t-porque">O diário é a ilha. <em>A manhã é o arquipélago.</em></h2>
+    <div class="why">
+      <div><h3>Ninguém fica sozinho</h3><p>Você sai com um trio de pessoas que também usam o Dipa e se acompanham no mês.</p></div>
+      <div><h3>Uma vez por mês</h3><p>Um ritmo que cabe na vida: uma manhã a cada mês, sempre com uma pílula nova.</p></div>
+      <div><h3>Pequeno de propósito</h3><p>Até 15 pessoas, para que todo mundo fale e seja ouvido.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="lista" aria-labelledby="t-lista">
+  <div class="wrap">
+    <p class="mono">Lista de interessados</p>
+    <h2 id="t-lista">Guarde o seu lugar na <em>primeira manhã.</em></h2>
+    <p class="muted" style="margin-top:12px">Ainda não há data nem valor fechados. Quem está na lista recebe o convite primeiro e ajuda a escolher o lugar e o horário.</p>
+
+    <form id="form" novalidate>
+      <div class="row">
+        <label for="f-nome">Nome<input type="text" id="f-nome" name="nome" autocomplete="given-name" required></label>
+        <label for="f-cidade">Cidade<input type="text" id="f-cidade" name="cidade" autocomplete="address-level2" required></label>
+      </div>
+      <div class="row">
+        <label for="f-whats">WhatsApp <small>com DDD</small><input type="tel" id="f-whats" name="whatsapp" autocomplete="tel" placeholder="(DDD) 90000-0000" required></label>
+        <label for="f-email">E-mail<input type="email" id="f-email" name="email" autocomplete="email"></label>
+      </div>
+      <fieldset><legend>Você já usa o diário Dipa?</legend><div class="chips">
+        <input type="radio" name="usa_diario" id="u1" value="sim"><label for="u1">Sim</label>
+        <input type="radio" name="usa_diario" id="u2" value="ainda nao"><label for="u2">Ainda não</label>
+      </div></fieldset>
+      <fieldset><legend>Que valor faria sentido para uma manhã com café?</legend><div class="chips">
+        <input type="radio" name="valor" id="v1" value="ate 60"><label for="v1">até R$ 60</label>
+        <input type="radio" name="valor" id="v2" value="97"><label for="v2">R$ 97</label>
+        <input type="radio" name="valor" id="v3" value="147"><label for="v3">R$ 147</label>
+        <input type="radio" name="valor" id="v4" value="mais"><label for="v4">mais que isso</label>
+      </div></fieldset>
+      <fieldset><legend>Melhor manhã para você <small style="font-weight:400;color:var(--muted)">(pode marcar as duas)</small></legend><div class="chips">
+        <input type="checkbox" name="dia" id="d1" value="sabado"><label for="d1">Sábado</label>
+        <input type="checkbox" name="dia" id="d2" value="domingo"><label for="d2">Domingo</label>
+      </div></fieldset>
+      <label for="f-busca">O que você gostaria de levar dessa manhã? <small>Opcional.</small><textarea id="f-busca" name="busca" placeholder="Ex.: conhecer gente que também está tentando desacelerar."></textarea></label>
+      <p class="erro" id="erro" hidden></p>
+      <button class="btn btn-primary" type="submit" id="enviar" style="justify-self:start">Entrar na lista</button>
+      <p class="nota">Só usamos seus dados para avisar sobre a Manhã Dipa. Sem spam.</p>
+      <p class="cfg" id="cfg" hidden>Configuração pendente: a lista ainda não está ligada a uma planilha (LISTA_URL em dipa/config.js).</p>
+    </form>
+    <div class="ok" id="ok" hidden>
+      <p class="mono">Você está na lista</p>
+      <h3>Até breve, <span id="ok-nome"></span>.</h3>
+      <p class="muted">Quando a primeira manhã tiver data e lugar, você recebe o convite pelo WhatsApp antes de todo mundo.</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap"><a class="lockup" href="../"><span class="sym" data-sym></span><span class="wm">d<span class="i">ı<i></i></span>pa</span></a></div></footer>
+
+<script src="../marca/simbolo.js"></script>
+<script src="../config.js"></script>
+<script>
+document.querySelectorAll('[data-sym]').forEach(el => el.innerHTML = dipaSimbolo({ auto:true }));
+document.querySelectorAll('[data-sym-big]').forEach(el => el.innerHTML = dipaSimbolo({ auto:true }));
+dipaFavicon();
+const CFG = DIPA_CONFIG;
+if (CFG.META_PIXEL_ID){
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', CFG.META_PIXEL_ID); fbq('track', 'PageView');
+}
+if (!CFG.LISTA_URL) document.getElementById('cfg').hidden = false;
+
+const form = document.getElementById('form'), erro = document.getElementById('erro');
+const falha = (m, id) => { erro.textContent = m; erro.hidden = false; if (id) document.getElementById(id).focus(); };
+form.addEventListener('submit', async e => {
+  e.preventDefault(); erro.hidden = true;
+  const fd = new FormData(form);
+  const nome = (fd.get('nome') || '').trim(), cidade = (fd.get('cidade') || '').trim(), whats = (fd.get('whatsapp') || '').replace(/\D/g, '');
+  if (!nome) return falha('Escreva seu nome para a gente saber como te chamar.', 'f-nome');
+  if (!cidade) return falha('Diga a sua cidade, para escolhermos onde fazer a primeira manhã.', 'f-cidade');
+  if (whats.length < 10) return falha('Coloque o WhatsApp com DDD, por exemplo (11) 90000-0000.', 'f-whats');
+  if (!CFG.LISTA_URL) return falha('A lista ainda não está recebendo inscrições. Tente de novo em breve.');
+  const q = new URLSearchParams(location.search), dados = {
+    lista: 'Manhã Dipa', nome, cidade, whatsapp: whats, email: (fd.get('email') || '').trim(),
+    usa_diario: fd.get('usa_diario') || '', valor: fd.get('valor') || '', dia: fd.getAll('dia').join(', '), busca: (fd.get('busca') || '').trim(),
+    origem: q.get('utm_source') || '', campanha: q.get('utm_campaign') || ''
+  };
+  const b = document.getElementById('enviar'); b.disabled = true; b.textContent = 'Enviando…';
+  try { await fetch(CFG.LISTA_URL, { method:'POST', mode:'no-cors', body: new URLSearchParams(dados) }); }
+  catch(err){ b.disabled = false; b.textContent = 'Entrar na lista'; return falha('Não conseguimos enviar agora. Confira a internet e tente de novo.'); }
+  try { window.fbq && fbq('track', 'Lead', { content_name:'manha_dipa' }); } catch(err){}
+  form.hidden = true; document.getElementById('ok-nome').textContent = nome.split(' ')[0]; document.getElementById('ok').hidden = false;
+});
+</script>
+</body>
+</html>

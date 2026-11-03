@@ -240,8 +240,17 @@ footer .wm{font-size:1.6rem}
       </ul>
       <a class="btn btn-primary" id="checkout" href="#" data-buy>Comprar o meu diário</a>
       <p class="note">Pagamento seguro. Garantia de 7 dias: se não fizer sentido, você pede o dinheiro de volta.</p>
-      <p class="cfg" id="cfg" hidden>Configuração pendente: cole o link de pagamento em CONFIG.CHECKOUT_URL no fim desta página.</p>
+      <p class="cfg" id="cfg" hidden>Configuração pendente: cole o link de pagamento em CHECKOUT_URL, no arquivo dipa/config.js.</p>
     </div>
+  </div>
+</section>
+
+<section aria-labelledby="t-manha">
+  <div class="wrap" style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px;align-items:end">
+    <div><p class="mono">Presencial · em breve</p>
+      <h2 id="t-manha">Manhã <em>Dipa</em></h2>
+      <p class="muted" style="margin-top:14px">Uma manhã de sábado com um grupo pequeno: respiração diante da água, uma pílula lida em roda, café sem telas e as três gratidões em voz alta. A primeira turma sai da lista de interessados.</p></div>
+    <a class="btn" href="manha/">Entrar na lista</a>
   </div>
 </section>
 
@@ -269,20 +278,13 @@ footer .wm{font-size:1.6rem}
 </footer>
 
 <script src="marca/simbolo.js"></script>
+<script src="config.js"></script>
 <script>
-/* ================= CONFIGURAÇÃO =================
-   CHECKOUT_URL: o link de pagamento do produto (Kiwify, Hotmart, Mercado Pago…).
-   META_PIXEL_ID: o ID do pixel do Meta. Vazio = desligado.
-   CONTATO: o e-mail que aparece no rodapé. */
-const CONFIG = {
-  CHECKOUT_URL: '',
-  META_PIXEL_ID: '',
-  CONTATO: ''
-};
-
-if (CONFIG.CONTATO){ const c = document.querySelectorAll('[data-sym]').forEach(el => el.innerHTML = dipaSimbolo());
+/* Os links (pagamento, pixel, contato) ficam em config.js. */
+const CONFIG = DIPA_CONFIG;
+document.querySelectorAll('[data-sym]').forEach(el => el.innerHTML = dipaSimbolo({ auto:true }));
 dipaFavicon();
-document.getElementById('contato'); c.textContent = 'Dúvidas: ' + CONFIG.CONTATO; c.hidden = false; }
+if (CONFIG.CONTATO){ const c = document.getElementById('contato'); c.textContent = 'Dúvidas: ' + CONFIG.CONTATO; c.hidden = false; }
 if (CONFIG.META_PIXEL_ID){
   !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
   fbq('init', CONFIG.META_PIXEL_ID); fbq('track', 'PageView');

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Dipa · Plano de Lançamento</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* Layout: caderno de lançamento. Índice fixo à esquerda no desktop; seções na ordem em que você vai usar: o negócio, onde está cada coisa, o que fazer esta semana, depois os detalhes. */
+:root{
+  --bg:#0b141a; --card:#121f27; --line:#253740; --fg:#e6eef0; --muted:#8fa3ab; --accent:#eb9a52; --on-accent:#1c1006;
+  --display:'Instrument Serif','Iowan Old Style',Georgia,serif;
+  --body:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){ :root:not([data-theme="dark"]){ --bg:#e9eff1; --card:#f6f9fa; --line:#c5d3d8; --fg:#0f1d25; --muted:#53666e; --accent:#b8561c; --on-accent:#fff7ef; color-scheme:light; } }
+:root[data-theme="light"]{ --bg:#e9eff1; --card:#f6f9fa; --line:#c5d3d8; --fg:#0f1d25; --muted:#53666e; --accent:#b8561c; --on-accent:#fff7ef; color-scheme:light; }
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font:400 16px/1.65 var(--body);overflow-x:hidden}
+.page{max-width:1180px;margin-inline:auto;padding-inline:clamp(16px,4vw,40px);padding-block:40px 100px;display:grid;grid-template-columns:210px minmax(0,1fr);gap:48px}
+@media (max-width:960px){.page{grid-template-columns:minmax(0,1fr)}.toc{display:none}}
+.toc{position:sticky;top:28px;align-self:start;display:grid;gap:2px;font-size:.88rem}
+.toc a{color:var(--muted);text-decoration:none;padding:5px 0 5px 14px;border-left:1px solid var(--line)}
+.toc a:hover{color:var(--fg);border-color:var(--accent)}
+.toc .n{font-family:var(--mono);font-size:.7rem;margin-right:6px}
+main{min-width:0}
+h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.06;text-wrap:balance}
+h1{font-size:clamp(2.6rem,6vw,4.4rem)}
+h2{font-size:clamp(1.9rem,3.6vw,2.6rem);margin-bottom:12px}
+h3{font-size:1.4rem}
+h4{font:600 1rem var(--body);margin-block:18px 6px}
+p{max-width:68ch}
+p + p{margin-top:10px}
+em{color:var(--accent)}
+a{color:var(--accent)}
+.mono{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+.lead{font-size:1.12rem;color:var(--muted);margin-top:12px}
+section{padding-block:52px;border-top:1px solid var(--line)}
+.kick{display:flex;gap:10px;align-items:baseline;margin-bottom:10px}
+.kick b{font:500 .74rem var(--mono);color:var(--accent)}
+.hero{display:flex;gap:22px;align-items:center;flex-wrap:wrap;padding-bottom:30px}
+.hero .sym{width:130px;height:130px;flex:none}
+.sym svg{width:100%;height:100%;display:block}
+.btn{font:600 .84rem var(--body);border:1px solid var(--line);background:transparent;color:var(--fg);border-radius:999px;padding:9px 16px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:20px}
+.cards.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.cards.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;min-width:0}
+.card p,.card li{font-size:.93rem;color:var(--muted)}
+.card ul{padding-left:18px;display:grid;gap:4px;margin-top:8px}
+.card .price{font-family:var(--display);font-size:2rem;line-height:1;margin-block:8px 4px;color:var(--fg)}
+.card.now{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+a.card{text-decoration:none;color:var(--fg);display:grid;gap:4px}
+@media (max-width:900px){.cards.four{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:720px){.cards,.cards.two,.cards.four{grid-template-columns:minmax(0,1fr)}}
+.tree{font:400 .9rem/1.7 var(--mono);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-top:16px;overflow-x:auto;white-space:pre}
+.tree b{color:var(--accent);font-weight:500}
+.tree i{color:var(--muted);font-style:normal}
+.facts{display:grid;grid-template-columns:160px minmax(0,1fr);gap:12px 20px;margin-top:18px}
+.facts dt{font:500 .68rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding-top:5px}
+.facts dd{min-width:0;overflow-wrap:anywhere}
+@media (max-width:560px){.facts{grid-template-columns:minmax(0,1fr);gap:4px}.facts dd{margin-bottom:10px}}
+.copybox{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;padding-right:96px;white-space:pre-wrap;font-size:.95rem;position:relative;margin-top:10px}
+.copybox .btn{position:absolute;top:10px;right:10px;padding:6px 12px;font-size:.78rem}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:12px;margin-top:18px}
+table{border-collapse:collapse;width:100%;min-width:600px;font-size:.93rem}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 .66rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:var(--card)}
+tr:last-child td{border-bottom:0}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.swatches{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:18px}
+.sw{border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+.sw i{display:block;height:60px}
+.sw span{display:block;padding:8px 10px;font:500 .66rem var(--mono);background:var(--card)}
+@media (max-width:640px){.swatches{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.assets{display:grid;gap:24px;margin-top:20px}
+.group h3{margin-bottom:12px}
+.row-imgs{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+.row-imgs.wide{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}
+.asset{display:grid;gap:8px;align-content:start}
+.asset img{width:100%;height:auto;max-width:100%;border-radius:10px;border:1px solid var(--line);display:block;background:#0a131a}
+.asset.round img{border-radius:50%}
+.asset span{font-size:.82rem;color:var(--muted)}
+.asset .btn{justify-self:start;padding:6px 12px;font-size:.78rem}
+.msg{font-size:.84rem;color:var(--muted);margin-top:10px}
+.weeks{display:grid;gap:14px;margin-top:18px}
+.wk{display:grid;grid-template-columns:140px minmax(0,1fr);gap:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+.wk > div{min-width:0}
+.wk .when{font:500 .72rem var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.wk h3{font-size:1.3rem}
+.wk ul{padding-left:18px;display:grid;gap:4px;margin-top:8px;font-size:.93rem;color:var(--muted)}
+.wk .meta{font-size:.86rem;margin-top:10px}
+@media (max-width:640px){.wk{grid-template-columns:minmax(0,1fr);gap:6px}}
+.check{list-style:none;display:grid;gap:8px;margin-top:16px}
+.check li{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.check input{width:20px;height:20px;accent-color:var(--accent);margin-top:2px}
+.check li.ok{opacity:.55}
+.check b{display:block}
+.check span{font-size:.9rem;color:var(--muted)}
+.note{background:color-mix(in srgb,var(--accent) 14%,transparent);border-radius:14px;padding:16px 18px;margin-top:18px;font-size:.94rem}
+code{font-family:var(--mono);font-size:.84em;overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<div class="page">
+<nav class="toc" aria-label="Índice">
+  <a href="#negocio"><span class="n">01</span>O negócio</a>
+  <a href="#mapa"><span class="n">02</span>Onde está cada coisa</a>
+  <a href="#agora"><span class="n">03</span>O que fazer agora</a>
+  <a href="#calendario"><span class="n">04</span>As 4 primeiras semanas</a>
+  <a href="#identidade"><span class="n">05</span>Identidade</a>
+  <a href="#instagram"><span class="n">06</span>Instagram</a>
+  <a href="#pecas"><span class="n">07</span>Peças para baixar</a>
+  <a href="#venda"><span class="n">08</span>Venda e acesso</a>
+  <a href="#manha"><span class="n">09</span>Manhã Dipa</a>
+  <a href="#numeros"><span class="n">10</span>Números para acompanhar</a>
+</nav>
+<main>
+  <div class="hero"><span class="sym" data-sym></span><div><p class="mono">Plano de lançamento · versão de novembro</p><h1>Dipa</h1><p class="lead" style="margin-top:6px">Tudo o que já construímos, organizado na ordem em que você vai usar.</p></div></div>
+
+  <section id="negocio" style="border-top:0;padding-top:0">
+    <div class="kick"><b>01</b><span class="mono">O negócio</span></div>
+    <h2>Calmo por fora, aceso por dentro</h2>
+    <p class="lead">O Dipa ajuda a pessoa a parar no meio do dia, respirar e receber uma pílula de sabedoria (de Buda, dos estoicos, de Jesus ou da mitologia) escolhida para como ela chega. <em>Dīpa</em>, em páli, é ilha e lâmpada.</p>
+    <div class="cards four">
+      <div class="card"><span class="mono">Grátis</span><h3>Instagram</h3><p class="price">R$ 0</p><p>As pílulas viram carrosséis. É a vitrine que traz gente.</p></div>
+      <div class="card now"><span class="mono">Agora</span><h3>O diário</h3><p class="price">R$ 47</p><p>Pagamento único. Check-in, pílula, mantra, respiração e gratidão.</p></div>
+      <div class="card now"><span class="mono">Agora · lista</span><h3>Manhã Dipa</h3><p class="price">R$ 97</p><p>Encontro presencial de uma manhã, até 15 pessoas. Valor a validar na lista.</p></div>
+      <div class="card"><span class="mono">Depois</span><h3>Comunidade</h3><p class="price">mensal</p><p>Uma manhã por mês com quem já veio, e trilhas novas de pílulas.</p></div>
+    </div>
+    <p style="margin-top:16px">O caminho de uma pessoa: vê uma pílula no Instagram, compra o diário, usa por algumas semanas e vai a uma Manhã Dipa. Quem vai à manhã vira comunidade e traz amigos.</p>
+  </section>
+
+  <section id="mapa">
+    <div class="kick"><b>02</b><span class="mono">Onde está cada coisa</span></div>
+    <h2>O seu GitHub, organizado</h2>
+    <p>O repositório <strong>Site</strong> tem quatro partes. Na raiz continua o site da Dra. Rebeca, que não foi alterado.</p>
+<div class="tree"><b>dipa/</b>                     <i>o que o público vê (está no ar)</i>
+  index.html               <i>página de vendas · o link da bio</i>
+  config.js                <i>o ÚNICO arquivo que você edita: links de pagamento, planilha, pixel</i>
+  diario/                  <i>o diário que o comprador recebe</i>
+    conteudo.js            <i>as 36 pílulas, mantras, meditações e a chave de acesso</i>
+  manha/                   <i>a página da Manhã Dipa, com a lista de interessados</i>
+  marca/                   <i>símbolo, ícone do app e imagem de compartilhamento</i>
+<b>ferramentas/</b>              <i>o que você usa para trabalhar</i>
+  plano-de-lancamento.html <i>esta página</i>
+  fabrica-de-pilulas.html  <i>gera o carrossel de qualquer pílula</i>
+  instagram/               <i>as peças prontas em PNG</i>
+  pecas.html               <i>a prancheta que desenha as peças</i>
+  google-apps-script.gs    <i>o script que leva a lista para uma planilha</i>
+<b>arquivo/</b>                  <i>estudos antigos (Travessia, nomes, símbolos). Só consulta.</i></div>
+    <div class="cards">
+      <a class="card" href="../dipa/index.html"><b>Página de vendas</b><span class="muted" style="font-size:.88rem">freddalla.github.io/Site/dipa/</span></a>
+      <a class="card" href="../dipa/manha/index.html"><b>Manhã Dipa</b><span class="muted" style="font-size:.88rem">freddalla.github.io/Site/dipa/manha/</span></a>
+      <a class="card" href="fabrica-de-pilulas.html"><b>Fábrica de Pílulas</b><span class="muted" style="font-size:.88rem">ferramentas/fabrica-de-pilulas.html</span></a>
+    </div>
+  </section>
+
+  <section id="agora">
+    <div class="kick"><b>03</b><span class="mono">O que fazer agora</span></div>
+    <h2>Para lançar, nesta ordem</h2>
+    <ul class="check" id="check">
+      <li><input type="checkbox" id="c1"><label for="c1"><b>1. Conferir o nome</b><span>@dipa.diario no Instagram e "Dipa" na busca de marcas do INPI (classes 9 e 41).</span></label></li>
+      <li><input type="checkbox" id="c2"><label for="c2"><b>2. Criar o Instagram</b><span>Conta profissional, foto, bio e os 5 destaques (seção 06).</span></label></li>
+      <li><input type="checkbox" id="c3"><label for="c3"><b>3. Criar o produto na Kiwify</b><span>R$ 47, pagamento único, garantia de 7 dias. Entrega: o link do diário com a chave (seção 08).</span></label></li>
+      <li><input type="checkbox" id="c4"><label for="c4"><b>4. Ligar a lista da Manhã Dipa a uma planilha</b><span>15 minutos com o Google Apps Script (seção 09).</span></label></li>
+      <li><input type="checkbox" id="c5"><label for="c5"><b>5. Colar os links em dipa/config.js</b><span>O link de pagamento e o da planilha. Ou me mande os dois que eu colo e publico.</span></label></li>
+      <li><input type="checkbox" id="c6"><label for="c6"><b>6. Fazer uma compra de teste</b><span>Comprar, receber o e-mail, abrir o diário pelo link e pedir o reembolso.</span></label></li>
+      <li><input type="checkbox" id="c7"><label for="c7"><b>7. Publicar o post fixado e a primeira pílula</b><span>E fixar o carrossel de apresentação no topo do perfil.</span></label></li>
+      <li><input type="checkbox" id="c8"><label for="c8"><b>8. Contar para as primeiras 30 pessoas</b><span>Mensagem pessoal no WhatsApp para amigos e conhecidos, com o link da página.</span></label></li>
+    </ul>
+  </section>
+
+  <section id="calendario">
+    <div class="kick"><b>04</b><span class="mono">As 4 primeiras semanas</span></div>
+    <h2>Do lançamento à primeira manhã</h2>
+    <div class="weeks">
+      <div class="wk"><div><p class="when">Semana 1</p><h3>Lançar</h3></div><div><ul>
+        <li>Itens 1 a 7 da lista acima.</li><li>Post fixado e a pílula 29 · Não voe baixo demais.</li><li>Stories todo dia: o seu mantra do dia como fundo de tela.</li><li>Mensagem pessoal para 30 pessoas.</li></ul>
+        <p class="meta"><strong>Meta:</strong> 10 vendas e 30 nomes na lista da Manhã Dipa.</p></div></div>
+      <div class="wk"><div><p class="when">Semana 2</p><h3>Constância</h3></div><div><ul>
+        <li>3 carrosséis: pílulas 11, 01 e 21 (seção 06).</li><li>Story com o convite da Manhã Dipa (peça 12).</li><li>Perguntar a 5 compradores o que acharam do diário.</li></ul>
+        <p class="meta"><strong>Meta:</strong> 25 vendas no total e 50 nomes na lista.</p></div></div>
+      <div class="wk"><div><p class="when">Semana 3</p><h3>Marcar a manhã</h3></div><div><ul>
+        <li>Olhar a planilha: cidade, valor e dia mais escolhidos.</li><li>Escolher o lugar (praia, parque ou lago ao amanhecer) e um café parceiro.</li><li>Abrir as 15 vagas primeiro para quem está na lista, com 48 horas de prioridade.</li><li>3 carrosséis: pílulas 28, 19 e mais uma escolhida pelos comentários.</li></ul>
+        <p class="meta"><strong>Meta:</strong> 15 vagas vendidas.</p></div></div>
+      <div class="wk"><div><p class="when">Semana 4</p><h3>A primeira Manhã Dipa</h3></div><div><ul>
+        <li>Fazer a manhã (roteiro na seção 09).</li><li>Fotos do grupo, com autorização, para o Instagram.</li><li>No dia seguinte, perguntar a cada pessoa: viria de novo? Traria alguém?</li><li>Anunciar a data da segunda manhã.</li></ul>
+        <p class="meta"><strong>Meta:</strong> pelo menos 10 das 15 pessoas querendo voltar.</p></div></div>
+    </div>
+    <p class="mono" style="margin-top:12px">As metas são referências para decidir os próximos passos, não médias de mercado.</p>
+  </section>
+
+  <section id="identidade">
+    <div class="kick"><b>05</b><span class="mono">Identidade</span></div>
+    <h2>O Meio sol</h2>
+    <p class="lead">O sol pousado na água parada: a metade de cima acesa, a de baixo o reflexo. Lembra o yin e yang sem copiá-lo. Não há slogan: o nome e o símbolo bastam.</p>
+    <div class="swatches">
+      <div class="sw"><i style="background:radial-gradient(circle,#1c3541,#0a131a)"></i><span>Noite fria · #1C3541 → #0A131A</span></div>
+      <div class="sw"><i style="background:#c5d3d8"></i><span>Névoa · #C5D3D8</span></div>
+      <div class="sw"><i style="background:#e9eff1"></i><span>Gelo · #E9EFF1</span></div>
+      <div class="sw"><i style="background:radial-gradient(circle at 50% 100%,#f6c784,#e0702e 75%)"></i><span>Sol · #F6C784 → #E0702E</span></div>
+      <div class="sw"><i style="background:#eb9a52"></i><span>Brasa para texto · #EB9A52</span></div>
+    </div>
+    <div class="cards">
+      <div class="card"><h3>Símbolo</h3><p>Sempre o mesmo desenho, vindo de dipa/marca/simbolo.js. Nas pílulas, ele aparece sozinho, sem o nome.</p></div>
+      <div class="card"><h3>Tipografia</h3><p>Instrument Serif para títulos e mantras. Manrope para o texto. JetBrains Mono, em caixa alta e espaçada, para rótulos.</p></div>
+      <div class="card"><h3>Uma luz só</h3><p>Cada peça tem um único ponto quente: o sol ou uma palavra em brasa. Todo o resto fica frio e quieto, com grão leve.</p></div>
+    </div>
+  </section>
+
+  <section id="instagram">
+    <div class="kick"><b>06</b><span class="mono">Instagram</span></div>
+    <h2>Configuração e conteúdo</h2>
+    <dl class="facts">
+      <dt>Nome</dt><dd><strong>Dipa · calma e sabedoria</strong></dd>
+      <dt>Usuário</dt><dd>@dipa.diario · alternativas: @sejadipa, @dipa.ilha</dd>
+      <dt>Categoria</dt><dd>Saúde e bem-estar</dd>
+      <dt>Link na bio</dt><dd><code>https://freddalla.github.io/Site/dipa/?utm_source=instagram&amp;utm_medium=bio</code></dd>
+      <dt>Destaques</dt><dd>Comece · Respire · Mantras · Diário · Preço</dd>
+    </dl>
+    <h4>Bio</h4>
+    <div class="copybox" id="bio">Uma pílula de sabedoria por dia, escolhida para como você chega.
+Buda · estoicos · Jesus · mitos
+O seu diário ↓<button class="btn" data-copy="bio">Copiar</button></div>
+    <h4 style="margin-top:22px">Ritmo</h4>
+    <div class="tbl"><table>
+      <thead><tr><th>Quando</th><th>Formato</th><th>O que postar</th></tr></thead>
+      <tbody>
+        <tr><td>Lançamento</td><td>Carrossel fixado</td><td>Post fixado (peças 07 a 09), com a legenda abaixo.</td></tr>
+        <tr><td>Semana 1</td><td>Carrossel</td><td>Pílula 29 · Não voe baixo demais (peça 10, já pronta)</td></tr>
+        <tr><td>Semana 2</td><td>3 carrosséis</td><td>Pílula 11 · A segunda flecha · Pílula 01 · O que depende de você · Pílula 21 · Olhai os lírios do campo</td></tr>
+        <tr><td>Semana 3</td><td>3 carrosséis</td><td>Pílula 28 · Sísifo e a pedra · Pílula 19 · Passemos para a outra margem · uma pedida nos comentários</td></tr>
+        <tr><td>A partir da semana 2</td><td>Story e post</td><td>Convite da Manhã Dipa (peças 12 e 13), uma vez por semana.</td></tr>
+        <tr><td>Todo dia</td><td>Story</td><td>O seu mantra do dia como fundo de tela, gerado pelo diário.</td></tr>
+      </tbody>
+    </table></div>
+    <p class="muted" style="margin-top:10px;font-size:.92rem">Para cada carrossel: abra a Fábrica de Pílulas, escolha a pílula, baixe os 6 slides e copie a legenda pronta.</p>
+    <h4 style="margin-top:22px">Legenda do post fixado</h4>
+    <div class="copybox" id="leg">Dīpa, em páli, é ilha e é lâmpada.
+
+Todo dia você diz como chega: ansioso, sem energia, travado, sobrecarregado.
+O Dipa responde com a pílula de sabedoria certa para esse momento. Um ensinamento de Buda, dos estoicos, de Jesus ou da mitologia. Um mantra para repetir. Um gesto prático para fazer hoje.
+
+Depois, você fecha a tela.
+
+R$ 47, pagamento único. O link está na bio.
+
+#dipa #autoconhecimento #estoicismo #budismo #meditacao #calma<button class="btn" data-copy="leg">Copiar</button></div>
+    <h4 style="margin-top:22px">Legenda do convite da Manhã Dipa</h4>
+    <div class="copybox" id="legm">Manhã Dipa · primeira turma.
+
+Um sábado de manhã, com até 15 pessoas. Respirar diante da água, ouvir uma pílula em roda, tomar café sem telas e dizer três gratidões em voz alta.
+
+Ainda não tem data. Quem entrar na lista recebe o convite antes e ajuda a escolher o lugar.
+
+Lista no link da bio.<button class="btn" data-copy="legm">Copiar</button></div>
+  </section>
+
+  <section id="pecas">
+    <div class="kick"><b>07</b><span class="mono">Peças para baixar</span></div>
+    <h2>Tudo no tamanho certo</h2>
+    <div class="assets" id="assets"></div>
+    <p class="msg" id="msg" hidden></p>
+  </section>
+
+  <section id="venda">
+    <div class="kick"><b>08</b><span class="mono">Venda e acesso</span></div>
+    <h2>Como a compra funciona</h2>
+    <ol style="padding-left:20px;display:grid;gap:8px;margin-top:12px;max-width:70ch">
+      <li>A pessoa clica em "Comprar" na página de vendas e vai para o checkout da Kiwify.</li>
+      <li>Paga por Pix ou cartão. A Kiwify envia por e-mail o <strong>link de entrega</strong>: o endereço do diário com a chave de acesso.</li>
+      <li>O diário abre e fica liberado naquele aparelho. Sem a chave, aparece a tela "Este diário é seu depois da compra".</li>
+    </ol>
+    <dl class="facts">
+      <dt>Produto</dt><dd>Dipa · o diário · R$ 47 · pagamento único · garantia de 7 dias</dd>
+      <dt>Link de pagamento</dt><dd>Você cria na Kiwify e cola em <code>CHECKOUT_URL</code>, no arquivo <code>dipa/config.js</code>.</dd>
+      <dt>Link de entrega</dt><dd><code>…/dipa/diario/?k=SUA-CHAVE</code><br><span class="muted" style="font-size:.88rem">A chave está na nossa conversa e não aparece nesta página.</span></dd>
+      <dt>CPF ou CNPJ</dt><dd>Dá para começar com CPF na Kiwify, com o produto e o nome de exibição como "Dipa". Depois, abra um CNPJ com a ajuda de um contador.</dd>
+    </dl>
+    <div class="note">A chave barra quem não comprou, mas um comprador pode repassar o link. Para o lançamento, isso basta. Se vazar, a chave é trocada em minutos.</div>
+  </section>
+
+  <section id="manha">
+    <div class="kick"><b>09</b><span class="mono">Manhã Dipa</span></div>
+    <h2>O encontro que vira comunidade</h2>
+    <p class="lead">O diário é a ilha. A manhã é o arquipélago: um sábado por mês, um grupo pequeno, fazendo junto o que o diário propõe todo dia.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Hora</th><th>Momento</th><th>Como fazer</th></tr></thead>
+      <tbody>
+        <tr><td class="num">7h00</td><td>Chegada em silêncio</td><td>Caixa para os celulares. Chá quente. Nada de apresentação formal ainda.</td></tr>
+        <tr><td class="num">7h15</td><td>Respirar diante da água</td><td>5 minutos de suspiro cíclico, de pé, olhando o horizonte. Depois, caminhada lenta e calada.</td></tr>
+        <tr><td class="num">7h50</td><td>A pílula da manhã</td><td>Uma pílula do diário lida em voz alta. Conversa em trios a partir da pergunta dela.</td></tr>
+        <tr><td class="num">8h40</td><td>O gesto</td><td>Cada pessoa escreve o protocolo da pílula para a própria semana e conta ao trio.</td></tr>
+        <tr><td class="num">9h10</td><td>Café juntos</td><td>Mesa posta, sem tela. É aqui que as pessoas se conhecem de verdade.</td></tr>
+        <tr><td class="num">10h00</td><td>Três gratidões</td><td>Quem quiser fala uma em voz alta. Fecha com o mantra do dia em grupo.</td></tr>
+        <tr><td class="num">10h30</td><td>Volta para casa</td><td>Cada um leva um cartão impresso com o mantra e fica com o trio para se acompanhar no mês.</td></tr>
+      </tbody>
+    </table></div>
+    <h4 style="margin-top:22px">Conta de uma manhã (hipótese para validar)</h4>
+    <div class="tbl"><table>
+      <thead><tr><th>Item</th><th>Valor</th><th>Observação</th></tr></thead>
+      <tbody>
+        <tr><td>15 vagas × R$ 97</td><td class="num">R$ 1.455</td><td>O valor final sai das respostas da lista.</td></tr>
+        <tr><td>Café da manhã para 16 pessoas</td><td class="num">− R$ 400</td><td>Com um café parceiro, pode sair mais barato em troca de divulgação.</td></tr>
+        <tr><td>Cartões impressos, chá e caixa dos celulares</td><td class="num">− R$ 80</td><td></td></tr>
+        <tr><td>Taxas de pagamento (~8%)</td><td class="num">− R$ 116</td><td></td></tr>
+        <tr><td><strong>Sobra por manhã</strong></td><td class="num"><strong>≈ R$ 860</strong></td><td>Um lugar público ao ar livre não tem custo. Um espaço fechado, sim.</td></tr>
+      </tbody>
+    </table></div>
+    <h4 style="margin-top:22px">Como a lista funciona</h4>
+    <p>A página <code>dipa/manha/</code> pede nome, cidade, WhatsApp, se já usa o diário, quanto pagaria e o melhor dia. As respostas vão para uma Planilha Google:</p>
+    <ol style="padding-left:20px;display:grid;gap:6px;margin-top:10px;max-width:70ch">
+      <li>Crie uma Planilha Google chamada "Dipa · Listas".</li>
+      <li>Vá em Extensões → Apps Script, apague o que estiver lá e cole o conteúdo de <code>ferramentas/google-apps-script.gs</code>. Salve.</li>
+      <li>Clique em Implantar → Nova implantação → App da Web. Executar como: Eu. Quem pode acessar: Qualquer pessoa.</li>
+      <li>Autorize e copie o endereço que termina em <code>/exec</code>.</li>
+      <li>Cole em <code>LISTA_URL</code>, no arquivo <code>dipa/config.js</code>, ou me mande que eu colo.</li>
+    </ol>
+    <p class="muted" style="margin-top:10px">A aba "Manhã Dipa" é criada sozinha na primeira inscrição. Enquanto o endereço não estiver colado, a página avisa e não aceita inscrições, para ninguém se inscrever sem ficar registrado.</p>
+  </section>
+
+  <section id="numeros">
+    <div class="kick"><b>10</b><span class="mono">Números para acompanhar</span></div>
+    <h2>Uma vez por semana, cinco números</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Número</th><th>Onde ver</th><th>Por que importa</th></tr></thead>
+      <tbody>
+        <tr><td>Vendas do diário</td><td>Kiwify</td><td>É a receita e a prova de que a oferta funciona.</td></tr>
+        <tr><td>Visitas na página de vendas</td><td>Kiwify ou Meta (quando ligar o pixel)</td><td>Vendas ÷ visitas = conversão. Abaixo de 2%, vale mexer na página.</td></tr>
+        <tr><td>Nomes na lista da Manhã Dipa</td><td>Planilha</td><td>Com 40 nomes numa cidade, dá para marcar a primeira manhã.</td></tr>
+        <tr><td>Salvamentos por carrossel</td><td>Instagram</td><td>Mostra quais pílulas o público quer. Repita os temas que mais salvam.</td></tr>
+        <tr><td>Pedidos de reembolso</td><td>Kiwify</td><td>Acima de 10% das vendas, pergunte o motivo a cada pessoa.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note">Toda semana, me mande esses cinco números. Eu leio, digo o que mudar e preparo as pílulas e as peças da semana seguinte.</div>
+  </section>
+</main>
+</div>
+
+<script src="../dipa/marca/simbolo.js"></script>
+<script>
+document.querySelectorAll('[data-sym]').forEach(el => el.innerHTML = dipaSimbolo({ auto:true }));
+/* Salvar arquivo: na prévia do Claude usa a permissão de download (com confirmação); fora dela, o download normal. */
+let _dl;
+async function salvarArquivo(nome, blob){
+  try { if (window.claude && claude.use){ _dl = _dl || claude.use('downloads'); const d = await _dl; if (d){ await d.save({ filename: nome, data: blob }); return 'salvo'; } } }
+  catch(e){ return e && e.code === 'declined' ? 'recusado' : 'erro'; }
+  const url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1500);
+  return 'navegador';
+}
+const GRUPOS = [
+  ['Foto de perfil', 'round', [['01-foto-de-perfil.png','01 · Foto de perfil']]],
+  ['Capas dos destaques', '', [['02-destaque-comece.png','02 · Comece'],['03-destaque-respire.png','03 · Respire'],['04-destaque-mantras.png','04 · Mantras'],['05-destaque-diario.png','05 · Diário'],['06-destaque-preco.png','06 · Preço']]],
+  ['Post fixado · apresentação', 'wide', [['07-post-fixado-1.png','07 · 1 de 3'],['08-post-fixado-2.png','08 · 2 de 3'],['09-post-fixado-3.png','09 · 3 de 3']]],
+  ['Primeira pílula · Não voe baixo demais', '', [1,2,3,4,5,6].map(n => [`10-carrossel-icaro-${n}.png`, `10 · Slide ${n}`])],
+  ['Fundo de tela do mantra (exemplo)', '', [['11-fundo-de-tela-mantra.png','11 · Story ou fundo de tela']]],
+  ['Manhã Dipa · convite', '', [['12-manha-dipa-story.png','12 · Story'],['13-manha-dipa-post.png','13 · Post']]]
+];
+document.getElementById('assets').innerHTML = GRUPOS.map(([t, cls, itens]) => `<div class="group"><h3>${t}</h3><div class="row-imgs ${cls === 'wide' ? 'wide' : ''}">${itens.map(([f, l]) => `<div class="asset ${cls === 'round' ? 'round' : ''}"><img src="instagram/${f}" alt="${l}" loading="lazy"><span>${l}</span><button class="btn" data-file="${f}">Baixar</button></div>`).join('')}</div></div>`).join('');
+const msg = document.getElementById('msg');
+document.addEventListener('click', async e => {
+  const f = e.target.closest('[data-file]');
+  if (f){
+    try { const blob = await (await fetch('instagram/' + f.dataset.file)).blob(); const r = await salvarArquivo('dipa-' + f.dataset.file, blob);
+      msg.hidden = false; msg.textContent = r === 'salvo' ? 'Arquivo salvo.' : r === 'recusado' ? 'Download cancelado.' : r === 'erro' ? 'Não deu para salvar aqui. Segure o dedo sobre a imagem para salvar.' : 'Se o download não começar, segure o dedo sobre a imagem para salvar.';
+    } catch(err){ msg.hidden = false; msg.textContent = 'Não deu para baixar agora. Segure o dedo sobre a imagem para salvar.'; }
+    msg.scrollIntoView({ block:'nearest' }); return;
+  }
+  const c = e.target.closest('[data-copy]');
+  if (c){ const box = document.getElementById(c.dataset.copy), txt = [...box.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent).join('');
+    navigator.clipboard?.writeText(txt.trim()).then(() => c.textContent = 'Copiado').catch(() => { const r = document.createRange(); r.selectNodeContents(box); const s = getSelection(); s.removeAllRanges(); s.addRange(r); c.textContent = 'Selecionado'; }); }
+});
+const CK = 'dipa.plano.check';
+let marcado = {}; try { marcado = JSON.parse(localStorage.getItem(CK) || '{}'); } catch(e){}
+document.querySelectorAll('#check input').forEach(i => { i.checked = !!marcado[i.id]; i.closest('li').classList.toggle('ok', i.checked);
+  i.addEventListener('change', () => { marcado[i.id] = i.checked; i.closest('li').classList.toggle('ok', i.checked); try { localStorage.setItem(CK, JSON.stringify(marcado)); } catch(e){} }); });
+</script>
+</body>
+</html>

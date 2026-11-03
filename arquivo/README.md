@@ -1,3 +1,5 @@
+> **Arquivo.** Estudos antigos, guardados só para consulta: o conceito Travessia, os nomes e os símbolos testados. Nada aqui está em uso. O projeto atual está em `../dipa/` e `../ferramentas/`.
+
 # Travessia
 
 Marca-movimento contra a vida no piloto automático. Primeiro produto: **Travessia Norte**, uma jornada de 30 dias para uma turma fundadora de 15 pessoas.
