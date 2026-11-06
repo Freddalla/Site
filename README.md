@@ -13,7 +13,8 @@ Este repositório tem dois sites.
 | [`ferramentas/`](ferramentas/) | Plano de lançamento, Fábrica de Pílulas e as peças do Instagram | Só você |
 | [`arquivo/`](arquivo/) | Estudos antigos (Travessia, nomes e símbolos testados) | Só consulta |
 
-**Comece por aqui:** abra `ferramentas/plano-de-lancamento.html`. Ele explica o negócio, o que fazer agora e o calendário das primeiras semanas.
+**Comece por aqui:** [`BUSSOLA.md`](BUSSOLA.md). Lá estão o conceito, todas as decisões e o plano por fases.
+O `ferramentas/plano-de-lancamento.html` tem os detalhes práticos: legendas, peças e Apps Script.
 
 **O único arquivo que você precisa editar:** `dipa/config.js` (links de pagamento, planilha, pixel e e-mail).
 

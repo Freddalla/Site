@@ -430,7 +430,7 @@ function carregarExemplo(){
     S.dias[k] = { feito:{ pilula:true, med: i !== 3, diario:true }, checkin:{ ...ck, inferidos:[] }, ranking, idx:0, pilulaId:ranking[0], pergunta:pill(ranking[0]).pergunta,
                   grat:grats[i % 3], resposta:'(exemplo) Percebi que adio por medo de não estar pronto.', energia:Math.min(5, ck.energia), paz:Math.min(5, 2 + Math.round(r() * 2 + i / 7)), medMin: i !== 3 ? 5 : 0 };
   }
-  saveNow(); tab = 'hoje'; render();
+  ob = null; saveNow(); tab = 'hoje'; render();
 }
 
 /* ======================================================================
@@ -525,10 +525,21 @@ function renderHoje(){
       <div class="task-head"><span class="tag">À noite · fechar o dia</span>${D.feito.diario ? '<span class="done-mark">Registrado</span>' : ''}</div>
       <h3>Três motivos de gratidão de hoje</h3>
       <div class="grat">${[0,1,2].map(i => `<label for="g${i}"><b>${i+1}</b><input type="text" id="g${i}" data-grat="${i}" value="${esc(D.grat[i])}" placeholder="${esc(angulos[i])}…"></label>`).join('')}</div>
+      <label class="field" for="acendeu" style="margin-top:14px">O que te acendeu hoje?<input type="text" id="acendeu" data-dia="acendeu" value="${esc(D.acendeu || '')}" placeholder="Uma pessoa, um momento, uma frase…"></label>
       <label class="field" for="resposta" style="margin-top:14px">${esc(D.pergunta || P.pergunta)}<textarea id="resposta" data-dia="resposta" placeholder="Opcional. Ninguém mais lê.">${esc(D.resposta)}</textarea></label>
       <div><p class="mono" style="margin-bottom:6px">Paz no fim do dia</p><div class="scale" role="group" aria-label="Paz de 1 a 5">${[1,2,3,4,5].map(v => `<button type="button" data-escala="paz" data-v="${v}" aria-pressed="${D.paz === v}">${v}</button>`).join('')}</div></div>
       <button class="btn ${D.feito.diario ? '' : 'btn-primary'}" data-act="salvar-diario">${D.feito.diario ? 'Atualizar' : 'Fechar o dia'}</button>
       <p class="muted" id="diario-msg" style="font-size:.86rem" hidden></p>
+    </article>`;
+  if (new Date().getDay() === 0 || D.espelhoPara || D.espelhoDisse) h += `
+    <article class="card" id="espelho">
+      <div class="task-head"><span class="tag tide">Domingo · o espelho</span>${D.feito.espelho ? '<span class="done-mark">Feito</span>' : ''}</div>
+      <h3>Diga a uma pessoa a luz que você vê nela.</h3>
+      <p class="muted" style="font-size:.92rem">Ninguém vê a própria luz. Escolha alguém e diga, de verdade, o que você enxerga nela. Pode ser por mensagem. Não peça nada de volta.</p>
+      <label class="field" for="esp-para">Para quem<input type="text" id="esp-para" data-dia="espelhoPara" value="${esc(D.espelhoPara || '')}" placeholder="Um amigo, alguém da família, um colega…"></label>
+      <label class="field" for="esp-disse">O que você disse<textarea id="esp-disse" data-dia="espelhoDisse" placeholder="A luz que você vê nessa pessoa.">${esc(D.espelhoDisse || '')}</textarea></label>
+      <label class="field" for="esp-ouviu">Se ela devolveu algo, anote <small>Opcional. É o que ela viu em você.</small><textarea id="esp-ouviu" data-dia="espelhoOuviu">${esc(D.espelhoOuviu || '')}</textarea></label>
+      <label class="check ${D.feito.espelho ? 'done' : ''}"><input type="checkbox" data-feito="espelho" ${D.feito.espelho ? 'checked' : ''}><span>Eu disse</span></label>
     </article>`;
   if (feitos === 3) h += `<div class="card complete"><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 38a16 16 0 0 1 32 0"/><path d="M6 38h44"/><circle cx="28" cy="15" r="4" fill="currentColor" stroke="none"/></svg><h3>Dia completo.</h3><p class="muted">Agora o mais difícil: fechar a tela.</p></div>`;
   h += `</div>`;
@@ -604,7 +615,7 @@ function renderEvolucao(){
       ${ultimos.length ? ultimos.map(k => { const D = S.dias[k], P = D.pilulaId && pill(D.pilulaId); return `<details class="entry"><summary><span>${fmtDate(parseKey(k), {weekday:'short', day:'numeric', month:'short'})}</span><span class="mono">${nivel(k)}/3</span></summary>
         ${D.checkin ? `<p class="muted">Chegou ${esc(listaEstados(D.checkin.estados))}${D.checkin.texto ? ': “' + esc(D.checkin.texto) + '”' : ''}</p>` : ''}
         ${P ? `<p><em style="font-family:var(--display);font-size:1.1rem">${esc(P.mantra)}</em> <span class="muted">· ${esc(P.titulo)}</span></p>` : ''}
-        <ul>${D.grat.filter(g => g && g.trim()).map(g => `<li>${esc(g)}</li>`).join('')}</ul>${D.resposta ? `<p><em class="muted">${esc(D.pergunta || '')}</em><br>${esc(D.resposta)}</p>` : ''}</details>`; }).join('') : '<p class="muted">Seus registros vão aparecer aqui.</p>'}
+        <ul>${D.grat.filter(g => g && g.trim()).map(g => `<li>${esc(g)}</li>`).join('')}</ul>${D.acendeu ? `<p><em class="muted">O que me acendeu</em><br>${esc(D.acendeu)}</p>` : ''}${D.resposta ? `<p><em class="muted">${esc(D.pergunta || '')}</em><br>${esc(D.resposta)}</p>` : ''}${D.espelhoDisse ? `<p><em class="muted">Espelho${D.espelhoPara ? ' · para ' + esc(D.espelhoPara) : ''}</em><br>${esc(D.espelhoDisse)}${D.espelhoOuviu ? `<br><em class="muted">O que ouvi de volta:</em> ${esc(D.espelhoOuviu)}` : ''}</p>` : ''}</details>`; }).join('') : '<p class="muted">Seus registros vão aparecer aqui.</p>'}
     </section>
   </div>`;
   if (ui.revisao) setTimeout(() => document.getElementById('avaliacao')?.scrollIntoView({ behavior:'smooth', block:'start' }), 50);
