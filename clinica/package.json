@@ -1,0 +1,6 @@
+{
+  "name": "clinica",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node testes/interpretador.test.js" }
+}
