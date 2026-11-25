@@ -305,3 +305,8 @@ button.item:active, a.item:active { background: var(--rose-claro); }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 .placar.tres { grid-template-columns: 1fr 1fr 1fr; margin-bottom: 14px; }
 .placar.tres > div { padding: 12px 10px; }
+@media (max-width: 440px) {
+  .retorno .btn-whats { width: 46px; height: 46px; padding: 0; justify-content: center; border-radius: 50%; }
+  .retorno .btn-whats span { display: none; }
+  .retorno .btn-whats svg { width: 24px; height: 24px; }
+}

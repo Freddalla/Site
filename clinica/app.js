@@ -65,12 +65,14 @@ function aviso(msg, { rotulo, acao, tempo = 4200 } = {}) {
 
 /* folha que sobe de baixo; o botão "voltar" do celular fecha a folha */
 let folhaAberta = false;
+/* dentro de um quadro (prévia), o histórico é o da página de fora: não mexe nele */
+const usaHistorico = (() => { try { return window.self === window.top; } catch { return false; } })();
 function abrirFolha(html, montar) {
   const folha = $('#folha');
   folha.innerHTML = `<div class="folha-alca"></div>${html}`;
   folha.hidden = false; $('#fundo').hidden = false;
   document.body.style.overflow = 'hidden';
-  if (!folhaAberta) { history.pushState({ folha: true }, ''); folhaAberta = true; }
+  if (!folhaAberta) { if (usaHistorico) history.pushState({ folha: true }, ''); folhaAberta = true; }
   folha.scrollTop = 0;
   montar?.(folha);
   return folha;
@@ -80,7 +82,7 @@ function fecharFolha({ doHistorico = false } = {}) {
   folhaAberta = false;
   $('#folha').hidden = true; $('#fundo').hidden = true; $('#folha').innerHTML = '';
   document.body.style.overflow = '';
-  if (!doHistorico && history.state?.folha) history.back();
+  if (usaHistorico && !doHistorico && history.state?.folha) history.back();
 }
 window.addEventListener('popstate', () => { if (folhaAberta) fecharFolha({ doHistorico: true }); });
 $('#fundo').addEventListener('click', () => fecharFolha());
@@ -142,7 +144,7 @@ function htmlRetorno(a) {
   const link = linkWhats(a);
   const principal = a.whatsEm
     ? `<button class="btn pequeno secundario" data-acao="retorno-feito" data-id="${a.id}">✓ Feito</button>`
-    : link ? `<a class="btn-whats" href="${esc(link)}" target="_blank" rel="noopener" data-acao="whats" data-id="${a.id}">${SVG_WHATS}WhatsApp</a>`
+    : link ? `<a class="btn-whats" href="${esc(link)}" target="_blank" rel="noopener" data-acao="whats" data-id="${a.id}" aria-label="Mandar WhatsApp">${SVG_WHATS}<span>WhatsApp</span></a>`
     : `<button class="btn pequeno secundario" data-acao="paciente" data-id="${a.pacienteId}">Pôr telefone</button>`;
   return `<div class="retorno">
     <div class="item-icone">${ICONE_AREA[pr.area] || '🦷'}</div>
@@ -266,11 +268,12 @@ function telaInicio() {
     .sort((a, b) => (a.vencimento || a.data).localeCompare(b.vencimento || b.data));
   const receber = ativos(E.atendimentos).filter(a => a.status === 'a_receber').sort((a, b) => a.data.localeCompare(b.data));
   const faixas = [];
-  if (!instalado() && !E.aj.instalarDispensado) {
+  if (window.CLINICA_DEMO) faixas.push('<div class="faixa alerta"><p><strong>Prévia com dados de exemplo</strong>Pacientes e valores são fictícios. Pode lançar, editar e apagar à vontade: fica só neste navegador.</p></div>');
+  else if (!instalado() && !E.aj.instalarDispensado) {
     faixas.push(`<div class="faixa suave"><p><strong>Instale na tela inicial</strong>${ehIOS() ? 'No Safari, toque em Compartilhar e depois em "Adicionar à Tela de Início". Assim os dados ficam guardados com segurança.' : 'Fica como um aplicativo e os dados ficam guardados com segurança.'}</p>
       ${eventoInstalar ? '<button class="btn pequeno primario" data-acao="instalar">Instalar</button>' : ''}<button class="icone-btn" data-acao="dispensar-instalar" aria-label="Dispensar">${SVG_X}</button></div>`);
   }
-  if (temDados) {
+  if (temDados && !window.CLINICA_DEMO) {
     const dias = E.aj.ultimoBackup ? diasEntre(E.aj.ultimoBackup.slice(0, 10), hoje()) : null;
     if (dias === null || dias >= 7) {
       faixas.push(`<div class="faixa ${dias === null || dias >= 14 ? 'critico' : 'alerta'}"><p><strong>${dias === null ? 'Você ainda não fez backup' : `Último backup há ${dias} dias`}</strong>Os dados ficam só neste celular. Guarde uma cópia no Drive.</p><button class="btn pequeno primario" data-acao="backup">Fazer</button></div>`);
@@ -1220,6 +1223,10 @@ async function iniciar() {
   if (!E.aj.fixosIniciados) {
     for (const x of FIXOS_PADRAO) await salvarEm('fixos', { ...x });
     await ajustar('fixosIniciados', true);
+  }
+  /* prévia: preenche com dados de exemplo na primeira vez */
+  if (window.CLINICA_DEMO && !E.atendimentos.length && !E.despesas.length) {
+    try { await (await import('./demo.js')).semearExemplo(); await carregar(); } catch (e) { console.warn('exemplo', e); }
   }
   db.pedirPersistencia();
   travar();
