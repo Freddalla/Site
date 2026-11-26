@@ -24,7 +24,7 @@
   --alerta-claro: #fdf3e1;
   --critico: #b9473a;
   --critico-claro: #fbe9e6;
-  --serif: 'Cormorant Garamond', Georgia, serif;
+  --serif: 'EB Garamond', Garamond, Georgia, serif;
   --sans: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --r: 16px;
   --r-p: 10px;
@@ -89,7 +89,7 @@ a { color: inherit; }
 /* ---------- tela ---------- */
 #tela { display: block; max-width: 640px; margin: 0 auto; padding: 16px 16px 0; outline: none; }
 .titulo { font-family: var(--serif); font-size: 30px; font-weight: 600; line-height: 1.1; margin: 4px 0 14px; }
-.titulo em { font-style: italic; color: var(--suave); font-weight: 500; }
+.titulo em { display: block; font-size: .62em; font-style: italic; color: var(--suave); font-weight: 500; margin-top: 2px; }
 .secao { margin: 22px 0 10px; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
 .secao h2 { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--suave); }
 .secao a, .secao button.link { font-size: 14px; color: var(--receita); text-decoration: none; font-weight: 500; }
