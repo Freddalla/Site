@@ -1225,8 +1225,18 @@ async function iniciar() {
     await ajustar('fixosIniciados', true);
   }
   /* prévia: preenche com dados de exemplo na primeira vez */
-  if (window.CLINICA_DEMO && !E.atendimentos.length && !E.despesas.length) {
-    try { await (await import('./demo.js')).semearExemplo(); await carregar(); } catch (e) { console.warn('exemplo', e); }
+  if (window.CLINICA_DEMO) {
+    try {
+      const demo = await import('./demo.js');
+      /* exemplo novo publicado: troca o exemplo antigo guardado neste navegador */
+      if (E.aj.demoVersao !== demo.VERSAO_EXEMPLO) {
+        await db.esvaziarDados();
+        for (const x of FIXOS_PADRAO) await db.salvar('fixos', { ...x });
+        await demo.semearExemplo();
+        await ajustar('demoVersao', demo.VERSAO_EXEMPLO);
+        await carregar();
+      }
+    } catch (e) { console.warn('exemplo', e); }
   }
   db.pedirPersistencia();
   travar();

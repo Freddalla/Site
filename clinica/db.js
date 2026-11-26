@@ -180,6 +180,14 @@ export async function restaurarBackup(dados) {
   return total;
 }
 
+/* Só para a prévia de demonstração: esvazia as tabelas de dados (não toca nos ajustes) */
+export async function esvaziarDados() {
+  const db = await abrir();
+  for (const t of ['pacientes', 'atendimentos', 'despesas', 'fixos', 'anexos']) {
+    await new Promise((ok, erro) => { const tr = db.transaction(t, 'readwrite'); tr.objectStore(t).clear(); tr.oncomplete = ok; tr.onerror = () => erro(tr.error); });
+  }
+}
+
 /* Resumo de hash (para o PIN) */
 export async function hashTexto(texto) {
   const buf = await crypto.subtle.digest('SHA-256', enc.encode(texto));

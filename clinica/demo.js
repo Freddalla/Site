@@ -6,12 +6,17 @@
 import * as db from './db.js';
 import { hoje, somaDias, somaMeses, mesDe } from './dados.js';
 
+export const VERSAO_EXEMPLO = 2;
+
 export async function semearExemplo() {
   const h = hoje();
+  const inicioMes = mesDe(h) + '-01';
+  const noMes = atras => { const d = somaDias(h, -atras); return d < inicioMes ? inicioMes : d; };
   const pacientes = [
     ['Ana Beatriz Lima', '27999990001'], ['Juliana Reis', '27999990002'], ['Marcos Vieira', '27999990003'],
     ['Fernanda Costa', '27999990004'], ['Patrícia Alves', '27999990005'], ['Lucas Martins', '27999990006'],
-    ['Camila Duarte', '27999990007'], ['Roberta Nunes', '27999990008']
+    ['Camila Duarte', '27999990007'], ['Roberta Nunes', '27999990008'], ['Tatiana Moura', '27999990009'],
+    ['Renata Prado', '27999990010'], ['Gabriel Souza', '27999990011'], ['Helena Castro', '27999990012']
   ];
   const ids = [];
   for (const [nome, telefone] of pacientes) ids.push((await db.salvar('pacientes', { nome, telefone, aceitaWhats: true, exemplo: true })).id);
@@ -37,6 +42,18 @@ export async function semearExemplo() {
     const velho = retorno < somaDias(h, -20);
     await db.salvar('atendimentos', { pacienteId: ids[p], procedimento, area, data, valor, pagamento, taxa, status, retorno, retornoFeito: velho, parcelas: pagamento === 'parcelado' ? 3 : null, exemplo: true });
   }
+  /* mais atendimentos no mês atual: um mês bom, com lucro */
+  const doMes = [
+    [8, 'botox', 3, 1600, 'pix', 0, 120], [9, 'harmonizacao', 6, 3800, 'parcelado', 7, 150], [10, 'limpeza', 4, 280, 'pix', 0, 180],
+    [11, 'labial', 10, 1800, 'credito', 3.5, 270], [0, 'restauracao', 14, 400, 'pix', 0, 180], [1, 'clareamento', 16, 900, 'pix', 0, 180],
+    [3, 'botox', 18, 1500, 'pix', 0, 120], [5, 'limpeza', 20, 250, 'dinheiro', 0, 180]
+  ];
+  for (const [p, procedimento, atras, valor, pagamento, taxa, ret] of doMes) {
+    const data = noMes(atras);
+    const area = ['botox', 'labial', 'harmonizacao', 'bioestimulador'].includes(procedimento) ? 'estetica' : 'odonto';
+    await db.salvar('atendimentos', { pacienteId: ids[p], procedimento, area, data, valor, pagamento, taxa, status: 'recebido', retorno: somaDias(data, ret), retornoFeito: false, parcelas: pagamento === 'parcelado' ? 3 : null, exemplo: true });
+  }
+
   /* receita dos meses anteriores, para o gráfico de 6 meses */
   const mensal = [9800, 11200, 10400, 12900, 11800];
   for (let i = 1; i <= 5; i++) {
