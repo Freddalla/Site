@@ -1,5 +1,9 @@
 # Clínica · gestão do consultório da Dra. Rebeca
 
+> **O app mudou de endereço.** Agora ele mora no repositório [Gestao-Clinica-Rebeca/gestaoclinicarebeca](https://github.com/Gestao-Clinica-Rebeca/gestaoclinicarebeca)
+> e abre em https://gestao-clinica-rebeca.github.io/gestaoclinicarebeca/. Mudanças no app são feitas lá.
+> Esta pasta só fica para quem abriu o endereço antigo: sem dados, vai direto para o novo; com dados, mostra como fazer o backup e restaurar lá.
+
 App de celular (PWA) para:
 
 - lançar **despesas** e **receitas** falando, escrevendo ou tirando foto da nota ou do boleto;

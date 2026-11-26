@@ -268,8 +268,10 @@ function telaInicio() {
     .sort((a, b) => (a.vencimento || a.data).localeCompare(b.vencimento || b.data));
   const receber = ativos(E.atendimentos).filter(a => a.status === 'a_receber').sort((a, b) => a.data.localeCompare(b.data));
   const faixas = [];
+  if (window.CLINICA_NOVO_ENDERECO) faixas.push(`<div class="faixa critico"><p><strong>O app mudou de endereço</strong>Para levar o que você lançou aqui: 1) toque em Fazer backup; 2) abra o endereço novo, instale e vá em Ajustes → Restaurar.</p>
+    <span class="linha-flex"><button class="btn pequeno primario" data-acao="backup">Fazer backup</button><a class="btn pequeno secundario" href="${esc(window.CLINICA_NOVO_ENDERECO)}">Abrir o novo</a></span></div>`);
   if (window.CLINICA_DEMO) faixas.push('<div class="faixa alerta"><p><strong>Prévia com dados de exemplo</strong>Pacientes e valores são fictícios. Pode lançar, editar e apagar à vontade: fica só neste navegador.</p></div>');
-  else if (!instalado() && !E.aj.instalarDispensado) {
+  else if (!window.CLINICA_NOVO_ENDERECO && !instalado() && !E.aj.instalarDispensado) {
     faixas.push(`<div class="faixa suave"><p><strong>Instale na tela inicial</strong>${ehIOS() ? 'No Safari, toque em Compartilhar e depois em "Adicionar à Tela de Início". Assim os dados ficam guardados com segurança.' : 'Fica como um aplicativo e os dados ficam guardados com segurança.'}</p>
       ${eventoInstalar ? '<button class="btn pequeno primario" data-acao="instalar">Instalar</button>' : ''}<button class="icone-btn" data-acao="dispensar-instalar" aria-label="Dispensar">${SVG_X}</button></div>`);
   }
@@ -1218,6 +1220,11 @@ async function iniciar() {
     await carregar();
   } catch (e) {
     tela.innerHTML = `<div class="cartao pad"><p><strong>Não consegui abrir o banco de dados deste aparelho.</strong></p><p class="nota mt">${esc(e.message)}. Se estiver numa aba anônima, abra numa aba normal.</p></div>`;
+    return;
+  }
+  /* endereço antigo sem nada lançado: vai direto para o novo */
+  if (window.CLINICA_NOVO_ENDERECO && !E.atendimentos.length && !E.despesas.length && !E.pacientes.length) {
+    location.replace(window.CLINICA_NOVO_ENDERECO);
     return;
   }
   if (!E.aj.fixosIniciados) {

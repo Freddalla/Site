@@ -1,7 +1,7 @@
 /* CLÍNICA · service worker: o app abre mesmo sem internet.
    Rede primeiro (pega a versão nova quando há internet); sem internet, usa a cópia guardada.
    Ao mudar a lista de arquivos, aumente VERSAO. */
-const VERSAO = 'clinica-v1';
+const VERSAO = 'clinica-v2';
 const ARQUIVOS = ['./', 'index.html', 'app.css', 'app.js', 'dados.js', 'db.js', 'interpretador.js', 'ia.js',
   'manifest.webmanifest', 'icones/icone.svg', 'icones/icone-192.png', 'icones/apple-touch-icon.png'];
 

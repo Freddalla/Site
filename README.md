@@ -4,7 +4,7 @@ Este repositório tem dois sites.
 
 - **Raiz** (`index.html`, `styles.css`, `script.js`): o site da Dra. Rebeca. Não mexa nele junto com o Dipa.
 - **Dipa**: a marca, o diário e a comunidade.
-- **Clínica** ([`clinica/`](clinica/)): app de gestão do consultório da Dra. Rebeca (custos, receitas, lucro e retornos). Veja [`clinica/README.md`](clinica/README.md).
+- **Clínica**: o app de gestão do consultório da Dra. Rebeca mudou para o repositório [Gestao-Clinica-Rebeca/gestaoclinicarebeca](https://github.com/Gestao-Clinica-Rebeca/gestaoclinicarebeca). A pasta `clinica/` só leva quem abrir o endereço antigo para o novo.
 
 ## Dipa: onde está cada coisa
 
